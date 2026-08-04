@@ -157,7 +157,7 @@ export function OnlinePresenceSection({ showHeading = true }: Props) {
         ) : null}
       </div>
 
-      <p className="mt-4 text-sm text-[#9a8f82]">
+      <p className="mt-4 text-sm spark-text-supporting">
         Social posts use copy-and-paste: the app copies your text and opens your
         profile page so you can paste it there.
       </p>

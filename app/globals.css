@@ -13,11 +13,80 @@
   --spark-layer-popover: 1000;
   --spark-layer-modal: 1100;
   --spark-layer-dialog: 1200;
+
+  /*
+   * Shared readability & surface tokens — canonical text and work-surface
+   * levels for content over Estate backgrounds. Fixed regardless of OS
+   * color scheme (the Estate's own visual-mode system, see companion.css
+   * --cm-*, is the only thing that changes Estate light/dark presentation —
+   * this is not a dark-theme redesign). Text values are chosen to clear
+   * WCAG AA (4.5:1) against both white and the Estate's cream (#faf7f2)
+   * surfaces; only current adopters use these — the many pre-existing
+   * ad-hoc rgba()/hex values elsewhere are deliberately left alone for now.
+   */
+  --spark-text-primary: #1f1c19;
+  --spark-text-secondary: #6b635a;
+  --spark-text-supporting: #7a6f61;
+  --spark-text-disabled: #9a8f82;
+
+  --spark-surface-frosted-bg: rgba(255, 255, 255, 0.8);
+  --spark-surface-frosted-blur: 8px;
+  --spark-surface-frosted-strong-bg: rgba(255, 255, 255, 0.94);
+  --spark-surface-frosted-strong-blur: 16px;
+  --spark-surface-border: #d4cdc3;
+
+  --spark-surface-selected-bg: #f0f5f5;
+  --spark-surface-selected-border: #1e4f4f;
+  --spark-surface-disabled-bg: #f5f2ed;
+  --spark-surface-disabled-border: #e7dfd4;
+
+  --spark-focus-ring: #1e4f4f;
 }
 
 /* Temporary popovers and menus registered as kind "popover". */
 .spark-layer-popover {
   z-index: var(--spark-layer-popover);
+}
+
+/* Readable text levels — never rely on very low opacity for functional copy. */
+.spark-text-primary {
+  color: var(--spark-text-primary);
+}
+.spark-text-secondary {
+  color: var(--spark-text-secondary);
+}
+.spark-text-supporting {
+  color: var(--spark-text-supporting);
+}
+.spark-text-disabled {
+  color: var(--spark-text-disabled);
+}
+
+/* Frosted work surfaces. */
+.spark-surface-frosted {
+  background: var(--spark-surface-frosted-bg);
+  backdrop-filter: blur(var(--spark-surface-frosted-blur));
+  -webkit-backdrop-filter: blur(var(--spark-surface-frosted-blur));
+}
+.spark-surface-frosted-strong {
+  background: var(--spark-surface-frosted-strong-bg);
+  backdrop-filter: blur(var(--spark-surface-frosted-strong-blur));
+  -webkit-backdrop-filter: blur(var(--spark-surface-frosted-strong-blur));
+}
+.spark-surface-border {
+  border-color: var(--spark-surface-border);
+}
+.spark-surface-selected {
+  background: var(--spark-surface-selected-bg);
+  border-color: var(--spark-surface-selected-border);
+}
+.spark-surface-disabled {
+  background: var(--spark-surface-disabled-bg);
+  border-color: var(--spark-surface-disabled-border);
+}
+.spark-focus-ring:focus-visible {
+  outline: 2px solid var(--spark-focus-ring);
+  outline-offset: 2px;
 }
 
 @theme inline {

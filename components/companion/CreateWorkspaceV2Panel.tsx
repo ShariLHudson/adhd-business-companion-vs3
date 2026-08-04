@@ -176,16 +176,16 @@ function SectionCard({
       aria-label={`${section.label} — ${onOpenSection ? "open section" : "drag to reorder"}`}
       data-testid={`workshop-map-row-${section.id}`}
       data-active-focus={isActiveFocus ? "true" : undefined}
-      className={`rounded-xl border px-3 py-3 transition-colors ${
+      className={`spark-focus-ring rounded-xl border px-3 py-3 transition-colors ${
         isDragging
           ? "cursor-grabbing border-[#1e4f4f]/40 bg-[#f0f5f5] opacity-60 shadow-md"
           : section.skipped
-            ? "border-[#e7dfd4] bg-[#f5f2ed] opacity-80"
+            ? "spark-surface-disabled opacity-80"
             : isActiveFocus || pulseHighlight
-              ? "border-[#1e4f4f] bg-[#f0f5f5] ring-2 ring-[#1e4f4f]/35"
+              ? "spark-surface-selected ring-2 ring-[#1e4f4f]/35"
               : isDragTarget
                 ? "border-[#1e4f4f] bg-[#f0f5f5] ring-2 ring-[#1e4f4f]/20"
-                : "border-[#d4cdc3] bg-white"
+                : "spark-surface-border bg-white"
       } ${onOpenSection ? "cursor-pointer hover:border-[#1e4f4f]/40" : ""}`}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
@@ -194,7 +194,7 @@ function SectionCard({
       <div className="flex items-stretch gap-2">
         {!onOpenSection ? (
           <div
-            className="flex w-7 shrink-0 cursor-grab flex-col items-center justify-center rounded-lg text-[#9a8f82] hover:bg-[#f5f2ed] active:cursor-grabbing"
+            className="flex w-7 shrink-0 cursor-grab flex-col items-center justify-center rounded-lg spark-text-disabled hover:bg-[#f5f2ed] active:cursor-grabbing"
             title="Drag to reorder"
             aria-hidden
           >
@@ -313,7 +313,7 @@ function SectionCard({
           </div>
 
           {section.skipped ? (
-            <p className="mt-2 text-sm italic text-[#9a8f82]">
+            <p className="mt-2 text-sm italic spark-text-supporting">
               Marked N/A — skipped in your draft.
             </p>
           ) : (
@@ -424,7 +424,7 @@ export function CreateWorkspaceV2Panel({
             className="rounded-2xl border border-[#c9bfb0] bg-white/90 px-4 py-3"
             data-testid="workspace-draft-present"
           >
-            <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
+            <p className="text-xs font-bold uppercase tracking-wide spark-text-supporting">
               Working draft
             </p>
             <div className="mt-2 max-h-[40vh] overflow-y-auto whitespace-pre-wrap text-sm leading-relaxed text-[#1f1c19]">
@@ -493,7 +493,7 @@ export function CreateWorkspaceV2Panel({
         }
       >
         {estatePresentation ? null : (
-          <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
+          <p className="text-xs font-bold uppercase tracking-wide spark-text-supporting">
             Your workspace
           </p>
         )}
@@ -542,18 +542,18 @@ export function CreateWorkspaceV2Panel({
           </p>
         ) : (
           <>
-        <p className="mt-2 text-sm leading-relaxed text-[#6b635a]">
+        <p className="mt-2 text-sm leading-relaxed spark-text-secondary">
           {isEventWorkspace
             ? "Your foundation is already here. We shape the next pieces together — only what you confirm fills each box."
             : "Sections start empty — we shape them together. Share what you know in the conversation; only what you confirm fills each box. When you're ready,"}{" "}
           {!isEventWorkspace ? (
             <>
-              <span className="font-semibold text-[#1f1c19]"> Build Draft</span> turns your
+              <span className="font-semibold spark-text-primary"> Build Draft</span> turns your
               notes into a working draft you can keep shaping, print, or export.
             </>
           ) : null}
         </p>
-        <p className="mt-1 text-xs text-[#9a8f82]">
+        <p className="mt-1 text-xs spark-text-supporting">
           {filledCount} of {sections.length} sections have content or are N/A · drag a
           section or use ↑ ↓ to reorder
         </p>
@@ -724,7 +724,7 @@ export function CreateWorkspaceV2Panel({
           ) : null}
           {savedBlueprints.length > 0 ? (
             <div className="mt-3">
-              <label className="text-xs font-semibold uppercase tracking-wide text-[#9a8f82]">
+              <label className="text-xs font-semibold uppercase tracking-wide spark-text-supporting">
                 Load saved blueprint
               </label>
               <select
@@ -781,11 +781,11 @@ export function CreateWorkspaceV2Panel({
             </button>
           ) : null}
           {!canBuild ? (
-            <p className="mt-2 text-center text-xs leading-relaxed text-[#9a8f82]">
+            <p className="mt-2 text-center text-xs leading-relaxed spark-text-supporting">
               Add content to at least one section (or mark sections N/A), then build.
             </p>
           ) : (
-            <p className="mt-2 text-center text-xs leading-relaxed text-[#9a8f82]">
+            <p className="mt-2 text-center text-xs leading-relaxed spark-text-supporting">
               After the draft appears, you can edit, add, print, copy, or export.
             </p>
           )}
