@@ -13,6 +13,11 @@ export type UseExclusivePopoverOptions = {
   rootRef: RefObject<HTMLElement | null>;
   /** Control that opened it; focus returns here on close. */
   triggerRef: RefObject<HTMLElement | null>;
+  /**
+   * CSS selector for panel content portaled outside `rootRef`.
+   * Presses matching it count as inside.
+   */
+  outsideClickIgnore?: string;
 };
 
 /**
@@ -35,11 +40,13 @@ export function useExclusivePopover({
   onClose,
   rootRef,
   triggerRef,
+  outsideClickIgnore,
 }: UseExclusivePopoverOptions) {
   const { requestClose } = useDismissibleWindow({
     open,
     onClose,
     outsideClickRef: rootRef,
+    outsideClickIgnore,
     overlayId,
     overlayKind: "popover",
   });

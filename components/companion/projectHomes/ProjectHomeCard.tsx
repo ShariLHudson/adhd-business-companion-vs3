@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  useEffect,
   useId,
   useRef,
   useState,
   type MouseEvent as ReactMouseEvent,
 } from "react";
+import { useExclusivePopover } from "@/lib/windowDismiss/useExclusivePopover";
 import {
   formatProjectHomeDate,
   getProjectHomeRoom,
@@ -40,29 +40,21 @@ export function ProjectHomeCard({ project, onOpen, onAction }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const menuId = useId();
 
-  useEffect(() => {
-    if (!menuOpen) return;
-    function onDocPointer(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-        setConfirmDelete(false);
-      }
-    }
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setMenuOpen(false);
-        setConfirmDelete(false);
-      }
-    }
-    document.addEventListener("mousedown", onDocPointer);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDocPointer);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [menuOpen]);
+  // Escape, outside-click, exclusivity and focus return are shared behavior.
+  // Closing also clears the inline delete confirmation, as it always has.
+  useExclusivePopover({
+    overlayId: `project-home-card-menu:${project.id}`,
+    open: menuOpen,
+    onClose: () => {
+      setMenuOpen(false);
+      setConfirmDelete(false);
+    },
+    rootRef: menuRef,
+    triggerRef,
+  });
 
   function handleCardActivate() {
     onOpen(project.id);
@@ -128,6 +120,7 @@ export function ProjectHomeCard({ project, onOpen, onAction }: Props) {
           )}
           <span className="project-home-card__menu" ref={menuRef}>
             <button
+              ref={triggerRef}
               type="button"
               className="project-home-card__options"
               aria-label={`Options for ${project.name}`}

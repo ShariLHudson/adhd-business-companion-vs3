@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { useExclusivePopover } from "@/lib/windowDismiss/useExclusivePopover";
 import { GardenBannerDropdown } from "@/components/companion/peacefulPlaces/GardenBannerDropdown";
 import { GardenFlagPhoto } from "@/components/companion/peacefulPlaces/GardenFlagPhoto";
 import { gardenFlagPlaqueFor } from "@/lib/peacefulPlaces/gardenFlagMarkers";
@@ -36,8 +37,24 @@ export function GardenFlagStake({
   children,
 }: Props) {
   const flagRef = useRef<HTMLButtonElement>(null);
+  const stakeRef = useRef<HTMLDivElement>(null);
   const photo = gardenFlagPhotoFor(id);
   const plaque = gardenFlagPlaqueFor(id);
+
+  /**
+   * Adds Escape and outside-click (there were none) plus focus return, and
+   * joins the registry so another popover opening closes this banner.
+   * Hover behavior is untouched — onToggle still owns open/close.
+   * The dropdown portals to <body>, so it is declared as owned content.
+   */
+  useExclusivePopover({
+    overlayId: `garden-banner:${id}`,
+    open,
+    onClose: onToggle,
+    rootRef: stakeRef,
+    triggerRef: flagRef,
+    outsideClickIgnore: "[data-garden-banner-dropdown]",
+  });
 
   function handleToggle(e: PointerEvent<HTMLButtonElement>) {
     e.stopPropagation();
@@ -46,6 +63,7 @@ export function GardenFlagStake({
 
   return (
     <div
+      ref={stakeRef}
       className={`pathway-garden-stake pathway-garden-stake--${side}`}
       data-sign-id={id}
       data-open={open ? "1" : undefined}

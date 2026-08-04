@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { useExclusivePopover } from "@/lib/windowDismiss/useExclusivePopover";
 import { PROJECTS_CONTINUE_LABEL } from "@/lib/projects/activeWork/copy";
 import type { ActiveWorkCardModel } from "@/lib/projects/activeWork/types";
 import { formatProjectHomeDate } from "@/lib/projectHomes/sampleProjects";
@@ -35,29 +36,21 @@ export function ActiveWorkCard({
   const [confirmTrash, setConfirmTrash] = useState(false);
   const [renameDraft, setRenameDraft] = useState(work.name);
   const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const showMenu = Boolean(onRename || onArchive || trashHandler);
 
-  useEffect(() => {
-    if (!menuOpen) return;
-    function onDocPointer(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-        setConfirmTrash(false);
-      }
-    }
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setMenuOpen(false);
-        setConfirmTrash(false);
-      }
-    }
-    document.addEventListener("mousedown", onDocPointer);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDocPointer);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [menuOpen]);
+  // Escape, outside-click, exclusivity and focus return are shared behavior.
+  // Closing also clears the inline trash confirmation, as it always has.
+  useExclusivePopover({
+    overlayId: `active-work-card-menu:${work.id}`,
+    open: menuOpen,
+    onClose: () => {
+      setMenuOpen(false);
+      setConfirmTrash(false);
+    },
+    rootRef: menuRef,
+    triggerRef,
+  });
 
   return (
     <article
@@ -96,9 +89,11 @@ export function ActiveWorkCard({
           {showMenu ? (
             <div className="relative shrink-0" ref={menuRef}>
               <button
+                ref={triggerRef}
                 type="button"
                 className="rounded px-2 py-1 text-sm text-[#6b635a]"
                 aria-label="Work options"
+                aria-haspopup="menu"
                 aria-expanded={menuOpen}
                 data-testid={`active-work-menu-${work.id}`}
                 onClick={() => {
@@ -110,8 +105,9 @@ export function ActiveWorkCard({
               </button>
               {menuOpen ? (
                 <div
-                  className="absolute right-0 z-10 mt-1 min-w-[11rem] rounded-lg border border-[#d4cdc3] bg-white p-1 shadow-md"
+                  className="spark-layer-popover absolute right-0 mt-1 min-w-[11rem] rounded-lg border border-[#d4cdc3] bg-white p-1 shadow-md"
                   role="menu"
+                  data-testid={`active-work-menu-panel-${work.id}`}
                 >
                   {confirmTrash ? (
                     <div

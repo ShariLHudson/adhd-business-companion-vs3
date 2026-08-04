@@ -59,6 +59,12 @@ export type UseDismissibleWindowOptions = {
   overlayId?: string;
   /** What this surface is. Required alongside `overlayId`. */
   overlayKind?: OverlayKind;
+  /**
+   * CSS selector for content that belongs to this window but lives outside
+   * `outsideClickRef` in the DOM — typically a panel portaled to `document.body`.
+   * Pointer presses matching it count as inside.
+   */
+  outsideClickIgnore?: string;
 };
 
 /**
@@ -77,6 +83,7 @@ export function useDismissibleWindow({
   closeOnOutsideClick = true,
   overlayId,
   overlayKind,
+  outsideClickIgnore,
 }: UseDismissibleWindowOptions) {
   const reactId = useId();
   const windowIdRef = useRef(`${createDismissibleWindowId()}-${reactId}`);
@@ -180,6 +187,15 @@ export function useDismissibleWindow({
       if (!(target instanceof Node)) return;
       if (container.contains(target)) return;
 
+      // Content this window owns but portals elsewhere in the DOM.
+      if (
+        outsideClickIgnore &&
+        target instanceof Element &&
+        target.closest(outsideClickIgnore)
+      ) {
+        return;
+      }
+
       // Scrollbar track/thumb is not an outside click (106). Only an element
       // that actually overflows can own a scrollbar — checking that first
       // keeps zero-layout elements from matching the geometry test.
@@ -214,7 +230,14 @@ export function useDismissibleWindow({
       document.removeEventListener("mousedown", onPointerDown, true);
       document.removeEventListener("touchstart", onPointerDown, true);
     };
-  }, [open, enabled, closeOnOutsideClick, outsideClickRef, requestClose]);
+  }, [
+    open,
+    enabled,
+    closeOnOutsideClick,
+    outsideClickRef,
+    outsideClickIgnore,
+    requestClose,
+  ]);
 
   const onBackdropClick = useCallback(
     (event?: { stopPropagation?: () => void }) => {

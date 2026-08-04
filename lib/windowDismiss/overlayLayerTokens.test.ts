@@ -52,6 +52,27 @@ describe("migrated adopters use the shared layer", () => {
     expect(source).toContain("spark-layer-popover");
     expect(source).not.toMatch(/\bz-\d+\b/);
   });
+
+  it("ActiveWorkCard menu uses the class, not a hard-coded z-index", () => {
+    const source = read("components/companion/projectHomes/ActiveWorkCard.tsx");
+    expect(source).toContain("spark-layer-popover");
+    expect(source).not.toMatch(/\bz-\d+\b/);
+  });
+
+  it("ProjectHomeCard menu panel reads the token from CSS", () => {
+    const css = read("app/companion/project-homes.css");
+    expect(css).toMatch(
+      /\.project-home-card__menu-panel\s*\{[\s\S]*?z-index:\s*var\(--spark-layer-popover/,
+    );
+  });
+
+  it("GardenBannerDropdown reads the token instead of z-index 9999", () => {
+    const source = read(
+      "components/companion/peacefulPlaces/GardenBannerDropdown.tsx",
+    );
+    expect(source).toContain("var(--spark-layer-popover");
+    expect(source).not.toMatch(/zIndex:\s*9999/);
+  });
 });
 
 describe("migrated adopters share the popover behavior hook", () => {
@@ -59,6 +80,9 @@ describe("migrated adopters share the popover behavior hook", () => {
     "components/companion/library/LibraryItemActionMenu.tsx",
     "components/companion/DraftDropdownMenu.tsx",
     "components/companion/CreateOptionsMenu.tsx",
+    "components/companion/projectHomes/ProjectHomeCard.tsx",
+    "components/companion/projectHomes/ActiveWorkCard.tsx",
+    "components/companion/peacefulPlaces/GardenFlagStake.tsx",
   ];
 
   it.each(adopters)("%s uses useExclusivePopover", (path) => {

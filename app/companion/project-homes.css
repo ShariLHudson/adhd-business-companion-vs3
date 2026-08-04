@@ -355,11 +355,12 @@
   outline-offset: 2px;
 }
 
+/* Shared popover layer — see :root in app/globals.css. */
 .project-home-card__menu-panel {
   position: absolute;
   top: calc(100% + 0.35rem);
   right: 0;
-  z-index: 5;
+  z-index: var(--spark-layer-popover, 5);
   min-width: 10.5rem;
   padding: 0.35rem;
   border-radius: 0.75rem;

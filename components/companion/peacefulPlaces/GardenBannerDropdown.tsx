@@ -88,7 +88,8 @@ export function GardenBannerDropdown({
         position: "fixed",
         top: position.top,
         left: position.left,
-        zIndex: 9999,
+        // Shared popover layer — see :root in app/globals.css.
+        zIndex: "var(--spark-layer-popover, 9999)" as unknown as number,
       }}
       onPointerEnter={onMenuPointerEnter}
       onPointerLeave={onMenuPointerLeave}
