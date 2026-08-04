@@ -23,6 +23,11 @@ Transform Create from a category picker into a conversational creation entry poi
 8. Never ask the user to decide where work belongs
 9. Keep Create, Projects, Shari, Chamber, and Board synchronized through the same Creation Context
 10. Continue Existing Work displays active Creation Workspaces — not only document drafts
+11. Every individual section of every creation offers Section Research — one reusable
+    section-level research component (research this section · view saved research ·
+    add selected findings · save to Evidence Vault · save for later), designed in
+    [076-061 Section-Level Research Component](./076_research_v2/076_061_SECTION_LEVEL_RESEARCH_COMPONENT.md).
+    **Design approved; not yet implemented.**
 
 ## Global Platform Rule (binding)
 
