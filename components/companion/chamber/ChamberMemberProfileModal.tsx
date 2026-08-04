@@ -55,7 +55,7 @@ export function ChamberMemberProfileModal({
         type="button"
         className="chamber-member-profile__backdrop"
         aria-label="Close member profile"
-        onClick={() => onBackdropClick()}
+        onClick={onBackdropClick}
         tabIndex={-1}
       />
       <div

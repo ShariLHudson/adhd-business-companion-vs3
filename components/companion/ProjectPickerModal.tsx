@@ -65,7 +65,7 @@ export function ProjectPickerModal({
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4"
       role="presentation"
-      onClick={() => onBackdropClick()}
+      onClick={onBackdropClick}
     >
       <div
         className="max-h-[80vh] w-full max-w-md overflow-hidden rounded-2xl border border-[#e7dfd4] bg-[#faf7f2] shadow-xl"

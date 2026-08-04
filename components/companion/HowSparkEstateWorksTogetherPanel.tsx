@@ -81,7 +81,7 @@ export function HowSparkEstateWorksTogetherPanel({
       className="how-estate-works"
       data-testid="how-spark-estate-works-together"
       role="presentation"
-      onClick={() => onBackdropClick()}
+      onClick={onBackdropClick}
     >
       <div
         className="how-estate-works__surface"

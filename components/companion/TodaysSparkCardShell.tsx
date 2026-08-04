@@ -159,7 +159,7 @@ export function TodaysSparkCardShell({
       aria-label={`Today's Spark: ${presentation.title}. Click outside the card to close.`}
       data-testid="todays-spark-card"
       tabIndex={-1}
-      onClick={() => onBackdropClick()}
+      onClick={onBackdropClick}
     >
       <article
         className="tsc-card"

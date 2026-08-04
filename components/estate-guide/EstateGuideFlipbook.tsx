@@ -274,7 +274,7 @@ export function EstateGuideFlipbook({
         className="eg-flipbook__backdrop"
         aria-label="Close Spark Estate Guide"
         data-testid="estate-guide-backdrop"
-        onClick={(event) => onBackdropClick(event)}
+        onClick={onBackdropClick}
       />
 
       <button

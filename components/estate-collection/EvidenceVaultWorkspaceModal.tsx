@@ -77,7 +77,7 @@ export function EvidenceVaultWorkspaceModal({
           .filter(Boolean)
           .join(" ")}
         aria-label="Close vault panel"
-        onClick={() => onBackdropClick()}
+        onClick={onBackdropClick}
         tabIndex={-1}
       />
       <div

@@ -239,12 +239,74 @@ export function useDismissibleWindow({
     requestClose,
   ]);
 
+  /**
+   * Backdrop / scrim press. Structurally typed so a React MouseEvent can be
+   * passed straight through, and so the long-standing `onBackdropClick()`
+   * no-argument call still compiles.
+   *
+   * Without an event only the stack and policy checks apply; with one, the
+   * press must have landed directly on the backdrop itself. Returns true when
+   * the window actually closed.
+   */
   const onBackdropClick = useCallback(
-    (event?: { stopPropagation?: () => void }) => {
+    (event?: {
+      stopPropagation?: () => void;
+      target?: unknown;
+      currentTarget?: unknown;
+      clientX?: number;
+      clientY?: number;
+    }): boolean => {
       event?.stopPropagation?.();
-      requestClose();
+
+      // A backdrop beneath another layer must not steal the dismissal.
+      if (!isTopDismissibleWindow(windowIdRef.current)) return false;
+
+      if (event) {
+        const { target, currentTarget } = event;
+
+        /**
+         * Only a press that landed on the backdrop element itself dismisses.
+         * Anything deeper — panel content, or a React portal that bubbles
+         * through the component tree rather than the DOM — is inside.
+         */
+        if (target && currentTarget && target !== currentTarget) return false;
+
+        // Scrollbar track/thumb on the backdrop is not a dismissal (106).
+        if (
+          currentTarget instanceof Element &&
+          typeof event.clientX === "number" &&
+          (currentTarget.scrollHeight > currentTarget.clientHeight ||
+            currentTarget.scrollWidth > currentTarget.clientWidth) &&
+          isScrollbarPointerTarget(
+            { clientX: event.clientX, clientY: event.clientY, target: currentTarget },
+            currentTarget,
+          )
+        ) {
+          return false;
+        }
+
+        // Recognized portaled controls owned by this window.
+        if (
+          target instanceof HTMLElement &&
+          target.closest(
+            '[role="listbox"], [role="combobox"][aria-expanded="true"], [data-radix-popper-content-wrapper]',
+          )
+        ) {
+          return false;
+        }
+        if (
+          outsideClickIgnore &&
+          target instanceof Element &&
+          target.closest(outsideClickIgnore)
+        ) {
+          return false;
+        }
+      }
+
+      // Uploads, active operations, explicit decisions, dirty work, voice.
+      return requestClose();
     },
-    [requestClose],
+    [requestClose, outsideClickIgnore],
   );
 
   return {

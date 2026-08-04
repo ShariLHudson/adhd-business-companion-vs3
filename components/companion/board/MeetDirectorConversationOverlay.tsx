@@ -109,7 +109,7 @@ export function MeetDirectorConversationOverlay({
         className="meet-director-overlay__backdrop"
         aria-label="Return to Director profile"
         data-testid="meet-director-backdrop"
-        onClick={() => onBackdropClick()}
+        onClick={onBackdropClick}
         tabIndex={-1}
       />
 

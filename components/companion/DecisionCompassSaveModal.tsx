@@ -77,7 +77,7 @@ export function DecisionCompassSaveModal({
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4"
         data-testid="decision-compass-save-modal"
         role="presentation"
-        onClick={() => onBackdropClick()}
+        onClick={onBackdropClick}
       >
         <div
           className="w-full max-w-md rounded-2xl border border-[#e7dfd4] bg-[#faf7f2] p-5 shadow-xl"

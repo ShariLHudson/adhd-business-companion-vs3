@@ -489,7 +489,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
         <div
           className="spark-note-expanded__backdrop"
           aria-hidden
-          onClick={() => onBackdropClick()}
+          onClick={onBackdropClick}
         />
         <div className="spark-note-expanded__card spark-note-expanded__card--saved">
           <SparkCardOrnaments />
@@ -540,7 +540,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
       <div
         className="spark-note-expanded__backdrop"
         aria-hidden
-        onClick={() => onBackdropClick()}
+        onClick={onBackdropClick}
       />
       <article
         className="spark-note-expanded__card spark-note-expanded__card--keepsake"

@@ -78,7 +78,7 @@ export function RoundTableOverlay({
         className="round-table-overlay__scrim"
         aria-label="Close Round Table"
         data-testid="round-table-overlay-scrim"
-        onClick={() => onBackdropClick()}
+        onClick={onBackdropClick}
         tabIndex={-1}
       />
 

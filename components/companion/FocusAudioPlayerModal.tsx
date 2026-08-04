@@ -51,7 +51,7 @@ export function FocusAudioPlayerModal({ playback, onClose }: Props) {
       <button
         type="button"
         aria-label="Close soundscape"
-        onClick={() => onBackdropClick()}
+        onClick={onBackdropClick}
         className="absolute inset-0 bg-black/45"
       />
       <div

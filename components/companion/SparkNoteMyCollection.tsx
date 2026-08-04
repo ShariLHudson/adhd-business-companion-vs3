@@ -182,7 +182,7 @@ export function SparkNoteMyCollection({
       <div
         className="spark-note-collection__backdrop"
         aria-hidden
-        onClick={() => onBackdropClick()}
+        onClick={onBackdropClick}
       />
 
       <div className="spark-note-collection__card">
