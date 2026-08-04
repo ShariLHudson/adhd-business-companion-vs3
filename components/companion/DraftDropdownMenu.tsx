@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
+import { useExclusivePopover } from "@/lib/windowDismiss/useExclusivePopover";
 import type { DraftMenuGroup } from "@/lib/createDraftActions";
 import { MENU_DROPDOWN_ITEM, MENU_SECTION_HEADING, MENU_TEXT } from "@/lib/menuNavStyles";
 
@@ -22,15 +23,18 @@ export function DraftDropdownMenu({
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const instanceId = useId();
 
-  useEffect(() => {
-    if (!open) return;
-    function onDocClick(e: MouseEvent) {
-      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
-    }
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, [open]);
+  // Several of these render side by side in one bar, so the id is per instance.
+  // Adds Escape (there was none) plus focus return, and joins the registry.
+  useExclusivePopover({
+    overlayId: `draft-dropdown:${label}:${instanceId}`,
+    open,
+    onClose: () => setOpen(false),
+    rootRef,
+    triggerRef,
+  });
 
   function pick(id: string) {
     setOpen(false);
@@ -40,6 +44,7 @@ export function DraftDropdownMenu({
   return (
     <div ref={rootRef} className="relative">
       <button
+        ref={triggerRef}
         type="button"
         disabled={disabled}
         onClick={() => setOpen((v) => !v)}
@@ -52,7 +57,8 @@ export function DraftDropdownMenu({
       {open ? (
         <div
           role="menu"
-          className={`absolute z-40 mt-1 max-h-[min(70vh,28rem)] min-w-[14rem] overflow-y-auto rounded-xl border border-[#d4cdc3] bg-white py-1 shadow-lg ${
+          data-testid="draft-dropdown-panel"
+          className={`spark-layer-popover absolute mt-1 max-h-[min(70vh,28rem)] min-w-[14rem] overflow-y-auto rounded-xl border border-[#d4cdc3] bg-white py-1 shadow-lg ${
             align === "right" ? "right-0" : "left-0"
           }`}
         >

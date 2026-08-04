@@ -1,13 +1,13 @@
 "use client";
 
 import {
-  useEffect,
   useId,
   useRef,
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
 } from "react";
+import { useExclusivePopover } from "@/lib/windowDismiss/useExclusivePopover";
 import {
   labelForLibraryAction,
   menuActionsForItem,
@@ -32,26 +32,14 @@ export function LibraryItemActionMenu({ item, onAction }: Props) {
   const menuId = useId();
   const actions = menuActionsForItem(item);
 
-  useEffect(() => {
-    if (!open) return;
-    function onDoc(e: MouseEvent) {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setOpen(false);
-        triggerRef.current?.focus();
-      }
-    }
-    document.addEventListener("mousedown", onDoc);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDoc);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
+  // Escape, outside-click, exclusivity and focus return are shared behavior.
+  useExclusivePopover({
+    overlayId: `library-item-menu:${item.id}`,
+    open,
+    onClose: () => setOpen(false),
+    rootRef,
+    triggerRef,
+  });
 
   function stopCardOpen(e: ReactMouseEvent | ReactKeyboardEvent) {
     e.stopPropagation();

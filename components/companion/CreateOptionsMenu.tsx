@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
+import { useExclusivePopover } from "@/lib/windowDismiss/useExclusivePopover";
 import { MENU_DROPDOWN_ITEM, MENU_TEXT } from "@/lib/menuNavStyles";
 
 export type CreateOptionsAction =
@@ -32,15 +33,17 @@ export function CreateOptionsMenu({
 }: CreateOptionsMenuProps) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const instanceId = useId();
 
-  useEffect(() => {
-    if (!open) return;
-    function onDocClick(e: MouseEvent) {
-      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
-    }
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, [open]);
+  // Adds Escape (there was none) plus focus return, and joins the registry.
+  useExclusivePopover({
+    overlayId: `create-options-menu:${instanceId}`,
+    open,
+    onClose: () => setOpen(false),
+    rootRef,
+    triggerRef,
+  });
 
   function pick(action: CreateOptionsAction) {
     setOpen(false);
@@ -50,6 +53,7 @@ export function CreateOptionsMenu({
   return (
     <div ref={rootRef} className={`relative ${className}`}>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
@@ -61,7 +65,8 @@ export function CreateOptionsMenu({
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 z-30 mt-1 min-w-[11rem] overflow-hidden rounded-xl border border-[#d4cdc3] bg-white py-1 shadow-lg"
+          data-testid="create-options-menu-panel"
+          className="spark-layer-popover absolute right-0 mt-1 min-w-[11rem] overflow-hidden rounded-xl border border-[#d4cdc3] bg-white py-1 shadow-lg"
         >
           {ITEMS.map((item) => {
             const disabled =

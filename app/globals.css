@@ -3,6 +3,21 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /*
+   * Shared overlay layer scale — paint order must agree with the overlay
+   * registry's kinds (lib/windowDismiss/overlayRegistry.ts).
+   * Only the layers current adopters need are defined; the existing ad-hoc
+   * z-index values elsewhere are deliberately left alone for now.
+   */
+  --spark-layer-popover: 1000;
+  --spark-layer-modal: 1100;
+  --spark-layer-dialog: 1200;
+}
+
+/* Temporary popovers and menus registered as kind "popover". */
+.spark-layer-popover {
+  z-index: var(--spark-layer-popover);
 }
 
 @theme inline {
