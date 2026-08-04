@@ -94,7 +94,7 @@ export function CompanionBackground({
       {photoUrl ? (
         <div
           key={photoUrl}
-          className={`${SCENE_BG_IMAGE_CLASS} companion-bg-scene absolute inset-0 ${clearMyMind ? "" : "companion-scene-fade transition-opacity duration-700"}`}
+          className={`${SCENE_BG_IMAGE_CLASS} companion-bg-scene spark-readability-scene absolute inset-0 ${clearMyMind ? "" : "companion-scene-fade transition-opacity duration-700"}`}
           style={{
             backgroundImage: `url('${photoUrl}')`,
             opacity: clearMyMind ? "1" : undefined,

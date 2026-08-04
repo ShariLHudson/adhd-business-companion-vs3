@@ -245,7 +245,7 @@ export function WelcomeRoomPanel({
                   <img
                     src={WELCOME_ROOM_ASSET}
                     alt=""
-                    className="welcome-room__photo"
+                    className="welcome-room__photo spark-readability-scene"
                     style={{
                       objectPosition: arrival.dolly.objectPosition,
                       objectFit: arrival.dolly.objectFit,

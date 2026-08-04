@@ -240,7 +240,7 @@ export function WelcomeHomePage({
                   <img
                     src={heroImageUrl}
                     alt=""
-                    className="welcome-room__photo welcome-home-page__photo"
+                    className="welcome-room__photo welcome-home-page__photo spark-readability-scene"
                     style={{
                       objectPosition: roomDolly.objectPosition,
                       objectFit: roomDolly.objectFit,

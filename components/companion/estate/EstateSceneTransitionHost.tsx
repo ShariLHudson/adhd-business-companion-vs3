@@ -52,7 +52,7 @@ export function EstateSceneTransitionHost() {
           key={`out-${scene.outgoing!.imageUrl}`}
           src={scene.outgoing!.imageUrl}
           alt=""
-          className="estate-scene-transition-host__plate estate-scene-transition-host__plate--outgoing"
+          className="estate-scene-transition-host__plate spark-readability-scene estate-scene-transition-host__plate--outgoing"
           decoding="async"
         />
       ) : null}
@@ -63,7 +63,7 @@ export function EstateSceneTransitionHost() {
           key={`hold-${scene.active!.imageUrl}`}
           src={scene.active!.imageUrl}
           alt=""
-          className="estate-scene-transition-host__plate estate-scene-transition-host__plate--hold"
+          className="estate-scene-transition-host__plate spark-readability-scene estate-scene-transition-host__plate--hold"
           decoding="async"
         />
       ) : null}
@@ -74,7 +74,7 @@ export function EstateSceneTransitionHost() {
           key={`in-${scene.active!.imageUrl}`}
           src={scene.active!.imageUrl}
           alt=""
-          className="estate-scene-transition-host__plate estate-scene-transition-host__plate--active"
+          className="estate-scene-transition-host__plate spark-readability-scene estate-scene-transition-host__plate--active"
           decoding="async"
         />
       ) : null}
@@ -85,7 +85,7 @@ export function EstateSceneTransitionHost() {
           key={`fade-${scene.incoming!.imageUrl}`}
           src={scene.incoming!.imageUrl}
           alt=""
-          className="estate-scene-transition-host__plate estate-scene-transition-host__plate--incoming"
+          className="estate-scene-transition-host__plate spark-readability-scene estate-scene-transition-host__plate--incoming"
           decoding="async"
           style={{ transitionDuration: `${ESTATE_SCENE_CROSSFADE_MS}ms` }}
         />
@@ -97,7 +97,7 @@ export function EstateSceneTransitionHost() {
           key={`prep-${scene.incoming!.imageUrl}`}
           src={scene.incoming!.imageUrl}
           alt=""
-          className="estate-scene-transition-host__plate estate-scene-transition-host__plate--preparing"
+          className="estate-scene-transition-host__plate spark-readability-scene estate-scene-transition-host__plate--preparing"
           decoding="async"
         />
       ) : null}

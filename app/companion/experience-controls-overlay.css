@@ -260,15 +260,32 @@
   opacity: 0.85;
 }
 
-/* Presentation modes — do not change route or unload destination */
-html[data-estate-background-mode="soften"] .companion-root::before,
-html[data-estate-background-mode="soften"] .estate-scene-layer {
+/*
+ * Presentation modes — do not change route or unload destination.
+ * Applies to every real Estate background photo/video plate: everyday chat
+ * scenes and the homestead living-room scene (CompanionBackground.tsx,
+ * HomesteadChatScene.tsx) and Estate room plates, including video rooms
+ * (EstateRoomFullBleedBackground.tsx). Foreground panels, chat chrome, and
+ * text are untouched — this only ever targets .spark-readability-scene,
+ * never a shared ancestor.
+ */
+html[data-estate-background-mode="soften"] .spark-readability-scene {
   filter: blur(2px) brightness(0.72);
 }
 
-html[data-estate-background-mode="focus"] .companion-root::before,
-html[data-estate-background-mode="focus"] .estate-scene-layer {
+html[data-estate-background-mode="focus"] .spark-readability-scene {
   filter: blur(6px) brightness(0.45) saturate(0.85);
+}
+
+/*
+ * Clear My Mind is a dedicated calm-photo workspace with its own
+ * deliberately sharp, unfiltered photograph (see .companion-background-
+ * clear-my-mind .companion-bg-scene in companion.css) — Experience
+ * Controls' background mode does not reach into it.
+ */
+html[data-estate-background-mode="soften"] .companion-background-clear-my-mind .spark-readability-scene,
+html[data-estate-background-mode="focus"] .companion-background-clear-my-mind .spark-readability-scene {
+  filter: none;
 }
 
 html[data-estate-text-size="large"] .companion-root {

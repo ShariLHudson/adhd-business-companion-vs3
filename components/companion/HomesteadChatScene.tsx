@@ -31,7 +31,7 @@ export function HomesteadChatScene() {
         placement="absolute"
         gradientStrength={0.55}
         className="companion-homestead-chat-scene__cinematic"
-        mediaClassName="companion-welcome-scene__art companion-homestead-chat-scene__art"
+        mediaClassName="companion-welcome-scene__art companion-homestead-chat-scene__art spark-readability-scene"
       />
       <HomesteadSceneLayers />
       <div className="companion-homestead-chat-scene__wash" aria-hidden />

@@ -175,6 +175,7 @@ export function EstateRoomFullBleedBackground({
   const showFullPlate = hasMemberOverride && !useRoomVideo;
   const plateClassName = [
     "estate-room-fullbleed-bg",
+    "spark-readability-scene",
     showFullPlate ? "estate-room-fullbleed-bg--show-full-plate" : "",
     className,
   ]
@@ -184,7 +185,12 @@ export function EstateRoomFullBleedBackground({
   if (!src && !useRoomVideo) {
     return (
       <div
-        className={["estate-room-fullbleed-bg estate-room-fullbleed-bg--fallback", className]
+        className={[
+          "estate-room-fullbleed-bg",
+          "spark-readability-scene",
+          "estate-room-fullbleed-bg--fallback",
+          className,
+        ]
           .filter(Boolean)
           .join(" ")}
         aria-hidden
