@@ -182,14 +182,14 @@ export function SupportStylePanel() {
                 key={entry.id}
                 className={`rounded-xl border px-3.5 py-3 ${
                   active
-                    ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06]"
+                    ? "spark-surface-selected"
                     : "border-[#d4cdc3] bg-white/90"
                 }`}
                 data-testid={`support-style-option-${entry.id}`}
               >
                 <button
                   type="button"
-                  className="w-full text-left"
+                  className="spark-focus-ring w-full text-left"
                   onClick={() => selectStyle(entry.id)}
                 >
                   <span className="flex items-center justify-between gap-2">
@@ -273,10 +273,16 @@ export function SupportStylePanel() {
         )}
       </ul>
 
-      <div className="mt-4 rounded-xl border border-[#d4cdc3] bg-white/90 px-3.5 py-3">
+      <div
+        className={`mt-4 rounded-xl border px-3.5 py-3 ${
+          styleId === "custom"
+            ? "spark-surface-selected"
+            : "border-[#d4cdc3] bg-white/90"
+        }`}
+      >
         <button
           type="button"
-          className="flex w-full items-center justify-between text-left"
+          className="spark-focus-ring flex w-full items-center justify-between text-left"
           data-testid="support-style-option-custom"
           onClick={() => {
             setShowCustom(true);

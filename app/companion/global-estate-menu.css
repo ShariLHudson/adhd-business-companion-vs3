@@ -566,7 +566,8 @@
   .bg-\[\#f3efe8\],
   .bg-\[\#f0ebe3\],
   .bg-\[\#fff8ef\],
-  .bg-\[\#1e4f4f\]\/\[0\.06\]
+  .bg-\[\#1e4f4f\]\/\[0\.06\],
+  .spark-surface-selected
 ):not(.workspace-area-works-guide):not(.workspace-area-works-guide--settings):not(.workspace-area-works-guide__trigger) {
   color: var(--spark-text-primary);
 }
@@ -581,7 +582,8 @@
   .bg-\[\#f3efe8\],
   .bg-\[\#f0ebe3\],
   .bg-\[\#fff8ef\],
-  .bg-\[\#1e4f4f\]\/\[0\.06\]
+  .bg-\[\#1e4f4f\]\/\[0\.06\],
+  .spark-surface-selected
 ):not(.workspace-area-works-guide):not(.workspace-area-works-guide--settings):not(.workspace-area-works-guide__trigger)
   :is(p, span, label, summary, strong, em, small, li, div, button, legend, a):not(
     .workspace-area-works-guide__title
@@ -596,7 +598,8 @@
   .bg-\[\#f3efe8\],
   .bg-\[\#f0ebe3\],
   .bg-\[\#fff8ef\],
-  .bg-\[\#1e4f4f\]\/\[0\.06\]
+  .bg-\[\#1e4f4f\]\/\[0\.06\],
+  .spark-surface-selected
 ):not(.workspace-area-works-guide):not(.workspace-area-works-guide--settings):not(.workspace-area-works-guide__trigger)
   :is(
     .text-black,

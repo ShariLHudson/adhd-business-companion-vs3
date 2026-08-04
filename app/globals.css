@@ -65,6 +65,14 @@
   --spark-text-accent-on-dark: rgba(255, 220, 160, 0.95);
   --spark-surface-border-on-dark: rgba(255, 236, 200, 0.28);
   --spark-focus-ring-on-dark: rgba(255, 236, 200, 0.85);
+
+  /*
+   * Dark-tier selected-card surface — same warm gold accent Settings'
+   * dark cards (e.g. Appearance) already use, strengthened for clearer
+   * recognition: background alpha 0.1 → 0.16, border alpha 0.55 → 0.7.
+   */
+  --spark-surface-selected-bg-on-dark: rgba(201, 164, 108, 0.16);
+  --spark-surface-selected-border-on-dark: rgba(201, 164, 108, 0.7);
 }
 
 /* Temporary popovers and menus registered as kind "popover". */
@@ -111,6 +119,14 @@
 }
 .spark-focus-ring:focus-visible {
   outline: 2px solid var(--spark-focus-ring);
+  outline-offset: 2px;
+}
+.spark-surface-selected-on-dark {
+  background: var(--spark-surface-selected-bg-on-dark);
+  border-color: var(--spark-surface-selected-border-on-dark);
+}
+.spark-focus-ring-on-dark:focus-visible {
+  outline: 2px solid var(--spark-focus-ring-on-dark);
   outline-offset: 2px;
 }
 

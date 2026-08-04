@@ -11,7 +11,7 @@ import { activeColorModeProofLabel } from "@/lib/visualColorCoding";
 
 /** Match dark Settings / Estate menu button rows (not light cream cards). */
 const CARD =
-  "settings-appearance-option w-full rounded-[0.65rem] border border-[rgba(255,248,235,0.2)] bg-[rgba(255,255,255,0.05)] p-4 text-left text-[rgba(255,248,235,0.98)] transition-colors";
+  "settings-appearance-option spark-focus-ring-on-dark w-full rounded-[0.65rem] border border-[rgba(255,248,235,0.2)] bg-[rgba(255,255,255,0.05)] p-4 text-left text-[rgba(255,248,235,0.98)] transition-colors";
 
 type Props = {
   current: VisualMode;
@@ -218,7 +218,7 @@ export function VisualColorModePicker({ current, onSave }: Props) {
               onClick={() => setDraft(it.id)}
               className={`${CARD} ${
                 selected
-                  ? "border-[rgba(201,164,108,0.55)] bg-[rgba(201,164,108,0.1)]"
+                  ? "spark-surface-selected-on-dark"
                   : "hover:border-[rgba(255,248,235,0.3)] hover:bg-[rgba(255,255,255,0.1)]"
               }`}
             >

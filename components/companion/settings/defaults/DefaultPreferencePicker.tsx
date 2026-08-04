@@ -32,9 +32,9 @@ export function DefaultPreferencePicker<T extends string>({
                 role="option"
                 aria-selected={selected}
                 onClick={() => onSelect(option.id)}
-                className={`w-full rounded-lg border px-3 py-2.5 text-left text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f] ${
+                className={`spark-focus-ring w-full rounded-lg border px-3 py-2.5 text-left text-sm font-semibold ${
                   selected
-                    ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06] text-[#1f1c19]"
+                    ? "spark-surface-selected text-[#1f1c19]"
                     : "border-[#d4cdc3] bg-white text-[#1f1c19] hover:border-[#1e4f4f]/45"
                 }`}
                 data-testid={`${testIdPrefix}-option-${option.id}`}

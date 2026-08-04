@@ -158,7 +158,7 @@ function readPerm(): NotifPerm {
 }
 
 const CARD =
-  "w-full rounded-2xl border bg-white/90 p-4 text-left transition-colors";
+  "spark-focus-ring w-full rounded-2xl border bg-white/90 p-4 text-left transition-colors";
 const LABEL = MENU_SECTION_HEADING;
 
 export function SettingsPanel({
@@ -467,7 +467,7 @@ export function SettingsPanel({
               key={it.id}
               type="button"
               onClick={() => onPick(it.id)}
-              className={`${CARD} ${active ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06]" : "border-[#d4cdc3] hover:border-[#1e4f4f]/45"}`}
+              className={`${CARD} ${active ? "spark-surface-selected" : "border-[#d4cdc3] hover:border-[#1e4f4f]/45"}`}
             >
               <span className="flex items-center justify-between gap-2">
                 <span className={MENU_LIST_LABEL}>
@@ -1056,7 +1056,7 @@ export function SettingsPanel({
             setAdvanced(on);
             savePrefs({ advancedAiTools: on });
           }}
-          className={`${CARD} mt-4 ${advanced ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06]" : "border-[#d4cdc3]"}`}
+          className={`${CARD} mt-4 ${advanced ? "spark-surface-selected" : "border-[#d4cdc3]"}`}
         >
           <span className="flex items-center justify-between">
             <span className={MENU_LIST_LABEL}>
@@ -1095,7 +1095,7 @@ export function SettingsPanel({
               savePrefs({ timeBlockAlerts: on });
               flashSettingsSaved();
             }}
-            className={`${CARD} ${alerts ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06]" : "border-[#d4cdc3]"}`}
+            className={`${CARD} ${alerts ? "spark-surface-selected" : "border-[#d4cdc3]"}`}
           >
             <span className="flex items-center justify-between">
               <span className={MENU_LIST_LABEL}>
@@ -1112,7 +1112,7 @@ export function SettingsPanel({
             type="button"
             disabled={perm === "denied" || perm === "unsupported"}
             onClick={() => chooseDesktop(!desktopOn)}
-            className={`${CARD} disabled:opacity-50 ${desktopOn ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06]" : "border-[#d4cdc3]"}`}
+            className={`${CARD} disabled:opacity-50 ${desktopOn ? "spark-surface-selected" : "border-[#d4cdc3]"}`}
           >
             <span className="flex items-center justify-between">
               <span className={MENU_LIST_LABEL}>
