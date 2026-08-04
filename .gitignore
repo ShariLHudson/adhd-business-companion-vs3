@@ -56,9 +56,20 @@ eng.traineddata
 /GPT-*.docx
 /GPT-*.pdf
 /GPT-*.zip
+# ...and the same packets delivered as folders (the patterns above match files only)
+/GPT-*/
 /personal-assistant-navigation.pdf
 /Spark_Estate_GPT_Reverse_Engineering_Report.docx
 .turbopack-build-log.txt
 /066_CURRENT_UNCOMMITTED_WORK_RECOVERY_REPORT.md
 /public/achived images/
 /public/backgrounds/*(1).*
+
+# local Claude Code dev-server launch config — machine-specific absolute paths
+.claude/
+
+# authoring source material (.docx/.zip/.pdf bundles + raw card seeds).
+# Upstream of the app, never imported at runtime: transformed catalog data is
+# copied into lib/sparkNote/volumes/ (see that folder's index.ts).
+# Also excluded in tsconfig.json — .gitignore alone does not hide it from tsc.
+/Intelligence Library/
