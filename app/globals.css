@@ -48,6 +48,23 @@
   --spark-surface-disabled-border: #e7dfd4;
 
   --spark-focus-ring: #1e4f4f;
+
+  /*
+   * Dark-surface companion tokens — Settings' dark modal sheet (see
+   * app/companion/global-estate-menu.css .modal-sheet--estate-dark) needs
+   * cream-on-near-black values, the inverse of the light --spark-text-*
+   * tokens above. Not a dark-theme redesign: these formalize an existing,
+   * already-verified-compliant palette (7.2:1+ contrast at every level)
+   * so Settings components using the light spark-text-* utility classes
+   * still resolve correctly when rendered on the dark sheet.
+   */
+  --spark-text-primary-on-dark: rgba(255, 248, 235, 0.98);
+  --spark-text-secondary-on-dark: rgba(255, 236, 200, 0.85);
+  --spark-text-supporting-on-dark: rgba(255, 236, 200, 0.7);
+  --spark-text-disabled-on-dark: rgba(255, 248, 235, 0.62);
+  --spark-text-accent-on-dark: rgba(255, 220, 160, 0.95);
+  --spark-surface-border-on-dark: rgba(255, 236, 200, 0.28);
+  --spark-focus-ring-on-dark: rgba(255, 236, 200, 0.85);
 }
 
 /* Temporary popovers and menus registered as kind "popover". */
