@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useExclusivePopover } from "@/lib/windowDismiss/useExclusivePopover";
 import type { PlanDayItem } from "@/lib/planMyDay";
 import {
   isPlanItemLocked,
@@ -73,17 +74,21 @@ export function PlanDaySimpleList({
   const [promptValue, setPromptValue] = useState("");
   const [dragId, setDragId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const menuTriggerRef = useRef<HTMLButtonElement | null>(null);
 
-  useEffect(() => {
-    if (!menuId) return;
-    function onDoc(e: MouseEvent) {
-      if (!menuRef.current?.contains(e.target as Node)) {
-        setMenuId(null);
-      }
-    }
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
-  }, [menuId]);
+  /**
+   * Only one item's menu is ever open at a time (menuId is a single value),
+   * so one hook call at the list level covers every item. The registry id
+   * changes with menuId, so switching items re-registers cleanly. Escape,
+   * outside-click, exclusivity and focus return are shared behavior.
+   */
+  useExclusivePopover({
+    overlayId: menuId ? `plan-day-item-menu:${menuId}` : "plan-day-item-menu:none",
+    open: menuId !== null,
+    onClose: () => setMenuId(null),
+    rootRef: menuRef,
+    triggerRef: menuTriggerRef,
+  });
 
   function beginEdit(item: PlanDayItem) {
     setEditingId(item.id);
@@ -467,17 +472,23 @@ export function PlanDaySimpleList({
                       type="button"
                       className="inline-flex h-11 min-w-11 items-center justify-center rounded-md px-2 text-lg font-semibold text-[#6b635a] hover:bg-[#f5f0ea] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]"
                       aria-label={`More actions for ${item.title}`}
+                      aria-haspopup="menu"
                       aria-expanded={menuId === item.id}
                       data-testid={`plan-day-more-${item.id}`}
-                      onClick={() =>
-                        setMenuId((cur) => (cur === item.id ? null : item.id))
-                      }
+                      onClick={(e) => {
+                        // Captured imperatively, not via a conditional JSX ref:
+                        // a conditional ref detaches in the same commit that
+                        // closes the menu, before the focus-restore effect
+                        // (which runs after commit) can read it.
+                        menuTriggerRef.current = e.currentTarget;
+                        setMenuId((cur) => (cur === item.id ? null : item.id));
+                      }}
                     >
                       ⋯
                     </button>
                     {menuId === item.id ? (
                       <div
-                        className="absolute right-0 z-20 mt-1 min-w-[12rem] rounded-xl border border-[#e7dfd4] bg-white py-1 shadow-md"
+                        className="spark-layer-popover absolute right-0 mt-1 min-w-[12rem] rounded-xl border border-[#e7dfd4] bg-white py-1 shadow-md"
                         role="menu"
                         data-testid={`plan-day-more-menu-${item.id}`}
                       >

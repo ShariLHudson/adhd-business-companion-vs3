@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { useExclusivePopover } from "@/lib/windowDismiss/useExclusivePopover";
 import { canonicalMapName } from "@/lib/cartographersStudio/mapDefinitions";
 import type { VisualFocusMap } from "@/lib/visualFocus";
 import { studioCardTitleForMode } from "@/lib/visualFocus/studioCards";
@@ -27,6 +28,22 @@ export function MyMapsPanel({
   const [moreFor, setMoreFor] = useState<string | null>(null);
   const [renameId, setRenameId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
+  const moreMenuRef = useRef<HTMLDivElement | null>(null);
+  const moreTriggerRef = useRef<HTMLButtonElement | null>(null);
+
+  /**
+   * Only one map's "More" menu is ever open at a time (moreFor is a single
+   * value), so one hook call at the panel level covers every map. This menu
+   * previously had no Escape or outside-click handling at all.
+   */
+  useExclusivePopover({
+    overlayId: moreFor ? `cartographers-map-menu:${moreFor}` : "cartographers-map-menu:none",
+    open: moreFor !== null,
+    onClose: () => setMoreFor(null),
+    rootRef: moreMenuRef,
+    triggerRef: moreTriggerRef,
+  });
+
   const sorted = useMemo(
     () =>
       [...maps].sort(
@@ -93,15 +110,23 @@ export function MyMapsPanel({
                   >
                     Edit
                   </button>
-                  <div className="cartographers-my-maps__more-wrap">
+                  <div
+                    className="cartographers-my-maps__more-wrap"
+                    ref={moreFor === map.id ? moreMenuRef : undefined}
+                  >
                     <button
                       type="button"
                       className="cartographers-map-entry__secondary"
                       aria-expanded={moreFor === map.id}
                       aria-haspopup="menu"
-                      onClick={() =>
-                        setMoreFor((id) => (id === map.id ? null : map.id))
-                      }
+                      data-testid={`my-maps-more-${map.id}`}
+                      onClick={(e) => {
+                        // Captured imperatively: a conditional JSX ref would
+                        // detach in the same commit that closes the menu,
+                        // before the focus-restore effect can read it.
+                        moreTriggerRef.current = e.currentTarget;
+                        setMoreFor((id) => (id === map.id ? null : map.id));
+                      }}
                     >
                       More
                     </button>
@@ -109,6 +134,7 @@ export function MyMapsPanel({
                       <ul
                         className="cartographers-my-maps__menu"
                         role="menu"
+                        data-testid={`my-maps-menu-${map.id}`}
                       >
                         <li role="none">
                           <button

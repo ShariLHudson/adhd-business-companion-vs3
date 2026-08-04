@@ -2208,7 +2208,8 @@
   position: absolute;
   top: calc(100% + 0.25rem);
   right: 0;
-  z-index: 40;
+  /* Shared popover layer — see :root in app/globals.css. */
+  z-index: var(--spark-layer-popover, 40);
   min-width: 9rem;
   margin: 0;
   padding: 0.35rem;

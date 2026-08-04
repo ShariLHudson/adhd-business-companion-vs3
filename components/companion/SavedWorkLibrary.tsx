@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useExclusivePopover } from "@/lib/windowDismiss/useExclusivePopover";
 import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
 import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
 import { ConfirmDialog } from "@/components/companion/ConfirmDialog";
@@ -48,16 +49,17 @@ function SavedWorkItemMenu({
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const archived = item.status === "archived";
 
-  useEffect(() => {
-    if (!open) return;
-    function onDocClick(e: MouseEvent) {
-      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
-    }
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, [open]);
+  // Escape, outside-click, exclusivity and focus return are shared behavior.
+  useExclusivePopover({
+    overlayId: `saved-work-item-menu:${item.id}`,
+    open,
+    onClose: () => setOpen(false),
+    rootRef,
+    triggerRef,
+  });
 
   function pick(action: SavedWorkAction) {
     setOpen(false);
@@ -67,6 +69,7 @@ function SavedWorkItemMenu({
   return (
     <div ref={rootRef} className="relative shrink-0">
       <button
+        ref={triggerRef}
         type="button"
         onClick={(e) => {
           e.stopPropagation();
@@ -82,7 +85,8 @@ function SavedWorkItemMenu({
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 z-20 mt-1 min-w-[10rem] overflow-hidden rounded-xl border border-[#d4cdc3] bg-white py-1 shadow-lg"
+          data-testid={`saved-work-item-menu-${item.id}`}
+          className="spark-layer-popover absolute right-0 mt-1 min-w-[10rem] overflow-hidden rounded-xl border border-[#d4cdc3] bg-white py-1 shadow-lg"
           onClick={(e) => e.stopPropagation()}
         >
           <button
