@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
 import type { CoachingMode } from "@/lib/companionPrompt";
 import {
+  GROWTH_MENU,
   MORE_NAV,
   SIDEBAR_NAV,
   type SidebarNavId,
@@ -14,9 +15,11 @@ import {
   type CompanionOverlayParam,
 } from "@/lib/companionNavUrl";
 
-const NAV_IDS = new Set(
-  [...SIDEBAR_NAV, ...MORE_NAV].map((item) => item.id),
-);
+const NAV_IDS = new Set([
+  ...SIDEBAR_NAV.map((item) => item.id),
+  ...MORE_NAV.map((item) => item.id),
+  ...GROWTH_MENU.map((item) => item.id),
+]);
 
 function isSidebarNavId(value: string | null): value is SidebarNavId {
   return Boolean(value && NAV_IDS.has(value as SidebarNavId));

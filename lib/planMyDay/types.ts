@@ -43,6 +43,8 @@ export type PlanDayItem = {
   keptForReference?: boolean;
   /** Higher = shown first when multiple items are Doing */
   focusRank?: number;
+  /** P0.33 — supports Outcome Goal™ */
+  outcomeGoalId?: string;
 };
 
 export const PLAN_PRIORITY_OPTIONS: {

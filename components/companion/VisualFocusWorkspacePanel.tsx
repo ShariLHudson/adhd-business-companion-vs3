@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { LibraryCloseButton } from "@/components/companion/LibraryOrientationChrome";
 import { VisualFocusStudioHub } from "@/components/companion/VisualFocusStudioHub";
-import { VisualFocusPurposeAnchor } from "@/components/companion/VisualFocusPurposeAnchor";
+import { VisualThinkingWorkspaceHelp } from "@/components/companion/VisualThinkingWorkspaceHelp";
 import { VisualFocusMapHeader } from "@/components/companion/visualFocus/VisualFocusMapHeader";
+import { PriorityMatrixGuidedView } from "@/components/companion/visualFocus/PriorityMatrixGuidedView";
 import { VisualFocusVisualCanvas } from "@/components/companion/visualFocus/VisualFocusVisualCanvas";
 import { VisualFocusIntelligencePanel } from "@/components/companion/visualFocus/VisualFocusIntelligencePanel";
 import { IntelligenceViewModeToggle } from "@/components/companion/visualFocus/IntelligenceViewModeToggle";
@@ -56,6 +57,11 @@ import {
   type VisualKanbanCard,
   type VisualKanbanColumn,
 } from "@/lib/visualFocus";
+import {
+  getVisualThinkingHomeType,
+  resolveHomeTypeForMap,
+  type VisualThinkingHomeTypeId,
+} from "@/lib/visualThinkingHome";
 import {
   mergeCanvasHighlights,
   type IntelligenceViewMode,
@@ -278,23 +284,30 @@ function VisualFocusKanbanEditor({
   );
 }
 
+export type VisualFocusShariContext = {
+  fromHub?: boolean;
+  homeTypeId?: VisualThinkingHomeTypeId;
+  mode?: VisualFocusMode;
+  mapTitle?: string;
+};
+
 export function VisualFocusWorkspacePanel({
   onBack,
   onClose,
   registerBack,
   onWorkWithShari,
+  onOpenLinkedSection,
 }: {
   onBack?: () => void;
   onClose?: () => void;
   registerBack?: (fn: (() => boolean) | null) => void;
-  onWorkWithShari?: () => void;
+  onWorkWithShari?: (context?: VisualFocusShariContext) => void;
+  onOpenLinkedSection?: (section: import("@/lib/companionUi").AppSection) => void;
 }) {
   const [view, setView] = useState<StudioView>("hub");
   const [workspaceMode, setWorkspaceMode] = useState<WorkspaceMode>("build");
   const [maps, setMaps] = useState<VisualFocusMap[]>([]);
   const [active, setActive] = useState<VisualFocusMap | null>(null);
-  const [pendingCreateMode, setPendingCreateMode] =
-    useState<VisualFocusMode | null>(null);
   const [showBuildPanel, setShowBuildPanel] = useState(true);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [saveAsMode, setSaveAsMode] = useState(false);
@@ -409,17 +422,18 @@ export function VisualFocusWorkspacePanel({
     return saved;
   }
 
-  function handleRequestCreate(mode: VisualFocusMode) {
-    setPendingCreateMode(mode);
-  }
-
-  function handleCreate(mode: VisualFocusMode, purposeAnswer: string) {
-    const map = createAndActivateMap(mode, purposeAnswer);
+  function handleOpenHomeType(homeTypeId: VisualThinkingHomeTypeId) {
+    const homeType = getVisualThinkingHomeType(homeTypeId);
+    if (homeType.comingSoon) return;
+    if (homeType.section) {
+      onOpenLinkedSection?.(homeType.section);
+      return;
+    }
+    const map = createAndActivateMap(homeType.mode, undefined, homeTypeId);
     setActive(map);
     setMaps(listVisualFocusMaps());
     setView("workspace");
     setWorkspaceMode("build");
-    setPendingCreateMode(null);
   }
 
   function handleOpenMap(id: string) {
@@ -544,9 +558,10 @@ export function VisualFocusWorkspacePanel({
     >
       {view === "hub" ? (
         <>
+          <div className="min-h-0 flex-1">
           <VisualFocusStudioHub
             maps={maps}
-            onCreate={handleRequestCreate}
+            onOpenHomeType={handleOpenHomeType}
             onOpenMap={handleOpenMap}
             onRemoveMap={handleRemoveContinueThinkingMap}
             onDeleteMap={handleRequestDeleteContinueThinkingMap}
@@ -576,41 +591,43 @@ export function VisualFocusWorkspacePanel({
               reload();
             }}
           />
-          {pendingCreateMode ? (
-            <VisualFocusPurposeAnchor
-              mode={pendingCreateMode}
-              onCancel={() => setPendingCreateMode(null)}
-              onConfirm={(answer) => handleCreate(pendingCreateMode, answer)}
-            />
-          ) : null}
+          </div>
         </>
       ) : active ? (
         <div className="flex min-h-0 flex-1 flex-col">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e7dfd4] pb-4">
+          {(() => {
+            const homeType = resolveHomeTypeForMap({
+              homeTypeId: active.homeTypeId,
+              mode: active.mode,
+              title: active.title,
+            });
+            return (
+              <VisualThinkingWorkspaceHelp
+                title={homeType.title}
+                help={homeType.help}
+              />
+            );
+          })()}
+
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-b border-[#e7dfd4] pb-4">
             <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 onClick={backToStudio}
-                className="inline-flex items-center gap-1 rounded-full border border-[#e7d9c8] bg-[#faf7f2] px-3 py-1.5 text-sm font-semibold text-[#2f261f] hover:bg-[#f3ebe0]"
-                data-testid="visual-focus-back-to-studio"
-              >
-                <span aria-hidden="true">←</span>
-                Back to Studio
-              </button>
-              <button
-                type="button"
-                onClick={backToStudio}
-                className="inline-flex items-center gap-1 rounded-full border border-[#e7dfd4] bg-white px-3 py-1.5 text-sm font-semibold text-[#6b635a] hover:bg-[#faf7f2]"
+                className="inline-flex items-center gap-1 rounded-full border border-[#1e4f4f]/30 bg-[#f0f8f8] px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#e0f0f0]"
                 data-testid="visual-focus-close-map"
               >
-                Close map
+                Close
               </button>
               {modeBadge ? (
                 <span
                   className="rounded-full bg-[#1e4f4f]/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#1e4f4f]"
                   data-testid="visual-focus-mode-badge"
                 >
-                  {modeBadge}
+                  {resolveHomeTypeForMap({
+                    homeTypeId: active.homeTypeId,
+                    mode: active.mode,
+                  }).title}
                 </span>
               ) : null}
               {active.workflowStage === "generated" ? (
@@ -626,6 +643,22 @@ export function VisualFocusWorkspacePanel({
               ) : null}
             </div>
             <div className="flex items-center gap-2">
+              {onWorkWithShari ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    onWorkWithShari({
+                      homeTypeId: active.homeTypeId as VisualThinkingHomeTypeId | undefined,
+                      mode: active.mode,
+                      mapTitle: active.title,
+                    })
+                  }
+                  className="rounded-full border border-[#1e4f4f]/30 bg-[#f0f8f8] px-3 py-1.5 text-xs font-semibold text-[#1e4f4f] hover:bg-[#e0f0f0]"
+                  data-testid="visual-focus-work-with-shari"
+                >
+                  Work With Shari
+                </button>
+              ) : null}
               <VisualFocusSaveMenu
                 pinned={active.pinned}
                 archived={active.lifecycleStatus === "archived"}
@@ -829,18 +862,34 @@ export function VisualFocusWorkspacePanel({
                     </button>
                   </div>
                   {active.mode === "visual-kanban" && active.kanban ? (
-                    <VisualFocusKanbanEditor
-                      columns={active.kanban.columns}
-                      cards={active.kanban.cards}
-                      onChange={(columns, cards) => {
-                        const updated = { ...active, kanban: { columns, cards } };
-                        persist(
-                          workspaceMode === "generated"
-                            ? generateVisualFocusMap({ ...updated, workflowStage: "build" })
-                            : updated,
-                        );
-                      }}
-                    />
+                    active.homeTypeId === "priority-matrix" ? (
+                      <PriorityMatrixGuidedView
+                        mapId={active.id}
+                        columns={active.kanban.columns}
+                        cards={active.kanban.cards}
+                        onChange={(columns, cards) => {
+                          const updated = { ...active, kanban: { columns, cards } };
+                          persist(
+                            workspaceMode === "generated"
+                              ? generateVisualFocusMap({ ...updated, workflowStage: "build" })
+                              : updated,
+                          );
+                        }}
+                      />
+                    ) : (
+                      <VisualFocusKanbanEditor
+                        columns={active.kanban.columns}
+                        cards={active.kanban.cards}
+                        onChange={(columns, cards) => {
+                          const updated = { ...active, kanban: { columns, cards } };
+                          persist(
+                            workspaceMode === "generated"
+                              ? generateVisualFocusMap({ ...updated, workflowStage: "build" })
+                              : updated,
+                          );
+                        }}
+                      />
+                    )
                   ) : (
                     <VisualFocusTreeEditor
                       root={active.root}
@@ -907,7 +956,7 @@ export function VisualFocusWorkspacePanel({
               </div>
             </div>
           ) : (
-            <div className="mt-6 min-h-0 flex-1 overflow-y-auto">
+            <div className="mt-4 min-h-[min(70vh,720px)] flex-1 overflow-y-auto">
               <input
                 value={active.title}
                 onChange={(e) => persist({ ...active, title: e.target.value })}
@@ -923,13 +972,24 @@ export function VisualFocusWorkspacePanel({
                   }
                 />
               ) : active.mode === "visual-kanban" && active.kanban ? (
-                <VisualFocusKanbanEditor
-                  columns={active.kanban.columns}
-                  cards={active.kanban.cards}
-                  onChange={(columns, cards) =>
-                    persist({ ...active, kanban: { columns, cards } })
-                  }
-                />
+                active.homeTypeId === "priority-matrix" ? (
+                  <PriorityMatrixGuidedView
+                    mapId={active.id}
+                    columns={active.kanban.columns}
+                    cards={active.kanban.cards}
+                    onChange={(columns, cards) =>
+                      persist({ ...active, kanban: { columns, cards } })
+                    }
+                  />
+                ) : (
+                  <VisualFocusKanbanEditor
+                    columns={active.kanban.columns}
+                    cards={active.kanban.cards}
+                    onChange={(columns, cards) =>
+                      persist({ ...active, kanban: { columns, cards } })
+                    }
+                  />
+                )
               ) : (
                 <VisualFocusTreeEditor
                   root={active.root}

@@ -43,6 +43,11 @@ import {
   detectThoughtSplitProposal,
   type ThoughtSplitProposal,
 } from "@/lib/clearMyMindThoughtSplitter";
+import {
+  loadCategorizationMode,
+  type PendingClassification,
+} from "@/lib/brainDumpClusterPreferences";
+import { ClassificationReviewCard } from "@/components/companion/ClassificationReviewCard";
 
 type Props = {
   sessionId?: string;
@@ -84,6 +89,9 @@ export function ClearMyMindSession({
   const [pendingSplit, setPendingSplit] = useState<ThoughtSplitProposal | null>(
     null,
   );
+  const [pendingClassifications, setPendingClassifications] = useState<
+    Record<string, PendingClassification>
+  >({});
 
   const refresh = useCallback(() => {
     setEntries(
@@ -131,6 +139,9 @@ export function ClearMyMindSession({
   const currentSortItem = unsortedItems[0] ?? null;
 
   async function classify(id: string, note: string) {
+    const mode = loadCategorizationMode();
+    if (mode === "manual") return;
+
     try {
       const res = await fetch("/api/braindump-classify", {
         method: "POST",
@@ -138,18 +149,51 @@ export function ClearMyMindSession({
         body: JSON.stringify({ text: note }),
       });
       const data = await res.json();
-      if (res.ok) {
-        updateBrainDump(id, {
-          topic: data.topic,
-          category: data.category,
-          contextType: data.contextType,
-          suggestion: data.suggestion,
-        });
+      if (!res.ok) return;
+
+      if (mode === "review") {
+        setPendingClassifications((prev) => ({
+          ...prev,
+          [id]: {
+            entryId: id,
+            topic: data.topic,
+            category: data.category,
+            contextType: data.contextType,
+            suggestion: data.suggestion,
+          },
+        }));
         refresh();
+        return;
       }
+
+      updateBrainDump(id, {
+        topic: data.topic,
+        category: data.category,
+        contextType: data.contextType,
+        suggestion: data.suggestion,
+      });
+      refresh();
     } catch {
       /* unclassified is fine */
     }
+  }
+
+  function approveClassification(
+    entryId: string,
+    final: PendingClassification,
+  ) {
+    updateBrainDump(entryId, {
+      topic: final.topic,
+      category: final.category,
+      contextType: final.contextType,
+      suggestion: final.suggestion,
+    });
+    setPendingClassifications((prev) => {
+      const next = { ...prev };
+      delete next[entryId];
+      return next;
+    });
+    refresh();
   }
 
   function saveThoughtParts(parts: string[]) {
@@ -340,13 +384,34 @@ export function ClearMyMindSession({
                   <p className="mt-0.5 text-base font-medium text-[#1f1c19]">
                     {entry.text}
                   </p>
-                  {entry.category ? (
+                  {pendingClassifications[entry.id] ? (
+                    <div className="mt-3">
+                      <ClassificationReviewCard
+                        entry={entry}
+                        pending={pendingClassifications[entry.id]!}
+                        onApprove={(final) =>
+                          approveClassification(entry.id, final)
+                        }
+                        onCategoryChange={(category) =>
+                          setPendingClassifications((prev) => ({
+                            ...prev,
+                            [entry.id]: {
+                              ...prev[entry.id]!,
+                              category,
+                            },
+                          }))
+                        }
+                      />
+                    </div>
+                  ) : entry.category ? (
                     <span className="mt-1 inline-block rounded-full bg-[#1e4f4f]/10 px-2 py-0.5 text-xs font-semibold text-[#1e4f4f]">
                       {normalizeCategory(entry.category)}
                     </span>
                   ) : (
                     <span className="mt-1 inline-block text-xs text-[#9a8f82]">
-                      Holding…
+                      {loadCategorizationMode() === "manual"
+                        ? "Set category in clusters"
+                        : "Holding…"}
                     </span>
                   )}
                 </li>

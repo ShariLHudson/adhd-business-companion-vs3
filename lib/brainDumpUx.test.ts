@@ -13,14 +13,18 @@ describe("groupRelationshipsByTheme", () => {
         toId: "b",
         fromLabel: "Finish newsletter",
         toLabel: "Text Izna",
-        reason: "Marketing",
+        kind: "shared_theme",
+        reason: "marketing",
+        whyLabel: "Marketing theme",
       },
       {
         fromId: "b",
         toId: "c",
         fromLabel: "Text Izna",
         toLabel: "Update website",
-        reason: "Marketing",
+        kind: "shared_theme",
+        reason: "marketing",
+        whyLabel: "Marketing theme",
       },
     ]);
 
@@ -33,7 +37,7 @@ describe("groupRelationshipsByTheme", () => {
         "Update website",
       ]),
     );
-    expect(themes[0]!.observation).toMatch(/Several thoughts relate to marketing/i);
+    expect(themes[0]!.observation).toMatch(/Several thoughts (?:relate to|share) marketing/i);
   });
 });
 

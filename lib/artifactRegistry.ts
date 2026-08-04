@@ -183,8 +183,12 @@ export function registryArtifactKindToCreateItemType(
 export function buildRegistryArtifactOfferLine(
   kind: RegistryArtifactKind,
   category: "build" | "execute",
+  opts?: { alreadyOpen?: boolean },
 ): string {
   const label = registryArtifactLabel(kind);
+  if (opts?.alreadyOpen) {
+    return `You're already in Create — let's keep building your ${label}. What part should we work on next?`;
+  }
   if (kind === "funnel") {
     return [
       "I can help build that.",

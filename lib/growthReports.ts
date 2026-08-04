@@ -15,7 +15,38 @@ import {
   getAllReflectionEntries,
   type GrowthReflectionEntry,
 } from "./growthReflection";
-import { getBusinessProfile, getPrefs } from "./companionStore";
+import { getBusinessProfile, getPrefs, getProjects, type Project } from "./companionStore";
+import {
+  formatMetricProgressLabel,
+  formatOutcomeProgressLabel,
+  getActiveGoalMetrics,
+  getGoalMetrics,
+  goalHealthStatus,
+  goalProgressPercent,
+  listCompletedOutcomeGoals,
+  listOutcomeGoals,
+  metricProgressPercent,
+  OUTCOME_COMPLETION_RULE_LABELS,
+  OUTCOME_GOAL_HEALTH_LABELS,
+  progressInDateRange,
+  type OutcomeGoal,
+  type OutcomeGoalHealthStatus,
+} from "./goals/outcomeGoals";
+import {
+  evidenceSupportsGoal,
+  growthItemSupportsGoal,
+  projectSupportsGoal,
+  winSupportsGoal,
+} from "./goals/goalLinking";
+import {
+  decisionSupportsGoal,
+  lessonSupportsGoal,
+  planCompletionsForGoalInRange,
+} from "./goals/goalIntelligence";
+import { getPlanCompletionHistory } from "./planMyDay/planTaskCompletion";
+import type { PlanTaskCompletionRecord } from "./planMyDay/planTaskCompletion";
+
+export { growthItemSupportsGoal };
 
 export type GrowthReportType =
   | "weekly"
@@ -31,6 +62,7 @@ export type GrowthReportStyle =
   | "visual";
 
 export type GrowthReportIncludes = {
+  goals: boolean;
   wins: boolean;
   evidence: boolean;
   highlights: boolean;
@@ -40,6 +72,28 @@ export type GrowthReportIncludes = {
   testimonials: boolean;
   certifications: boolean;
   reflections: boolean;
+};
+
+export type GrowthReportGoalSummary = {
+  activeGoals: number;
+  onTrack: number;
+  needsAttention: number;
+  stalled: number;
+  completedThisPeriod: number;
+  progressThisPeriod: number;
+};
+
+export type GrowthReportGoalEntry = {
+  goal: OutcomeGoal;
+  percent: number;
+  status: OutcomeGoalHealthStatus;
+  progressSinceLastReport: number;
+  linkedWins: SavedGrowthWin[];
+  linkedEvidence: EvidenceEntry[];
+  linkedDecisions: JourneyEntry[];
+  linkedLessons: JourneyEntry[];
+  linkedProjects: Project[];
+  linkedTasks: PlanTaskCompletionRecord[];
 };
 
 export type GrowthReportDateRange = {
@@ -66,6 +120,9 @@ export type GrowthReportContent = {
   reportStyle: GrowthReportStyle;
   dateRange: GrowthReportDateRange;
   includes: GrowthReportIncludes;
+  goalSummary: GrowthReportGoalSummary;
+  goals: GrowthReportGoalEntry[];
+  stalledGoals: GrowthReportGoalEntry[];
   wins: SavedGrowthWin[];
   evidence: EvidenceEntry[];
   highlights: ConfidenceEntry[];
@@ -163,6 +220,7 @@ export function defaultIncludesForType(
   switch (type) {
     case "weekly":
       return {
+        goals: true,
         wins: true,
         evidence: true,
         highlights: true,
@@ -175,6 +233,7 @@ export function defaultIncludesForType(
       };
     case "monthly":
       return {
+        goals: true,
         wins: true,
         evidence: true,
         highlights: true,
@@ -187,6 +246,7 @@ export function defaultIncludesForType(
       };
     case "quarterly":
       return {
+        goals: true,
         wins: true,
         evidence: true,
         highlights: true,
@@ -199,6 +259,7 @@ export function defaultIncludesForType(
       };
     case "annual":
       return {
+        goals: true,
         wins: true,
         evidence: true,
         highlights: true,
@@ -211,6 +272,7 @@ export function defaultIncludesForType(
       };
     default:
       return {
+        goals: true,
         wins: true,
         evidence: true,
         highlights: true,
@@ -272,6 +334,62 @@ export function getReportRecipientName(): string {
   return "Your Growth Report";
 }
 
+function buildGoalReportEntries(
+  activeGoals: OutcomeGoal[],
+  wins: SavedGrowthWin[],
+  evidence: EvidenceEntry[],
+  journey: JourneyEntry[],
+  projects: Project[],
+  dateRange: GrowthReportDateRange,
+  planCompletions: PlanTaskCompletionRecord[] = getPlanCompletionHistory(),
+): { goals: GrowthReportGoalEntry[]; stalledGoals: GrowthReportGoalEntry[] } {
+  const goals: GrowthReportGoalEntry[] = activeGoals.map((goal) => ({
+    goal,
+    percent: goalProgressPercent(goal),
+    status: goalHealthStatus(goal),
+    progressSinceLastReport: progressInDateRange(
+      goal,
+      dateRange.from,
+      dateRange.to,
+    ),
+    linkedWins: wins.filter((w) => winSupportsGoal(w, goal)),
+    linkedEvidence: evidence.filter((e) => evidenceSupportsGoal(e, goal)),
+    linkedDecisions: journey.filter((j) => decisionSupportsGoal(j, goal)),
+    linkedLessons: journey.filter((j) => lessonSupportsGoal(j, goal)),
+    linkedProjects: projects.filter((p) => projectSupportsGoal(p, goal)),
+    linkedTasks: planCompletionsForGoalInRange(
+      goal,
+      dateRange.from,
+      dateRange.to,
+      planCompletions,
+    ),
+  }));
+  return {
+    goals,
+    stalledGoals: goals.filter((g) => g.status === "stalled"),
+  };
+}
+
+function buildGoalSummary(
+  activeGoals: OutcomeGoal[],
+  completedInPeriod: OutcomeGoal[],
+  dateRange: GrowthReportDateRange,
+): GrowthReportGoalSummary {
+  const statuses = activeGoals.map((g) => goalHealthStatus(g));
+  const progressThisPeriod = activeGoals.reduce(
+    (sum, g) => sum + progressInDateRange(g, dateRange.from, dateRange.to),
+    0,
+  );
+  return {
+    activeGoals: activeGoals.length,
+    onTrack: statuses.filter((s) => s === "on_track").length,
+    needsAttention: statuses.filter((s) => s === "needs_attention").length,
+    stalled: statuses.filter((s) => s === "stalled").length,
+    completedThisPeriod: completedInPeriod.length,
+    progressThisPeriod,
+  };
+}
+
 export function buildGrowthReportContent(input: {
   reportType: GrowthReportType;
   reportStyle: GrowthReportStyle;
@@ -327,6 +445,33 @@ export function buildGrowthReportContent(input: {
       )
     : [];
 
+  const activeGoals = includes.goals ? listOutcomeGoals() : [];
+  const completedInPeriod = includes.goals
+    ? listCompletedOutcomeGoals().filter((g) =>
+        g.completedAt ? isInRange(g.completedAt, dateRange) : false,
+      )
+    : [];
+  const goalSummary = includes.goals
+    ? buildGoalSummary(activeGoals, completedInPeriod, dateRange)
+    : {
+        activeGoals: 0,
+        onTrack: 0,
+        needsAttention: 0,
+        stalled: 0,
+        completedThisPeriod: 0,
+        progressThisPeriod: 0,
+      };
+  const { goals: goalEntries, stalledGoals } = includes.goals
+    ? buildGoalReportEntries(
+        activeGoals,
+        wins,
+        evidence,
+        journey,
+        getProjects(),
+        dateRange,
+      )
+    : { goals: [], stalledGoals: [] };
+
   const photos: GrowthReportPhoto[] = [];
   const files: GrowthReportFile[] = [];
 
@@ -365,6 +510,9 @@ export function buildGrowthReportContent(input: {
     reportStyle: input.reportStyle,
     dateRange,
     includes,
+    goalSummary,
+    goals: goalEntries,
+    stalledGoals,
     wins,
     evidence,
     highlights,
@@ -384,6 +532,97 @@ function escapeHtml(text: string): string {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function formatGoalMetricsBlock(
+  goal: OutcomeGoal,
+  detailed: boolean,
+  dateRange?: GrowthReportDateRange,
+): string {
+  const metrics = getActiveGoalMetrics(goal);
+  if (metrics.length === 0) return "";
+  const items = metrics
+    .map((m) => {
+      const pct = metricProgressPercent(m);
+      const label = formatMetricProgressLabel(m);
+      const primary = m.isPrimary ? " (primary)" : "";
+      const delta =
+        dateRange && detailed
+          ? progressInDateRange(goal, dateRange.from, dateRange.to, m.id)
+          : 0;
+      const deltaNote =
+        delta !== 0
+          ? ` · ${delta > 0 ? "+" : ""}${m.metricKind === "revenue" ? `$${delta}` : delta} since last report`
+          : "";
+      if (!detailed) {
+        return `<li>${escapeHtml(m.label)}${primary}: ${escapeHtml(label)} — ${pct}%</li>`;
+      }
+      return `<p><strong>${escapeHtml(m.label)}</strong>${primary}: ${escapeHtml(label)} — ${pct}%${escapeHtml(deltaNote)}</p>`;
+    })
+    .join("");
+  const rule = goal.completionRule ?? "primary_metric";
+  const ruleLabel = OUTCOME_COMPLETION_RULE_LABELS[rule];
+  const custom =
+    rule === "custom" && goal.customCompletionRule
+      ? ` — ${escapeHtml(goal.customCompletionRule)}`
+      : "";
+  const heading = `<p class="meta"><strong>Multi-Metric Goal Tracking™</strong> · Complete when: ${escapeHtml(ruleLabel)}${custom}</p>`;
+  return `${heading}${detailed ? items : `<ul>${items}</ul>`}`;
+}
+
+function formatGoalEntry(
+  entry: GrowthReportGoalEntry,
+  detailed: boolean,
+  dateRange: GrowthReportDateRange,
+): string {
+  const { goal, percent, status, progressSinceLastReport } = entry;
+  const label = formatOutcomeProgressLabel(goal);
+  const due = goal.deadline;
+  const statusLabel = OUTCOME_GOAL_HEALTH_LABELS[status];
+  const metricsBlock = formatGoalMetricsBlock(goal, detailed, dateRange);
+  if (!detailed) {
+    const progressNote =
+      progressSinceLastReport !== 0
+        ? ` · +${progressSinceLastReport} this period`
+        : "";
+    return `<li><strong>${escapeHtml(goal.statement)}</strong> — ${escapeHtml(label)} (${percent}%) · ${escapeHtml(statusLabel)} · due ${escapeHtml(due)}${progressNote}${metricsBlock}</li>`;
+  }
+  const linked: string[] = [];
+  if (entry.linkedWins.length) {
+    linked.push(
+      `<p><strong>Supporting wins:</strong> ${entry.linkedWins.map((w) => escapeHtml(w.whatHappened)).join("; ")}</p>`,
+    );
+  }
+  if (entry.linkedEvidence.length) {
+    linked.push(
+      `<p><strong>Supporting evidence:</strong> ${entry.linkedEvidence.map((e) => escapeHtml(e.whatHappened)).join("; ")}</p>`,
+    );
+  }
+  if (entry.linkedDecisions.length) {
+    linked.push(
+      `<p><strong>Supporting decisions:</strong> ${entry.linkedDecisions.map((j) => escapeHtml(j.title)).join("; ")}</p>`,
+    );
+  }
+  if (entry.linkedLessons.length) {
+    linked.push(
+      `<p><strong>Supporting lessons:</strong> ${entry.linkedLessons.map((j) => escapeHtml(j.title)).join("; ")}</p>`,
+    );
+  }
+  if (entry.linkedProjects.length) {
+    linked.push(
+      `<p><strong>Supporting projects:</strong> ${entry.linkedProjects.map((p) => escapeHtml(p.name)).join("; ")}</p>`,
+    );
+  }
+  if (entry.linkedTasks.length) {
+    linked.push(
+      `<p><strong>Supporting tasks (completed this period):</strong> ${entry.linkedTasks.map((t) => escapeHtml(t.taskName)).join("; ")}</p>`,
+    );
+  }
+  return `<article class="entry"><h3>${escapeHtml(goal.statement)}</h3><p class="meta">${escapeHtml(label)} · ${percent}% · ${escapeHtml(statusLabel)} · due ${escapeHtml(due)}${progressSinceLastReport ? ` · +${progressSinceLastReport} this period` : ""}</p>${metricsBlock}${linked.join("")}</article>`;
+}
+
+function formatGoalSummaryBlock(summary: GrowthReportGoalSummary): string {
+  return `<div class="goal-summary"><p><strong>Active goals:</strong> ${summary.activeGoals} · <strong>On track:</strong> ${summary.onTrack} · <strong>Needs attention:</strong> ${summary.needsAttention} · <strong>Stalled:</strong> ${summary.stalled} · <strong>Completed this period:</strong> ${summary.completedThisPeriod} · <strong>Progress logged:</strong> ${summary.progressThisPeriod}</p></div>`;
 }
 
 function sectionHeading(title: string, count: number): string {
@@ -516,6 +755,7 @@ export function formatGrowthReportHtml(content: GrowthReportContent): string {
   }
 
   const stats = [
+    content.includes.goals ? `${content.goalSummary.activeGoals} goals` : null,
     content.includes.wins ? `${content.wins.length} wins` : null,
     content.includes.evidence ? `${content.evidence.length} evidence` : null,
     content.includes.highlights ? `${content.highlights.length} highlights` : null,
@@ -528,7 +768,35 @@ export function formatGrowthReportHtml(content: GrowthReportContent): string {
   }
 
   const wrapList = (items: string) =>
-  detailed || narrative ? items : `<ul>${items}</ul>`;
+    detailed || narrative ? items : `<ul>${items}</ul>`;
+
+  if (content.includes.goals) {
+    sections.push(formatGoalSummaryBlock(content.goalSummary));
+    if (content.goals.length) {
+      sections.push(
+        sectionHeading("Outcome Goals", content.goals.length) +
+          wrapList(
+            content.goals
+              .map((g) =>
+                formatGoalEntry(g, detailed || narrative, content.dateRange),
+              )
+              .join(""),
+          ),
+      );
+    }
+    if (content.stalledGoals.length) {
+      sections.push(
+        sectionHeading("Stalled Goals", content.stalledGoals.length) +
+          wrapList(
+            content.stalledGoals
+              .map((g) =>
+                formatGoalEntry(g, detailed || narrative, content.dateRange),
+              )
+              .join(""),
+          ),
+      );
+    }
+  }
 
   if (content.includes.wins && content.wins.length) {
     sections.push(
@@ -774,6 +1042,7 @@ export const GROWTH_REPORT_INCLUDE_OPTIONS: {
   key: keyof GrowthReportIncludes;
   label: string;
 }[] = [
+  { key: "goals", label: "Outcome Goals" },
   { key: "wins", label: "Wins" },
   { key: "evidence", label: "Evidence" },
   { key: "highlights", label: "My Highlights" },

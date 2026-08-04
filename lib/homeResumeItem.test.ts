@@ -100,10 +100,45 @@ describe("homeResumeItem", () => {
       ]),
     );
 
-    const item = findLatestHomeResumeItem();
+    const item = findLatestHomeResumeItem(new Date("2026-06-12T15:00:00.000Z"));
     expect(item?.kind).toBe("project");
     expect(item?.title).toBe("ADHD Workshop");
     expect(item?.nextStep).toBe("Draft module 1");
+  });
+
+  it("ignores resume items older than yesterday", () => {
+    localStorage.setItem(
+      "companion-projects-v1",
+      JSON.stringify([
+        {
+          id: "p-old",
+          name: "Old Project",
+          goal: "Done",
+          goals: [],
+          horizon: "now",
+          status: "in-progress",
+          nextAction: "Step",
+          color: "#1e4f4f",
+          createdAt: "2026-01-01T12:00:00.000Z",
+          updatedAt: "2026-01-02T12:00:00.000Z",
+        },
+      ]),
+    );
+    localStorage.setItem(
+      "companion-project-items-v1",
+      JSON.stringify([
+        {
+          id: "t-old",
+          projectId: "p-old",
+          title: "Old task",
+          kind: "task",
+          done: false,
+          createdAt: "2026-01-01T12:00:00.000Z",
+          updatedAt: "2026-01-02T12:00:00.000Z",
+        },
+      ]),
+    );
+    expect(findLatestHomeResumeItem(new Date("2026-06-24T12:00:00.000Z"))).toBeNull();
   });
 
   it("ignores projects that were only opened", () => {

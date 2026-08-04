@@ -12,6 +12,7 @@ export function DecisionCompassWorkspace({
   onSessionChange,
   onComplete,
   onClose,
+  registerBack,
   projectId = null,
   projectName = null,
 }: {
@@ -20,6 +21,7 @@ export function DecisionCompassWorkspace({
   onSessionChange?: (snapshot: PersistedDecisionCompassSession) => void;
   onComplete?: () => void;
   onClose?: () => void;
+  registerBack?: (fn: (() => boolean) | null) => void;
   projectId?: string | null;
   projectName?: string | null;
 }) {
@@ -54,6 +56,7 @@ export function DecisionCompassWorkspace({
           onSessionChange={onSessionChange}
           onComplete={onComplete}
           onClose={onClose}
+          registerBack={registerBack}
           hideInlineMap
           onScrollToExploration={scrollToExploration}
         />

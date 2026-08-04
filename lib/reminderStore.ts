@@ -5,6 +5,7 @@
 export type ReminderType = "one_time" | "recurring" | "event_offset";
 export type ReminderSource = "chat" | "calendar" | "project" | "task";
 export type ReminderStatus = "active" | "completed" | "cancelled";
+export type ReminderNotificationChannel = "desktop" | "sound" | "both";
 
 export type Reminder = {
   id: string;
@@ -13,12 +14,16 @@ export type Reminder = {
   reminderType: ReminderType;
   scheduledAt?: string;
   recurrenceRule?: string;
+  /** HH:mm (24h) — multiple daily fires for daily-multi rules */
+  dailyTimes?: string[];
+  notificationChannel?: ReminderNotificationChannel;
   eventId?: string;
   eventTitle?: string;
   offsets?: number[];
   source: ReminderSource;
   createdAt: string;
   status: ReminderStatus;
+  paused?: boolean;
   snoozedUntil?: string;
   lastFiredAt?: string;
 };
@@ -45,7 +50,9 @@ function readAll(): Reminder[] {
 function writeAll(items: Reminder[]): void {
   if (typeof window === "undefined") return;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  window.dispatchEvent(new CustomEvent("companion-reminders-updated"));
+  queueMicrotask(() => {
+    window.dispatchEvent(new CustomEvent("companion-reminders-updated"));
+  });
 }
 
 export function getReminders(): Reminder[] {
@@ -80,6 +87,8 @@ export function saveReminder(
     reminderType: input.reminderType,
     scheduledAt: input.scheduledAt,
     recurrenceRule: input.recurrenceRule,
+    dailyTimes: input.dailyTimes,
+    notificationChannel: input.notificationChannel,
     eventId: input.eventId,
     eventTitle: input.eventTitle,
     offsets: input.offsets,
@@ -88,6 +97,7 @@ export function saveReminder(
     status: input.status ?? "active",
     snoozedUntil: input.snoozedUntil,
     lastFiredAt: input.lastFiredAt,
+    paused: input.paused,
   };
   writeAll([reminder, ...readAll().filter((r) => r.id !== reminder.id)]);
   return reminder;
@@ -121,6 +131,10 @@ export function deleteReminder(id: string): void {
 
 export function snoozeReminder(id: string, until: string): Reminder | null {
   return updateReminder(id, { snoozedUntil: until });
+}
+
+export function pauseReminder(id: string, paused: boolean): Reminder | null {
+  return updateReminder(id, { paused });
 }
 
 export function completeReminder(id: string): Reminder | null {

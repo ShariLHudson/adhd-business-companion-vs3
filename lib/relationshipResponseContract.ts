@@ -8,6 +8,7 @@ import {
   type RelationshipMemoryConfidence,
 } from "./relationshipIntelligencePrompt";
 import { shouldSuppressRelationshipIntelligenceForUserText } from "./relationshipIntelligenceBoundaries";
+import { shouldSuppressProactivePatternInsights } from "./patternAwarenessPrefs";
 import {
   buildRelationshipObservations,
   type ObservationRankingContext,
@@ -88,6 +89,7 @@ export function buildRelationshipLeadParagraph(
     suppressForRouting?: boolean;
   },
 ): string | null {
+  if (shouldSuppressProactivePatternInsights()) return null;
   if (context?.suppressForRouting) return null;
   if (userText && shouldSuppressRelationshipIntelligenceForUserText(userText)) {
     return null;

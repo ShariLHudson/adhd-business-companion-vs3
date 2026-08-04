@@ -90,10 +90,26 @@ function resumeTypeLabel(type: ContinuityManifestItem["type"]): string {
 }
 
 /** Latest eligible genuine work — never navigation-only opens or chat snippets. */
-export function findLatestHomeResumeItem(): HomeResumeItem | null {
+export function isResumeWithinTodayOrYesterday(
+  iso: string,
+  now = new Date(),
+): boolean {
+  const ts = new Date(iso).getTime();
+  if (!Number.isFinite(ts)) return false;
+  const startOfToday = new Date(now);
+  startOfToday.setHours(0, 0, 0, 0);
+  const startOfYesterday = new Date(startOfToday);
+  startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+  return ts >= startOfYesterday.getTime();
+}
+
+/** Latest eligible genuine work — never navigation-only opens or chat snippets. */
+export function findLatestHomeResumeItem(now = new Date()): HomeResumeItem | null {
   const manifest = buildContinuityManifest();
-  const candidates = manifest.items.filter((item) =>
-    HOME_RESUME_CONTINUITY_TYPES.has(item.type),
+  const candidates = manifest.items.filter(
+    (item) =>
+      HOME_RESUME_CONTINUITY_TYPES.has(item.type) &&
+      isResumeWithinTodayOrYesterday(item.lastTouchedAt, now),
   );
   const eligible = pickEligibleContinuityItem(candidates);
   if (!eligible) return null;

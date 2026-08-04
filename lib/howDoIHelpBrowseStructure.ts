@@ -3,13 +3,20 @@ import type { HowDoIHelpArticle } from "./howDoIHelpTypes";
 
 export type HowDoITopSectionId = "new-user" | "main-areas" | "additional-help";
 
-export type HowDoIMainSubgroupId = "daily-use" | "growth" | "resources";
+export type HowDoIMainSubgroupId =
+  | "basics"
+  | "daily-use"
+  | "growth"
+  | "resources";
 
 export type HowDoIAdditionalSubgroupId =
-  | "account-settings"
-  | "companion-features"
-  | "productivity-growth"
-  | "more-help";
+  | "account"
+  | "notifications"
+  | "productivity"
+  | "settings"
+  | "integrations"
+  | "troubleshooting"
+  | "advanced-companion";
 
 export type HowDoISubgroupId = HowDoIMainSubgroupId | HowDoIAdditionalSubgroupId;
 
@@ -17,6 +24,8 @@ export type HowDoIBrowseSubgroup = {
   id: HowDoISubgroupId;
   label: string;
   articleIds: readonly string[];
+  /** When true, preserve articleIds order (onboarding paths). */
+  preserveOrder?: boolean;
 };
 
 export type HowDoIBrowseTopSection = {
@@ -24,84 +33,129 @@ export type HowDoIBrowseTopSection = {
   label: string;
   emoji: string;
   description: string;
-  /** Flat list for New? Start Here */
   articleIds?: readonly string[];
   subgroups?: HowDoIBrowseSubgroup[];
 };
 
-/** Alphabetical by article title — resolved at runtime. */
+/** P0.34 — recommended onboarding order (not alphabetical). */
 const NEW_USER_START_ARTICLE_IDS = [
-  "first-5-minutes",
-  "frequently-asked-questions",
-  "how-the-ecosystem-works",
   "meet-your-companion",
-  "understanding-the-main-areas",
+  "first-5-minutes",
   "your-first-day",
   "your-first-week",
 ] as const;
 
 const MAIN_AREA_SUBGROUPS: readonly HowDoIBrowseSubgroup[] = [
   {
+    id: "basics",
+    label: "Basics",
+    preserveOrder: true,
+    articleIds: [
+      "how-the-ecosystem-works",
+      "understanding-the-main-areas",
+      "frequently-asked-questions",
+    ],
+  },
+  {
     id: "daily-use",
     label: "Daily Use",
+    preserveOrder: true,
     articleIds: [
-      "clear-my-mind",
-      "create-overview",
-      "focus-sessions",
+      "chat-companion",
+      "today-view",
       "plan-my-day",
-      "visual-focus",
-      "projects",
+      "focus-sessions",
+      "clear-my-mind",
+      "daily-workflows",
     ],
   },
   {
     id: "growth",
     label: "Growth",
+    preserveOrder: true,
     articleIds: [
-      "evidence-bank",
-      "my-highlights",
-      "my-journey",
+      "outcome-goals",
       "wins-this-week",
+      "evidence-bank",
+      "portfolio",
+      "my-journey",
+      "growth-reports",
     ],
   },
   {
     id: "resources",
     label: "Resources",
+    preserveOrder: true,
     articleIds: [
-      "client-avatars",
-      "my-work",
-      "snippets",
-      "strategies",
       "templates",
+      "strategies",
+      "create-overview",
+      "visual-focus",
+      "learning-resources",
+      "saved-work",
     ],
   },
 ];
 
+const ADVANCED_COMPANION_CORE_IDS = [
+  "how-conversation-works",
+  "adaptive-learning",
+  "memory",
+  "workspace-vs-chat",
+  "chat-workspace",
+  "voice-conversations",
+  "privacy",
+] as const;
+
 const ADDITIONAL_HELP_SUBGROUPS: readonly HowDoIBrowseSubgroup[] = [
   {
-    id: "account-settings",
-    label: "Account & Settings",
-    articleIds: [
-      "account-settings",
-      "notifications",
-      "personalization",
-      "settings-personalization",
-      "subscription",
-    ],
+    id: "account",
+    label: "Account",
+    articleIds: ["account-settings", "subscription"],
   },
   {
-    id: "companion-features",
-    label: "Companion Features",
-    articleIds: ["chat-companion", "chat-workspace", "memory", "privacy", "voice-conversations"],
+    id: "notifications",
+    label: "Notifications",
+    articleIds: ["notifications"],
   },
   {
-    id: "productivity-growth",
-    label: "Productivity & Growth",
+    id: "productivity",
+    label: "Productivity",
     articleIds: [
+      "productivity-help",
       "cognitive-growth",
-      "growth-reports",
-      "ecosystem-search",
-      "growth-uploads",
+      "time-blocking",
+      "executive-function",
+      "planning-problems",
     ],
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    articleIds: [
+      "settings-personalization",
+      "personalization",
+      "adaptive-colors",
+      "accessibility",
+      "views-layouts",
+      "language-settings",
+      "voice-preferences",
+    ],
+  },
+  {
+    id: "integrations",
+    label: "Integrations",
+    articleIds: ["integrations"],
+  },
+  {
+    id: "troubleshooting",
+    label: "Troubleshooting",
+    articleIds: ["troubleshooting"],
+  },
+  {
+    id: "advanced-companion",
+    label: "Advanced Companion Behavior",
+    articleIds: [...ADVANCED_COMPANION_CORE_IDS],
   },
 ];
 
@@ -111,11 +165,14 @@ function compareByTitle(a: HowDoIHelpArticle, b: HowDoIHelpArticle): number {
   return a.title.localeCompare(b.title, undefined, { sensitivity: "base" });
 }
 
-function resolveArticles(ids: readonly string[]): HowDoIHelpArticle[] {
-  return ids
+function resolveArticles(
+  ids: readonly string[],
+  preserveOrder = false,
+): HowDoIHelpArticle[] {
+  const articles = ids
     .map((id) => articlesById.get(id))
-    .filter((a): a is HowDoIHelpArticle => Boolean(a))
-    .sort(compareByTitle);
+    .filter((a): a is HowDoIHelpArticle => Boolean(a));
+  return preserveOrder ? articles : articles.sort(compareByTitle);
 }
 
 function allExplicitBrowseArticleIds(): Set<string> {
@@ -129,53 +186,60 @@ function allExplicitBrowseArticleIds(): Set<string> {
   return ids;
 }
 
-function buildMoreHelpSubgroup(): HowDoIBrowseSubgroup {
+function buildAdvancedOverflowIds(): string[] {
   const explicit = allExplicitBrowseArticleIds();
-  const overflow = HOW_DO_I_HELP_ARTICLES.filter((a) => !explicit.has(a.id)).sort(
-    compareByTitle,
-  );
-  return {
-    id: "more-help",
-    label: "More Help Topics",
-    articleIds: overflow.map((a) => a.id),
-  };
+  return HOW_DO_I_HELP_ARTICLES.filter((a) => !explicit.has(a.id))
+    .sort(compareByTitle)
+    .map((a) => a.id);
 }
 
 export function howDoIBrowseSections(): HowDoIBrowseTopSection[] {
-  const moreHelp = buildMoreHelpSubgroup();
-  const additionalSubgroups = [
-    ...ADDITIONAL_HELP_SUBGROUPS,
-    ...(moreHelp.articleIds.length > 0 ? [moreHelp] : []),
+  const overflow = buildAdvancedOverflowIds();
+  const advancedGroup = ADDITIONAL_HELP_SUBGROUPS.find(
+    (g) => g.id === "advanced-companion",
+  )!;
+  const advancedArticleIds = [
+    ...advancedGroup.articleIds,
+    ...overflow,
   ];
+
+  const additionalSubgroups = ADDITIONAL_HELP_SUBGROUPS.map((group) => {
+    const ids =
+      group.id === "advanced-companion" ? advancedArticleIds : group.articleIds;
+    return {
+      ...group,
+      articleIds: resolveArticles(ids, group.preserveOrder).map((a) => a.id),
+    };
+  });
 
   return [
     {
       id: "new-user",
       label: "New? Start Here",
       emoji: "🚀",
-      description:
-        "Orientation and onboarding — calm first steps, not a feature manual.",
-      articleIds: [...NEW_USER_START_ARTICLE_IDS],
+      description: "Where to start — orientation in a few calm steps.",
+      articleIds: resolveArticles(NEW_USER_START_ARTICLE_IDS, true).map(
+        (a) => a.id,
+      ),
     },
     {
       id: "main-areas",
       label: "Main Areas",
-      emoji: "📚",
-      description: "The core ecosystem — grouped by how you use them.",
+      emoji: "🌎",
+      description: "How the ecosystem works — basics, daily use, growth, and resources.",
       subgroups: MAIN_AREA_SUBGROUPS.map((group) => ({
         ...group,
-        articleIds: resolveArticles(group.articleIds).map((a) => a.id),
+        articleIds: resolveArticles(group.articleIds, group.preserveOrder).map(
+          (a) => a.id,
+        ),
       })),
     },
     {
       id: "additional-help",
       label: "Additional Help Topics",
       emoji: "🛠",
-      description: "Account, companion behavior, productivity, and deeper topics.",
-      subgroups: additionalSubgroups.map((group) => ({
-        ...group,
-        articleIds: resolveArticles(group.articleIds).map((a) => a.id),
-      })),
+      description: "Account, settings, integrations, troubleshooting, and deeper companion topics.",
+      subgroups: additionalSubgroups,
     },
   ];
 }
@@ -206,14 +270,34 @@ export function browseLocationForArticle(
   return null;
 }
 
+/** Human-readable path for search results, e.g. "Main Areas → Growth". */
+export function formatBrowseLocationLabel(
+  location: HowDoIBrowseLocation,
+): string {
+  const section = howDoIBrowseSections().find((s) => s.id === location.topSectionId);
+  if (!section) return "Help";
+
+  if (!location.subgroupId) {
+    return section.label;
+  }
+
+  const subgroup = section.subgroups?.find((g) => g.id === location.subgroupId);
+  return subgroup ? `${section.label} → ${subgroup.label}` : section.label;
+}
+
+export function browseLocationLabelForArticle(articleId: string): string | null {
+  const loc = browseLocationForArticle(articleId);
+  return loc ? formatBrowseLocationLabel(loc) : null;
+}
+
 export function articlesForBrowseSubgroup(
   subgroup: HowDoIBrowseSubgroup,
 ): HowDoIHelpArticle[] {
-  return resolveArticles(subgroup.articleIds);
+  return resolveArticles(subgroup.articleIds, subgroup.preserveOrder);
 }
 
 export function articlesForNewUserStart(): HowDoIHelpArticle[] {
-  return resolveArticles(NEW_USER_START_ARTICLE_IDS);
+  return resolveArticles(NEW_USER_START_ARTICLE_IDS, true);
 }
 
 /** @deprecated Use browseLocationForArticle */
@@ -238,4 +322,9 @@ export function isHelpCenterBrowseArticle(id: string): boolean {
 
 export function getBrowseArticle(id: string): HowDoIHelpArticle | undefined {
   return articlesById.get(id);
+}
+
+export function mainAreaBrowseArticleIds(): string[] {
+  const main = howDoIBrowseSections().find((s) => s.id === "main-areas");
+  return (main?.subgroups ?? []).flatMap((g) => g.articleIds);
 }

@@ -100,7 +100,28 @@ describe("Clear My Mind visual clusters", () => {
       }),
     ]);
     expect(graph.relationships.length).toBeGreaterThan(0);
-    expect(graph.relationships[0]?.reason).toBe("Launch");
+    expect(graph.relationships[0]?.kind).toBe("same_topic");
+    expect(graph.relationships[0]?.whyLabel).toContain("Launch");
+  });
+
+  it("does not fabricate single-token theme connections", () => {
+    const graph = buildBrainDumpClusterGraph([
+      entry({ id: "1", text: "Buy milk today", category: "Admin" }),
+      entry({ id: "2", text: "Call dentist today", category: "Health" }),
+    ]);
+    const tokenOnly = graph.relationships.filter((r) => r.kind === "shared_theme");
+    expect(tokenOnly).toHaveLength(0);
+  });
+
+  it("alignment audit explains cluster vs connection mismatch", () => {
+    const graph = buildBrainDumpClusterGraph([
+      entry({ id: "1", text: "Sales call", category: "Sales", topic: "Business" }),
+      entry({ id: "2", text: "Marketing post", category: "Marketing", topic: "Work" }),
+      entry({ id: "3", text: "Gym", category: "Health", topic: "Health" }),
+      entry({ id: "4", text: "Kids pickup", category: "Family", topic: "Personal" }),
+    ]);
+    expect(graph.alignmentAudit.clusterCount).toBeGreaterThanOrEqual(2);
+    expect(graph.alignmentAudit.summary.length).toBeGreaterThan(0);
   });
 
   it("export SVG and PDF work", () => {

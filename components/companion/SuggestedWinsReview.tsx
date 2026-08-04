@@ -12,6 +12,8 @@ import {
 import { GrowthAttachmentsField } from "@/components/companion/GrowthAttachmentsField";
 import type { GrowthAttachment } from "@/lib/growthAttachments";
 import { createSavedGrowthWin } from "@/lib/growthWinsStore";
+import { OutcomeGoalMultiLinkPicker } from "@/components/companion/OutcomeGoalMultiLinkPicker";
+import { packGoalLinks } from "@/lib/goals/goalLinking";
 
 const INPUT_CLASS =
   "mt-1 w-full rounded-xl border border-[#e4ddd2] bg-white px-3 py-2.5 text-sm text-[#2d2926] focus:border-[#c9a66b] focus:outline-none focus:ring-2 focus:ring-[#c9a66b]/25";
@@ -52,6 +54,7 @@ export function SuggestedWinsReview({
     confidence: false,
     journey: false,
   });
+  const [linkedGoalIds, setLinkedGoalIds] = useState<string[]>([]);
 
   const editing = useMemo(
     () => moments.find((m) => m.id === editingId) ?? null,
@@ -62,6 +65,7 @@ export function SuggestedWinsReview({
     setEditingId(moment.id);
     setEditText(moment.whatHappened);
     setEditAttachments([]);
+    setLinkedGoalIds([]);
     setDestinations(defaultDestinationsForClassification(moment.classification));
   }
 
@@ -86,6 +90,7 @@ export function SuggestedWinsReview({
         sourceId: moment.sourceId,
         classification: moment.classification,
         attachments,
+        ...packGoalLinks(linkedGoalIds),
       });
     }
     if (dest.evidence) onRouteEvidence(text, moment.sourceId);
@@ -96,6 +101,7 @@ export function SuggestedWinsReview({
     setEditingId(null);
     setEditText("");
     setEditAttachments([]);
+    setLinkedGoalIds([]);
     onSaved();
   }
 
@@ -171,6 +177,10 @@ export function SuggestedWinsReview({
                   <GrowthAttachmentsField
                     attachments={editAttachments}
                     onAttachmentsChange={setEditAttachments}
+                  />
+                  <OutcomeGoalMultiLinkPicker
+                    value={linkedGoalIds}
+                    onChange={setLinkedGoalIds}
                   />
                 </div>
               ) : null}

@@ -16,9 +16,10 @@ describe("companionBehaviorAudit", () => {
     );
     expect(categories).toEqual(
       expect.objectContaining({
-        size: 10,
+        size: expect.any(Number),
       }),
     );
+    expect(categories.size).toBeGreaterThanOrEqual(12);
     for (const cat of [
       "learn",
       "create",
@@ -27,6 +28,9 @@ describe("companionBehaviorAudit", () => {
       "organize",
       "focus",
       "calm",
+      "strategy",
+      "emotional",
+      "reminder",
       "relationship",
       "navigate",
       "yes_continuation",

@@ -16,6 +16,7 @@ import type {
 } from "@/lib/workspaceAwareness";
 import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 import type { WorkspaceSession } from "@/lib/workspaceSop";
+import type { WorkspaceBackRegistrar } from "@/lib/workspaceDrillBack";
 import { useWorkspaceFieldFocus } from "@/lib/useWorkspaceFieldFocus";
 import { WorkspaceSopProgress } from "@/components/companion/WorkspaceSopProgress";
 import { WorkspaceStepCard } from "@/components/companion/WorkspaceStepCard";
@@ -150,6 +151,7 @@ import {
   isGoogleCreateSuccess,
   saveReceipt,
 } from "@/lib/saveExportTrust";
+import { GOOGLE_EXPORT_MESSAGES } from "@/lib/googleExportVerification";
 import { SaveStatusBanner } from "@/components/companion/SaveStatusBanner";
 import {
   buildTaskSheetCsv,
@@ -236,6 +238,7 @@ export function ContentGeneratorPanel({
   workspaceV2HighlightKey = 0,
   onCompanionTypePick,
   onWorkspaceNeedIdeas,
+  registerBack,
 }: {
   seed: GenSeed;
   onOpen?: (s: AppSection) => void;
@@ -315,6 +318,7 @@ export function ContentGeneratorPanel({
     sectionLabel: string,
     prompt: string,
   ) => void;
+  registerBack?: WorkspaceBackRegistrar;
 }) {
   const [type, setType] = useState(seed?.type ?? "");
   const [topic, setTopic] = useState(seed?.topic ?? seed?.brief ?? "");
@@ -1073,7 +1077,7 @@ export function ContentGeneratorPanel({
       return;
     }
     if (!draft.trim()) {
-      setGoogleExportError("There is no draft content to export yet.");
+      setGoogleExportError(GOOGLE_EXPORT_MESSAGES.emptyDocument);
       return;
     }
     setGoogleExportError(null);
@@ -1099,7 +1103,7 @@ export function ContentGeneratorPanel({
             ? "Connect Google in Settings first."
             : j.error === "not-form-friendly"
               ? "Would you like me to turn this into form questions first?"
-              : j.error || googleFailureReceipt(kind);
+              : j.error || googleFailureReceipt(kind, j.error);
         setGoogleExportError(short);
         onExportGuidance?.(`${short}\n\n${copyPasteFallbackMessage(kind)}`);
         return;
@@ -1108,7 +1112,7 @@ export function ContentGeneratorPanel({
         handleGoogleDocCreated(j.url, j.id, kind);
         note(googleReceiptForKind(kind));
       } else {
-        setGoogleExportError(googleFailureReceipt(kind));
+        setGoogleExportError(googleFailureReceipt(kind, j.error));
         onExportGuidance?.(copyPasteFallbackMessage(kind));
       }
     } catch {
@@ -1346,8 +1350,18 @@ export function ContentGeneratorPanel({
     setLocationPanelOpen((o) => !o);
   }
 
-  function handleLauncherCreate(display: string, customLabel?: string) {
+  function handleLauncherCreate(
+    display: string,
+    customLabel?: string,
+    artifactTitle?: string,
+  ) {
     recordCreationSignal(customLabel?.trim() || display);
+    const named = artifactTitle?.trim() ?? "";
+    if (named) {
+      setTitle(named);
+      setTopic(named);
+      setBrief(named);
+    }
     if (customLabel?.trim()) {
       pickCreateType(customLabel.trim(), { bypassRoute: true });
       return;
@@ -1570,6 +1584,31 @@ export function ContentGeneratorPanel({
     }
     resetLocalCreateState();
   }
+
+  useEffect(() => {
+    if (!registerBack || !workspaceMode) return;
+    const createDrilled =
+      !showCreateHub &&
+      (showDraftEditor || showWorkspaceV2 || Boolean(resolvedCreateType));
+    if (!createDrilled) {
+      registerBack(null);
+      return;
+    }
+    registerBack(() => {
+      resetLocalCreateState();
+      onChangeType?.();
+      return true;
+    });
+    return () => registerBack(null);
+  }, [
+    registerBack,
+    workspaceMode,
+    showCreateHub,
+    showDraftEditor,
+    showWorkspaceV2,
+    resolvedCreateType,
+    onChangeType,
+  ]);
 
   function handleCreateOption(action: CreateOptionsAction) {
     if (action === "change-type") {

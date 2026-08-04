@@ -3,6 +3,7 @@
  */
 
 import { captureBehaviorEvent } from "../closedLoopLearning";
+import { packGoalLinks } from "../goals/goalLinking";
 import { getProjectItems, saveProjectItem } from "../companionStore";
 import { createEvidenceEntry } from "../evidenceBankStore";
 import type { PlanDayItem, PlanLifeDomain } from "./types";
@@ -26,6 +27,8 @@ export type PlanTaskCompletionRecord = {
   projectId?: string;
   planItemId: string;
   elevatedToEvidence: boolean;
+  outcomeGoalId?: string;
+  outcomeGoalIds?: string[];
 };
 
 const HISTORY_KEY = "companion-plan-completion-history-v1";
@@ -206,6 +209,9 @@ export function completePlanItem(
     projectId: item.projectId,
     planItemId: item.id,
     elevatedToEvidence,
+    ...packGoalLinks(
+      item.outcomeGoalId ? [item.outcomeGoalId] : [],
+    ),
   };
 
   writeHistory([record, ...readHistory()]);

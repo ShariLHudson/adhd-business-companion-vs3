@@ -44,6 +44,13 @@ import {
   type ResolvePendingAcceptanceResult,
 } from "./pendingAcceptanceAuthority";
 import type { PendingAction } from "./pendingAction";
+import {
+  assistantQuestionOwnsDecisionContext,
+  filteredOutcomeThreadForAcceptance,
+  getActiveWorkflowOwner,
+  workflowOwnerContinuationFallback,
+  type WorkflowOwnerDetection,
+} from "./workflowOwnershipAuthority";
 import type { OutcomeThread } from "./companionOutcomeThread";
 import {
   adhdNativeHintForChat,
@@ -293,9 +300,38 @@ export function resolveCompanionAcceptanceTurn(input: {
     "userText" | "lastAssistantText" | "currentTurn"
   >;
   outcomeThread?: OutcomeThread | null;
+  workflowOwner?: WorkflowOwnerDetection | null;
 }): CompanionAcceptanceResolution {
   const t = input.userText.trim();
   if (!t || !isAcceptanceAttempt(t)) return { kind: "none" };
+
+  const owner =
+    input.workflowOwner ??
+    getActiveWorkflowOwner({
+      lastAssistantText: input.lastAssistantText,
+      conversationWorkflow: input.workflow,
+    });
+  const outcomeThread = filteredOutcomeThreadForAcceptance(
+    owner,
+    input.outcomeThread ?? null,
+  );
+
+  if (
+    owner &&
+    owner.owner !== "decision_workflow" &&
+    owner.owner !== "workspace_workflow" &&
+    owner.owner !== "conversation_workflow" &&
+    owner.owner !== "strategy_workflow"
+  ) {
+    return {
+      kind: "workflow",
+      continuation: {
+        action: "reply",
+        message: workflowOwnerContinuationFallback(owner),
+        nextWorkflow: null,
+      },
+    };
+  }
 
   const fromState = input.workflow
     ? resolveConversationWorkflowAcceptance({
@@ -303,7 +339,7 @@ export function resolveCompanionAcceptanceTurn(input: {
         lastAssistantText: input.lastAssistantText,
         workflow: input.workflow,
         currentTurn: input.currentTurn,
-        outcomeThread: input.outcomeThread,
+        outcomeThread,
       })
     : null;
 
@@ -313,10 +349,26 @@ export function resolveCompanionAcceptanceTurn(input: {
       t,
       input.lastAssistantText,
       input.currentTurn,
-      input.outcomeThread,
+      outcomeThread,
     );
 
   if (workflowHit) {
+    if (
+      owner &&
+      owner.owner !== "decision_workflow" &&
+      workflowHit.action === "reply" &&
+      /\bkeep going on\b/i.test(workflowHit.message) &&
+      /\bstrategic direction\b/i.test(workflowHit.message)
+    ) {
+      return {
+        kind: "workflow",
+        continuation: {
+          action: "reply",
+          message: workflowOwnerContinuationFallback(owner),
+          nextWorkflow: null,
+        },
+      };
+    }
     return { kind: "workflow", continuation: workflowHit };
   }
 
@@ -324,7 +376,7 @@ export function resolveCompanionAcceptanceTurn(input: {
     userText: t,
     lastAssistantText: input.lastAssistantText,
     currentTurn: input.currentTurn,
-    outcomeThread: input.outcomeThread,
+    outcomeThread,
     ...input.pendingInput,
   });
 
@@ -333,11 +385,21 @@ export function resolveCompanionAcceptanceTurn(input: {
   }
 
   if (pending.outcome === "conversation") {
+    if (owner && !assistantQuestionOwnsDecisionContext(input.lastAssistantText)) {
+      return {
+        kind: "workflow",
+        continuation: {
+          action: "reply",
+          message: workflowOwnerContinuationFallback(owner),
+          nextWorkflow: null,
+        },
+      };
+    }
     const retryWorkflow = resolveWorkflowFromLastAssistant(
       t,
       input.lastAssistantText,
       input.currentTurn,
-      input.outcomeThread,
+      outcomeThread,
     );
     if (retryWorkflow) {
       return { kind: "workflow", continuation: retryWorkflow };

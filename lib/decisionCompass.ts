@@ -444,6 +444,17 @@ export function advanceDecisionCompass(
   };
 }
 
+/** Step back one screen within the compass wizard (global Back). */
+export function retreatDecisionCompass(
+  state: DecisionCompassState,
+): DecisionCompassState {
+  if (state.complete) {
+    return { ...state, complete: false };
+  }
+  if (state.stepIndex <= 0) return state;
+  return { ...state, stepIndex: state.stepIndex - 1 };
+}
+
 export function setDecisionType(
   state: DecisionCompassState,
   type: DecisionType,

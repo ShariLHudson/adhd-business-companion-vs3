@@ -16,9 +16,26 @@ const VISUAL_CONCEPT_RE =
 export function isHowToLearningQuestion(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
-  if (HOW_TO_OPENER_RE.test(t)) return true;
   if (HOW_TO_PASSIVE_RE.test(t)) return true;
   if (/\bhow are .+ used\b/i.test(t)) return true;
+  if (HOW_TO_OPENER_RE.test(t)) {
+    if (
+      /\b(?:find|open|change|access|use|start|where|block)\b/i.test(t) &&
+      /\b(?:app|settings|games?|focus|templates?|strateg|sidebar|color|time|reminder|notification)/i.test(
+        t,
+      )
+    ) {
+      return false;
+    }
+    if (VISUAL_CONCEPT_RE.test(t)) return true;
+    if (
+      /\b(?:create|make|build|write|design|draft)\b/i.test(t) &&
+      /\b(?:plan|funnel|sop|email|marketing|newsletter|offer|proposal)/i.test(t)
+    ) {
+      return true;
+    }
+    return false;
+  }
   return false;
 }
 

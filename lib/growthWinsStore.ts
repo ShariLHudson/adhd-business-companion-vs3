@@ -15,6 +15,10 @@ export type SavedGrowthWin = {
   classification?: GrowthMomentClassification;
   attachments: GrowthAttachment[];
   createdAt: string;
+  /** P0.33 — explicit Outcome Goal™ link */
+  outcomeGoalId?: string;
+  /** P0.34 — multiple Outcome Goal™ links */
+  outcomeGoalIds?: string[];
 };
 
 const STORAGE_KEY = "companion-saved-growth-wins-v1";

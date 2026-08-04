@@ -9,6 +9,7 @@ import {
   type PlanItemColumn,
 } from "@/lib/planMyDay";
 import { KANBAN_COLUMNS } from "@/lib/planMyDay/types";
+import { PlanItemGoalBadge } from "@/components/companion/PlanItemGoalBadge";
 
 const DRAG_MIME = "application/x-plan-day-item";
 
@@ -91,6 +92,7 @@ function KanbanCard({
       >
         <span className="block text-base font-medium text-[#1f1c19] hover:text-[#1e4f4f]">
           {item.title}
+          <PlanItemGoalBadge outcomeGoalId={item.outcomeGoalId} />
         </span>
         <span className="mt-0.5 block text-sm text-[#6b635a]">
           {durationLabel(item)}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getDayState } from "@/lib/companionStore";
+import { PlanItemGoalBadge } from "@/components/companion/PlanItemGoalBadge";
 import {
   addQuickPlanItem,
   durationLabel,
@@ -56,7 +57,7 @@ function ViewDropdown({
   return (
     <div className="flex flex-wrap items-center gap-2">
       <label htmlFor="plan-day-view" className="text-base font-semibold text-[#1f1c19]">
-        View:
+        Task View:
       </label>
       <select
         id="plan-day-view"
@@ -91,7 +92,7 @@ function ListView({
       <ul className="mt-3 flex flex-col gap-2">
         {active.length === 0 ? (
           <li className="text-base text-[#6b635a]">
-            Nothing on the plan yet — add something above.
+            Your day is clear so far. Add one thing above when you&apos;re ready.
           </li>
         ) : (
           active.map((item) => {
@@ -111,6 +112,7 @@ function ListView({
                 >
                   <span className="min-w-0 flex-1">
                     <span className="text-lg text-[#1f1c19]">{item.title}</span>
+                    <PlanItemGoalBadge outcomeGoalId={item.outcomeGoalId} />
                     {item.keptForReference ? (
                       <span className="ml-2 text-xs font-bold uppercase text-[#1e4f4f]">
                         Reference
@@ -146,7 +148,14 @@ function TimelineView({
     .filter(isPlanItemActive)
     .sort((a, b) => (a.startTime ?? "").localeCompare(b.startTime ?? ""));
   return (
-    <div className="plan-day-timeline-rail pl-4">
+    <div>
+      <p className="text-lg font-semibold text-[#1f1c19]">Today&apos;s Focus</p>
+      {sorted.length === 0 ? (
+        <p className="mt-3 text-base text-[#6b635a]">
+          Your day is clear so far. Add one thing above when you&apos;re ready.
+        </p>
+      ) : (
+    <div className="plan-day-timeline-rail mt-3 pl-4">
       <ul className="flex flex-col gap-2">
         {sorted.map((item) => {
           const style = planItemStyle(item, colorCoding);
@@ -181,6 +190,7 @@ function TimelineView({
                   <span className="text-lg font-semibold text-[#1f1c19]">
                     {item.title}
                   </span>
+                  <PlanItemGoalBadge outcomeGoalId={item.outcomeGoalId} />
                   {colorCoding ? (
                     <span
                       className="ml-auto hidden text-xs font-bold uppercase tracking-wide sm:inline"
@@ -196,6 +206,8 @@ function TimelineView({
         })}
       </ul>
     </div>
+      )}
+    </div>
   );
 }
 
@@ -210,7 +222,14 @@ function CardsView({
 }) {
   const active = items.filter(isPlanItemActive);
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div>
+      <p className="text-lg font-semibold text-[#1f1c19]">Today&apos;s Focus</p>
+      {active.length === 0 ? (
+        <p className="mt-3 text-base text-[#6b635a]">
+          Your day is clear so far. Add one thing above when you&apos;re ready.
+        </p>
+      ) : (
+    <div className="mt-3 grid gap-3 sm:grid-cols-2">
       {active.map((item) => {
         const style = planItemStyle(item, colorCoding);
         return (
@@ -246,6 +265,8 @@ function CardsView({
         );
       })}
     </div>
+      )}
+    </div>
   );
 }
 
@@ -254,6 +275,7 @@ export function PlanMyDayPanel({
   onStartFocus,
   onOpenProject,
   onOpenAdaptMyDay,
+  onOpenReminderBuilder,
   registerBack,
   initialOpenItemId,
 }: {
@@ -263,6 +285,7 @@ export function PlanMyDayPanel({
   onStartFocus?: (item: PlanDayItem) => void;
   onOpenProject?: (projectId: string) => void;
   onOpenAdaptMyDay?: () => void;
+  onOpenReminderBuilder?: () => void;
   registerBack?: (fn: (() => boolean) | null) => void;
   initialOpenItemId?: string | null;
 }) {
@@ -451,18 +474,13 @@ export function PlanMyDayPanel({
       ) : null}
 
       <div className={`${PLAN_CENTERED_CLASS} ${openItem ? "" : "mt-4"}`}>
-        <div className="flex flex-col gap-3 border-b border-[#e7dfd4] pb-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0">
-            <h1 className="text-2xl font-semibold text-[#1f1c19] lg:text-3xl">
-              Plan My Day™
-            </h1>
-            <p className="mt-1 text-base leading-relaxed text-[#6b635a] lg:text-lg">
-              Choose what fits today&apos;s reality — not everything on your mind.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2 sm:justify-end sm:gap-3">
-            <ViewDropdown active={view} onChange={handleViewChange} />
-          </div>
+        <div className="border-b border-[#e7dfd4] pb-4">
+          <h1 className="text-2xl font-semibold text-[#1f1c19] lg:text-3xl">
+            Plan My Day™
+          </h1>
+          <p className="mt-1 text-base leading-relaxed text-[#6b635a] lg:text-lg">
+            Choose what fits today&apos;s reality — not everything on your mind.
+          </p>
         </div>
       </div>
 
@@ -522,13 +540,16 @@ export function PlanMyDayPanel({
                 </div>
               </div>
             ) : null}
-            <TodaysRealitySummary />
-            <p className="text-center text-sm text-[#9a8f82]">
-              Add a task → decide where it belongs → work the board. Kanban:
-              Considering Today → Today&apos;s Focus → In Progress. Tap ✓ to
-              complete — items archive and leave the board.
+            <TodaysRealitySummary onAdaptMyDay={onOpenAdaptMyDay} />
+            <p className="text-base font-semibold text-[#1f1c19]">
+              What needs attention today?
             </p>
-            <PlanDayAddForm onAdd={handleAdd} />
+            <PlanDayAddForm
+              onAdd={handleAdd}
+              showHeading={false}
+              onOpenReminderBuilder={onOpenReminderBuilder}
+            />
+            <ViewDropdown active={view} onChange={handleViewChange} />
             {view !== "kanban" ? renderTaskView() : null}
           </div>
           {view === "kanban" ? (

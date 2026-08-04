@@ -4,6 +4,8 @@ import { useState } from "react";
 import {
   ASSETS,
   BRAND,
+  GROWTH_MENU,
+  GROWTH_VAULT_SECTIONS,
   MORE_NAV,
   SECTION_NAV,
   SIDEBAR_NAV,
@@ -23,15 +25,17 @@ import type { CoachingMode } from "@/lib/companionPrompt";
 type AppSidebarProps = {
   activeNav: SidebarNavId;
   activeSection: AppSection;
+  workspacePanel?: AppSection | null;
   onNavSelect: (nav: SidebarNavId, mode?: CoachingMode) => void;
 };
 
-// Six sidebar doors — Chat, Focus My Brain, Visual Thinking, Growth, Other, How Do I.
 export function AppSidebar({
   activeNav,
   activeSection,
+  workspacePanel = null,
   onNavSelect,
 }: AppSidebarProps) {
+  const effectiveSection = workspacePanel ?? activeSection;
   const normalizedActiveNav = normalizeSidebarNav(activeNav);
   const moreActive = MORE_NAV.some(
     (item) =>
@@ -40,15 +44,92 @@ export function AppSidebar({
   const [moreOpen, setMoreOpen] = useState(false);
   const showMore = moreOpen || moreActive;
 
+  const growthVaultActive =
+    activeSection === "growth-vault" ||
+    GROWTH_VAULT_SECTIONS.includes(activeSection);
+  const outcomeGoalsActive = activeSection === "outcome-goals";
+  const growthBranchActive =
+    normalizedActiveNav === "growth" ||
+    growthVaultActive ||
+    outcomeGoalsActive;
+  const [growthOpen, setGrowthOpen] = useState(false);
+  const showGrowth = growthOpen || growthBranchActive;
+
   function renderItem(item: {
     id: SidebarNavId;
     label: string;
     emoji: string;
     mode?: CoachingMode;
   }) {
+    if (item.id === "growth") {
+      return (
+        <div key="growth-branch">
+          <button
+            type="button"
+            onClick={() => setGrowthOpen((o) => !o)}
+            aria-expanded={showGrowth}
+            title="Growth"
+            aria-label="Growth"
+            className={`${MENU_NAV_LINK} w-full ${
+              growthBranchActive ? "companion-nav-active shadow-sm" : MENU_TEXT_HOVER
+            }`}
+          >
+            <span
+              aria-hidden="true"
+              className="relative flex w-6 shrink-0 justify-center"
+            >
+              {item.emoji}
+            </span>
+            <span className={`${MENU_NAV_LINK_LABEL} flex-1 text-left`}>
+              {item.label}
+            </span>
+            <span aria-hidden className="hidden text-xs md:inline">
+              {showGrowth ? "▾" : "▸"}
+            </span>
+          </button>
+          {showGrowth ? (
+            <div className="mt-1 flex flex-col gap-1 md:pl-2">
+              {GROWTH_MENU.map((child) => {
+                const childActive =
+                  child.id === "growth-vault"
+                    ? growthVaultActive
+                    : outcomeGoalsActive;
+                return (
+                  <a
+                    key={child.id}
+                    href={companionNavHref(child.id)}
+                    data-nav-id={child.id}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onNavSelect(child.id);
+                    }}
+                    title={child.label}
+                    aria-label={child.label}
+                    aria-current={childActive ? "page" : undefined}
+                    className={`${MENU_NAV_LINK} ${
+                      childActive ? "companion-nav-active shadow-sm" : MENU_TEXT_HOVER
+                    }`}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="relative flex w-6 shrink-0 justify-center"
+                    >
+                      {child.emoji}
+                    </span>
+                    <span className={MENU_NAV_LINK_LABEL}>{child.label}</span>
+                  </a>
+                );
+              })}
+            </div>
+          ) : null}
+        </div>
+      );
+    }
+
     const sectionFor = SECTION_NAV[item.id];
     const active = sectionFor
-      ? activeSection === sectionFor ||
+      ? effectiveSection === sectionFor ||
+        (item.id === "today" && effectiveSection === "plan-my-day") ||
         (activeSection === "home" && normalizedActiveNav === item.id)
       : normalizedActiveNav === item.id && activeSection === "home";
     const href = companionNavHref(item.id, item.mode);
@@ -85,7 +166,6 @@ export function AppSidebar({
       className="companion-app-sidebar relative flex h-dvh w-14 shrink-0 flex-col overflow-y-auto border-r border-black/10 text-black backdrop-blur-md md:w-44"
       aria-label="Navigation"
     >
-      {/* Brand header — the identity anchor, above all navigation. */}
       <div className="flex items-center gap-2 border-b border-black/10 px-2 py-3.5 md:px-3">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -128,7 +208,6 @@ export function AppSidebar({
         ) : null}
       </nav>
 
-      {/* Google quick links — open your apps from anywhere. */}
       <div className="border-t border-black/10 p-2">
         <p className={`hidden px-2 pb-1 pt-0.5 md:block ${MENU_SECTION_HEADING}`}>
           Open in Google

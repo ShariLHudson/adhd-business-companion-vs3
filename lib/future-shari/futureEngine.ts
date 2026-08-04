@@ -3,6 +3,7 @@
  */
 
 import { frictionFromSnapshot } from "./futureInsights";
+import { shouldSuppressProactivePatternInsights } from "../patternAwarenessPrefs";
 import {
   buildFutureShariOffer,
   futureHintForChat,
@@ -56,6 +57,7 @@ export function evaluateFutureShari(
 export function evaluateFutureShariOffer(
   partial: FutureShariInput = {},
 ): FutureShariOffer | null {
+  if (shouldSuppressProactivePatternInsights()) return null;
   const now = partial.now ?? new Date();
   if (isFutureOfferDismissedToday(now)) return null;
 

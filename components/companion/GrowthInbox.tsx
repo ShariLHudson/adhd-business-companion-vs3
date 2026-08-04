@@ -14,8 +14,93 @@ import { GrowthAttachmentsField } from "@/components/companion/GrowthAttachments
 const INPUT_CLASS =
   "mt-1 w-full rounded-xl border border-[#e4ddd2] bg-white px-3 py-2.5 text-sm text-[#2d2926] focus:border-[#c9a66b] focus:outline-none focus:ring-2 focus:ring-[#c9a66b]/25";
 
-const ACTION_BTN =
+const PRIMARY_BTN =
+  "rounded-full bg-[#2f261f] px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-[#1f1c19]";
+
+const SECONDARY_BTN =
   "rounded-full border border-[#e7d9c8] bg-[#faf7f2] px-2.5 py-1 text-[11px] font-semibold text-[#2f261f] hover:bg-[#f3ebe0]";
+
+function InboxItemActions({
+  editing,
+  onSaveWin,
+  onSaveEvidence,
+  onSavePortfolio,
+  onSaveJourney,
+  onEditToggle,
+  onDismiss,
+}: {
+  editing: boolean;
+  onSaveWin: () => void;
+  onSaveEvidence: () => void;
+  onSavePortfolio: () => void;
+  onSaveJourney: () => void;
+  onEditToggle: () => void;
+  onDismiss: () => void;
+}) {
+  const [elsewhereOpen, setElsewhereOpen] = useState(false);
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-1.5">
+      <button type="button" className={PRIMARY_BTN} onClick={onSaveWin}>
+        Save as Win
+      </button>
+      <div className="relative">
+        <button
+          type="button"
+          className={SECONDARY_BTN}
+          onClick={() => setElsewhereOpen((v) => !v)}
+          aria-expanded={elsewhereOpen}
+        >
+          Save elsewhere ▾
+        </button>
+        {elsewhereOpen ? (
+          <div className="absolute left-0 top-full z-10 mt-1 min-w-[10rem] rounded-xl border border-[#e7d9c8] bg-white py-1 shadow-lg">
+            <button
+              type="button"
+              className="block w-full px-3 py-2 text-left text-xs font-semibold text-[#2f261f] hover:bg-[#faf7f2]"
+              onClick={() => {
+                setElsewhereOpen(false);
+                onSaveEvidence();
+              }}
+            >
+              Evidence
+            </button>
+            <button
+              type="button"
+              className="block w-full px-3 py-2 text-left text-xs font-semibold text-[#2f261f] hover:bg-[#faf7f2]"
+              onClick={() => {
+                setElsewhereOpen(false);
+                onSavePortfolio();
+              }}
+            >
+              Portfolio
+            </button>
+            <button
+              type="button"
+              className="block w-full px-3 py-2 text-left text-xs font-semibold text-[#2f261f] hover:bg-[#faf7f2]"
+              onClick={() => {
+                setElsewhereOpen(false);
+                onSaveJourney();
+              }}
+            >
+              Journey
+            </button>
+          </div>
+        ) : null}
+      </div>
+      <button type="button" className={SECONDARY_BTN} onClick={onEditToggle}>
+        {editing ? "Cancel" : "Edit"}
+      </button>
+      <button
+        type="button"
+        className="rounded-full px-2.5 py-1 text-[11px] font-semibold text-[#9a8f82] hover:text-[#6f6259]"
+        onClick={onDismiss}
+      >
+        Dismiss
+      </button>
+    </div>
+  );
+}
 
 export function GrowthInbox({
   items,
@@ -112,65 +197,34 @@ export function GrowthInbox({
                   />
                 </div>
               ) : null}
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                <button type="button" className={ACTION_BTN} onClick={() => saveAsWin(item)}>
-                  Save as Win
-                </button>
-                <button
-                  type="button"
-                  className={ACTION_BTN}
-                  onClick={() => {
-                    const text = textFor(item);
-                    if (!text) return;
-                    onSaveEvidence(text, item.sourceId);
-                    finish(item.sourceId);
-                  }}
-                >
-                  Save as Evidence
-                </button>
-                <button
-                  type="button"
-                  className={ACTION_BTN}
-                  onClick={() => {
-                    const text = textFor(item);
-                    if (!text) return;
-                    onSaveProof(text);
-                    finish(item.sourceId);
-                  }}
-                >
-                  Add to My Highlights
-                </button>
-                <button
-                  type="button"
-                  className={ACTION_BTN}
-                  onClick={() => {
-                    const text = textFor(item);
-                    if (!text) return;
-                    onSaveJourney(text);
-                    finish(item.sourceId);
-                  }}
-                >
-                  Save as Journey
-                </button>
-                <button
-                  type="button"
-                  className={ACTION_BTN}
-                  onClick={() =>
-                    editing
-                      ? setEditingId(null)
-                      : (setEditingId(item.id), setEditText(item.whatHappened))
-                  }
-                >
-                  {editing ? "Cancel" : "Edit"}
-                </button>
-                <button
-                  type="button"
-                  className="rounded-full px-2.5 py-1 text-[11px] font-semibold text-[#9a8f82] hover:text-[#6f6259]"
-                  onClick={() => dismiss(item)}
-                >
-                  Dismiss
-                </button>
-              </div>
+              <InboxItemActions
+                editing={editing}
+                onSaveWin={() => saveAsWin(item)}
+                onSaveEvidence={() => {
+                  const text = textFor(item);
+                  if (!text) return;
+                  onSaveEvidence(text, item.sourceId);
+                  finish(item.sourceId);
+                }}
+                onSavePortfolio={() => {
+                  const text = textFor(item);
+                  if (!text) return;
+                  onSaveProof(text);
+                  finish(item.sourceId);
+                }}
+                onSaveJourney={() => {
+                  const text = textFor(item);
+                  if (!text) return;
+                  onSaveJourney(text);
+                  finish(item.sourceId);
+                }}
+                onEditToggle={() =>
+                  editing
+                    ? setEditingId(null)
+                    : (setEditingId(item.id), setEditText(item.whatHappened))
+                }
+                onDismiss={() => dismiss(item)}
+              />
             </li>
           );
         })}

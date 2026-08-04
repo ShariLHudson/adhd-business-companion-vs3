@@ -8,6 +8,7 @@ import {
   updateBrainDump,
   type BrainDumpEntry,
 } from "./companionStore";
+import { createOutcomeGoal } from "./goals/outcomeGoals";
 import {
   routeBrainDumpEntry,
   type ClearMindRoute,
@@ -19,6 +20,7 @@ export type ThoughtAction =
   | "schedule"
   | "add-to-calendar"
   | "move-to-project"
+  | "convert-to-goal"
   | "plan-my-day"
   | "keep-here"
   | "delete";
@@ -34,6 +36,7 @@ export const THOUGHT_ACTION_ORDER: ThoughtAction[] = [
   "schedule",
   "add-to-calendar",
   "move-to-project",
+  "convert-to-goal",
   "plan-my-day",
   "keep-here",
   "delete",
@@ -44,6 +47,7 @@ export const THOUGHT_ACTION_LABEL: Record<ThoughtAction, string> = {
   schedule: "Schedule",
   "add-to-calendar": "Add to Calendar",
   "move-to-project": "Move to Project",
+  "convert-to-goal": "Convert to Goal",
   "plan-my-day": "Move to Plan My Day",
   "keep-here": "Keep Here",
   delete: "Delete",
@@ -109,6 +113,33 @@ export function applyThoughtAction(
     };
   }
 
+  if (action === "convert-to-goal") {
+    const deadline = new Date();
+    deadline.setMonth(deadline.getMonth() + 3);
+    const goal = createOutcomeGoal({
+      statement: text.slice(0, 120),
+      metric: "Progress",
+      targetValue: 1,
+      deadline: deadline.toISOString().slice(0, 10),
+      definitionOfDone: "Converted from a Clear My Mind thought.",
+      whyItMatters: text,
+    });
+    updateBrainDump(entry.id, {
+      outcomeGoalId: goal.id,
+      done: true,
+      routedAction: "goal",
+    });
+    return {
+      ok: true,
+      headline: `Goal created: "${goal.statement}"`,
+      savedWhere: "Growth Center → Outcome Goals™",
+      seeWhere: "Open Growth to track progress on this outcome.",
+      route: "task",
+      action,
+      removedFromLandscape: true,
+    };
+  }
+
   const route = ROUTE_BY_ACTION[action];
   if (!route) {
     return {
@@ -128,9 +159,10 @@ export function applyThoughtAction(
 
 export function thoughtActionOpensSection(
   action: ThoughtAction,
-): "time-block" | "projects" | "plan-my-day" | null {
+): "time-block" | "projects" | "plan-my-day" | "outcome-goals" | null {
   if (action === "add-to-calendar") return "time-block";
   if (action === "move-to-project") return "projects";
+  if (action === "convert-to-goal") return "outcome-goals";
   if (action === "plan-my-day") return "plan-my-day";
   return null;
 }

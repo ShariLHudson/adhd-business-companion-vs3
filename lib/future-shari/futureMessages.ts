@@ -2,6 +2,7 @@
  * Future Shari messages — warm, optional, never commanding.
  */
 
+import { buildIntelligenceSystemGuardrail } from "../emotionalSafetyIntelligence";
 import type { FutureShariOffer, FutureShariSnapshot } from "./types";
 
 const INTRO_LINES = [
@@ -41,6 +42,7 @@ export function futureHintForChat(snapshot: FutureShariSnapshot): string {
     `Timeframe: ${snapshot.timeframe}`,
     `If natural, you may weave in: "${snapshot.futureMessage}"`,
     "Tone: caring friend for tomorrow — no guilt, pressure, should, or fear.",
+    buildIntelligenceSystemGuardrail("future_impact"),
     "Do not mention Future Shari as a system label unless user already uses it.",
   ].join("\n");
 }

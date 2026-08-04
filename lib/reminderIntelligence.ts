@@ -5,8 +5,9 @@
 
 import type { TimeBlock } from "./companionStore";
 import { blockDateTime } from "./companionStore";
-import type { Reminder, ReminderType } from "./reminderStore";
+import type { Reminder, ReminderNotificationChannel, ReminderType } from "./reminderStore";
 import { saveReminder, saveReminders } from "./reminderStore";
+import { advanceBuilderRecurrenceFire } from "./reminderBuilder";
 
 export type ReminderDraft = {
   title: string;
@@ -17,7 +18,9 @@ export type ReminderDraft = {
   eventId?: string;
   eventTitle?: string;
   offsets?: number[];
-  missing: "time" | "am_pm" | "event" | null;
+  dailyTimes?: string[];
+  notificationChannel?: ReminderNotificationChannel;
+  missing: "name" | "time" | "am_pm" | "event" | "frequency" | null;
   ambiguousHour?: number;
 };
 
@@ -26,8 +29,56 @@ export type ReminderTurnOutcome =
   | { kind: "ask"; reply: string; draft: ReminderDraft }
   | { kind: "confirm"; reply: string; reminders: Reminder[] };
 
+/** Guided chat intake steps (P0.57 golden path). */
+export type ReminderIntakeStep =
+  | "createReminder"
+  | "ask_name"
+  | "ask_times"
+  | "ask_frequency"
+  | "complete";
+
+const GENERIC_REMINDER_NAME_RE = /^(?:reminder|a reminder)$/i;
+
+export function isGenericReminderName(title: string): boolean {
+  return GENERIC_REMINDER_NAME_RE.test(title.trim());
+}
+
+/** Map draft + turn outcome to the current intake step for debugging and UI locks. */
+export function getReminderIntakeStep(
+  draft: ReminderDraft | null,
+  outcome: Pick<ReminderTurnOutcome, "kind"> | ReminderTurnOutcome["kind"],
+): ReminderIntakeStep {
+  const kind = typeof outcome === "string" ? outcome : outcome.kind;
+  if (kind === "confirm") return "complete";
+  if (!draft) return "createReminder";
+  if (draft.missing === "name" || draft.missing === "event") return "ask_name";
+  if (draft.missing === "time" || draft.missing === "am_pm") return "ask_times";
+  if (draft.missing === "frequency") return "ask_frequency";
+  return "complete";
+}
+
+/** True while chat should stay in reminder intake (conversation locked). */
+export function isReminderIntakeAwaitingAnswer(
+  draft: ReminderDraft | null,
+  outcome: ReminderTurnOutcome,
+): boolean {
+  return outcome.kind === "ask" && getReminderIntakeStep(draft, outcome) !== "complete";
+}
+
 const REMINDER_REQUEST_RE =
-  /\b(?:remind me|notify me|alert me|nudge me|check in with me|don'?t let me forget|don'?t forget)\b/i;
+  /\b(?:(?:need|want|i need|i want)(?:\s+a)?\s+reminder|remind me|set up (?:a )?reminder(?:\s+for(?:\s+me)?)?|create (?:a )?reminder|set (?:a )?reminder|schedule (?:a )?reminder|notify me|alert me|nudge me|check in with me|don'?t let me forget|don'?t forget|recurring reminder|reminder (?:for|to|at))\b/i;
+
+const REMINDER_INTAKE_MESSAGE_RE =
+  /\bwhen would you like (?:me to remind you|the reminder)\b/i;
+
+const REMINDER_NAME_ASK_RE =
+  /\bwhat should I remind you about\b/i;
+
+const REMINDER_AFFIRMATION_RE =
+  /^(?:yes|yep|yeah|yup|sure|ok(?:ay)?|please|do that|go ahead|sounds good|that works|perfect|great|do it|every day|daily)\.?$/i;
+
+const REMINDER_SETUP_OFFER_RE =
+  /\b(?:help (?:you )?(?:set(?:ting)? up|create|make)(?:\s+a)?\s+reminder|set (?:that|a|the) reminder up)\b/i;
 
 const RECURRENCE_RE =
   /\b(?:every\s+hour|every\s+day|every\s+week|every\s+(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)|weekdays?\s+(?:at\s+)?|every\s+friday|every\s+monday)\b/i;
@@ -75,12 +126,58 @@ function capitalize(s: string): string {
 }
 
 function stripReminderPrefix(text: string): string {
-  return text
+  const trimmed = text.trim();
+  if (
+    /^(?:please\s+)?(?:(?:set up|create|set|schedule)\s+(?:a\s+)?reminder)\s*$/i.test(
+      trimmed,
+    )
+  ) {
+    return "";
+  }
+  return trimmed
     .replace(
-      /^(?:please\s+)?(?:remind me|notify me|alert me|nudge me|check in with me|don'?t let me forget|don'?t forget)\s+(?:to\s+)?/i,
+      /^(?:please\s+)?(?:(?:i\s+)?(?:need|want)\s+(?:a\s+)?reminder\s+(?:to|for)\s+|(?:set up|create|set|schedule)\s+(?:a\s+)?reminder(?:\s+for(?:\s+me)?)?\s*(?:to\s+)?(?:for\s+me\s+to\s+)?|remind me|notify me|alert me|nudge me|check in with me|don'?t let me forget|don'?t forget)\s*(?:to\s+)?(?:for\s+me\s+to\s+)?/i,
       "",
     )
     .trim();
+}
+
+export function isReminderSetupOfferMessage(assistantText: string): boolean {
+  const t = assistantText.trim();
+  if (!t) return false;
+  if (isReminderIntakeMessage(t)) return true;
+  return REMINDER_SETUP_OFFER_RE.test(t);
+}
+
+/** Find the most recent user message that started a reminder request. */
+export function findRecentReminderUserText(
+  messages: { role: string; content: string }[],
+): string | null {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const m = messages[i];
+    if (m?.role === "user" && isReminderRequest(m.content)) {
+      return m.content.trim();
+    }
+  }
+  return null;
+}
+
+export function isReminderIntakeMessage(assistantText: string): boolean {
+  const t = assistantText.trim();
+  if (!t) return false;
+  if (REMINDER_INTAKE_MESSAGE_RE.test(t)) return true;
+  if (REMINDER_NAME_ASK_RE.test(t)) return true;
+  if (/\bdo you mean \d{1,2} AM or \d{1,2} PM\b/i.test(t)) return true;
+  if (/\bwhich .+ should I use\b/i.test(t)) return true;
+  if (/\bone[- ]time or recurring\b/i.test(t)) return true;
+  if (/\bevery day\?\s*$/i.test(t)) return true;
+  if (/\bI'll remind you:\s*$/im.test(t)) return true;
+  if (/^Got it\.\s*$/i.test(t) && /\b(?:AM|PM)\b/.test(t)) return true;
+  return false;
+}
+
+export function isReminderAffirmation(text: string): boolean {
+  return REMINDER_AFFIRMATION_RE.test(text.trim());
 }
 
 function stripTimePhrases(text: string): string {
@@ -175,6 +272,253 @@ export function parseOffsets(text: string): number[] {
   return [...new Set(offsets)].sort((a, b) => b - a);
 }
 
+export function parseDailyTimeList(text: string): string[] | null {
+  const result = validateReminderTimes(text);
+  return result.times;
+}
+
+export type ReminderFrequencyKind = "daily" | "weekdays" | "once";
+
+export type ReminderBuilderValidation = {
+  valid: boolean;
+  issues: string[];
+  times: string[] | null;
+  frequency: ReminderFrequencyKind | null;
+  title: string;
+};
+
+/** Parse natural-language frequency for Reminder Builder™. */
+export function parseReminderFrequency(text: string): ReminderFrequencyKind | null {
+  const t = text.trim().toLowerCase();
+  if (!t) return null;
+  if (/\b(?:once|one[\s-]?time)\b/.test(t)) return "once";
+  if (
+    /\b(?:m-?f|mon-?fri|monday\s*(?:through|thru|to|–|-)\s*friday|weekdays?|every\s+weekday|business\s+days?)\b/.test(
+      t,
+    )
+  ) {
+    return "weekdays";
+  }
+  if (/\b(?:daily|every\s+day)\b/.test(t)) return "daily";
+  return null;
+}
+
+export function validateReminderTimes(text: string): {
+  times: string[] | null;
+  issues: string[];
+} {
+  const trimmed = text.trim();
+  if (!trimmed) {
+    return { times: null, issues: ["Add at least one reminder time"] };
+  }
+  const matches = [...trimmed.matchAll(/\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/gi)];
+  if (matches.length === 0) {
+    return {
+      times: null,
+      issues: [
+        "Could not read any times — try 10am, 1pm, 5pm or 10:00 AM, 1:00 PM",
+      ],
+    };
+  }
+  const times: string[] = [];
+  const issues: string[] = [];
+  for (const m of matches) {
+    const hour = Number(m[1]);
+    const minute = m[2] ? Number(m[2]) : 0;
+    const { hour24, ambiguous } = parseHour(hour, minute, m[3]);
+    if (ambiguous) {
+      issues.push(
+        `Add AM or PM for ${hour}:${String(minute).padStart(2, "0")}`,
+      );
+      continue;
+    }
+    times.push(
+      `${String(hour24).padStart(2, "0")}:${String(minute).padStart(2, "0")}`,
+    );
+  }
+  if (issues.length > 0) return { times: null, issues };
+  return { times: [...new Set(times)].sort(), issues: [] };
+}
+
+export function validateReminderBuilderInput(input: {
+  name: string;
+  timesText: string;
+  frequencyText: string;
+}): ReminderBuilderValidation {
+  const title = input.name.trim() || "Reminder";
+  const timeResult = validateReminderTimes(input.timesText);
+  const frequency = parseReminderFrequency(input.frequencyText);
+  const issues = [...timeResult.issues];
+
+  if (!frequency) {
+    issues.push(
+      "Select frequency — e.g. daily, weekdays, Monday–Friday, or once",
+    );
+  }
+  if (frequency === "once" && (timeResult.times?.length ?? 0) > 1) {
+    issues.push("Once reminders support one time only");
+  }
+
+  return {
+    valid: issues.length === 0 && Boolean(timeResult.times?.length),
+    issues,
+    times: timeResult.times,
+    frequency,
+    title,
+  };
+}
+
+function isWeekdayDate(d: Date): boolean {
+  const dow = d.getDay();
+  return dow !== 0 && dow !== 6;
+}
+
+export function nextWeekdaysMultiFire(
+  dailyTimes: string[],
+  from = new Date(),
+): string | null {
+  if (!dailyTimes.length) return null;
+  const now = from.getTime();
+  const candidates: number[] = [];
+  for (let dayOffset = 0; dayOffset <= 7; dayOffset++) {
+    const d = new Date(from);
+    d.setDate(d.getDate() + dayOffset);
+    if (!isWeekdayDate(d)) continue;
+    for (const hhmm of dailyTimes) {
+      const [h, m] = hhmm.split(":").map(Number);
+      const slot = new Date(d);
+      slot.setHours(h!, m!, 0, 0);
+      if (slot.getTime() > now) candidates.push(slot.getTime());
+    }
+  }
+  if (!candidates.length) return null;
+  return new Date(Math.min(...candidates)).toISOString();
+}
+
+export function advanceWeekdaysMultiFire(
+  dailyTimes: string[],
+  from: Date,
+): string | null {
+  const current = formatTime24(from);
+  const idx = dailyTimes.indexOf(current);
+  if (idx >= 0 && idx < dailyTimes.length - 1) {
+    const [h, m] = dailyTimes[idx + 1]!.split(":").map(Number);
+    const d = new Date(from);
+    d.setHours(h!, m!, 0, 0);
+    return d.toISOString();
+  }
+  const [h, m] = dailyTimes[0]!.split(":").map(Number);
+  const d = new Date(from);
+  d.setDate(d.getDate() + 1);
+  d.setHours(h!, m!, 0, 0);
+  while (!isWeekdayDate(d)) {
+    d.setDate(d.getDate() + 1);
+  }
+  return d.toISOString();
+}
+
+export function buildReminderFromBuilderValidation(
+  validation: ReminderBuilderValidation,
+  channel: ReminderNotificationChannel,
+): Omit<Reminder, "id" | "createdAt" | "status"> | null {
+  if (!validation.valid || !validation.times?.length || !validation.frequency) {
+    return null;
+  }
+  const { title, times, frequency } = validation;
+
+  if (frequency === "once") {
+    const [h, m] = times[0]!.split(":").map(Number);
+    const d = new Date();
+    d.setHours(h!, m!, 0, 0);
+    if (d.getTime() < Date.now()) d.setDate(d.getDate() + 1);
+    return {
+      title,
+      message: title,
+      reminderType: "one_time",
+      scheduledAt: d.toISOString(),
+      notificationChannel: channel,
+      source: "chat",
+    };
+  }
+
+  const rule =
+    frequency === "weekdays"
+      ? `weekdays-multi@${times.join(",")}`
+      : `daily-multi@${times.join(",")}`;
+  const scheduledAt =
+    frequency === "weekdays"
+      ? nextWeekdaysMultiFire(times) ?? undefined
+      : nextMultiDailyFire(times) ?? undefined;
+
+  return {
+    title,
+    message: title,
+    reminderType: "recurring",
+    recurrenceRule: rule,
+    dailyTimes: times,
+    scheduledAt,
+    notificationChannel: channel,
+    source: "chat",
+  };
+}
+
+function formatTime12(hhmm: string): string {
+  const [hStr, mStr] = hhmm.split(":");
+  const h = Number(hStr);
+  const m = Number(mStr);
+  const suffix = h >= 12 ? "PM" : "AM";
+  const display = h % 12 || 12;
+  return `${display}:${String(m).padStart(2, "0")} ${suffix}`;
+}
+
+function buildMultiTimeAskReply(draft: ReminderDraft): string {
+  const lines = (draft.dailyTimes ?? []).map((t) => `• ${formatTime12(t)}`);
+  return `Got it.\nI'll remind you:\n${lines.join("\n")}\n\nEvery day or weekdays (Monday–Friday)?`;
+}
+
+export function nextMultiDailyFire(
+  dailyTimes: string[],
+  from = new Date(),
+): string | null {
+  if (!dailyTimes.length) return null;
+  const now = from.getTime();
+  const candidates: number[] = [];
+  for (let dayOffset = 0; dayOffset <= 1; dayOffset++) {
+    for (const hhmm of dailyTimes) {
+      const [h, m] = hhmm.split(":").map(Number);
+      const d = new Date(from);
+      d.setDate(d.getDate() + dayOffset);
+      d.setHours(h!, m!, 0, 0);
+      if (d.getTime() > now) candidates.push(d.getTime());
+    }
+  }
+  if (!candidates.length) return null;
+  return new Date(Math.min(...candidates)).toISOString();
+}
+
+export function advanceMultiDailyFire(
+  dailyTimes: string[],
+  from: Date,
+): string | null {
+  const current = formatTime24(from);
+  const idx = dailyTimes.indexOf(current);
+  if (idx >= 0 && idx < dailyTimes.length - 1) {
+    const [h, m] = dailyTimes[idx + 1]!.split(":").map(Number);
+    const d = new Date(from);
+    d.setHours(h!, m!, 0, 0);
+    return d.toISOString();
+  }
+  const [h, m] = dailyTimes[0]!.split(":").map(Number);
+  const d = new Date(from);
+  d.setDate(d.getDate() + 1);
+  d.setHours(h!, m!, 0, 0);
+  return d.toISOString();
+}
+
+function formatTime24(date: Date): string {
+  return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+}
+
 export function extractEventQuery(text: string): string | null {
   const about = text.match(
     /\babout\s+(.+?)(?:\s*,?\s*\d+\s*(?:minutes?|hours?|hrs?|days?)\s+before|\s*$)/i,
@@ -237,6 +581,36 @@ function formatRecurrence(rule: string): string {
 
 export function buildConfirmationReply(reminders: Reminder[], now = new Date()): string {
   const r = reminders[0]!;
+  if (r.recurrenceRule?.startsWith("daily-multi@") && r.dailyTimes?.length) {
+    const lines = r.dailyTimes.map((t) => `• ${formatTime12(t)}`);
+    const notif =
+      r.notificationChannel === "both"
+        ? "Desktop + sound"
+        : r.notificationChannel === "sound"
+          ? "Sound"
+          : "Desktop";
+    return [
+      "Reminder created.",
+      `**${r.title}**`,
+      lines.join("\n"),
+      `Recurring daily · ${r.dailyTimes.length} notification${r.dailyTimes.length === 1 ? "" : "s"} per day · ${notif}`,
+    ].join("\n");
+  }
+  if (r.recurrenceRule?.startsWith("weekdays-multi@") && r.dailyTimes?.length) {
+    const lines = r.dailyTimes.map((t) => `• ${formatTime12(t)}`);
+    const notif =
+      r.notificationChannel === "both"
+        ? "Desktop + sound"
+        : r.notificationChannel === "sound"
+          ? "Sound"
+          : "Desktop";
+    return [
+      "Reminder created.",
+      `**${r.title}**`,
+      lines.join("\n"),
+      `Weekdays (Mon–Fri) · ${r.dailyTimes.length} notification${r.dailyTimes.length === 1 ? "" : "s"} per day · ${notif}`,
+    ].join("\n");
+  }
   if (r.reminderType === "recurring" && r.recurrenceRule) {
     return `Got it — I'll remind you ${formatRecurrence(r.recurrenceRule)} to ${r.message.toLowerCase()}.`;
   }
@@ -297,8 +671,14 @@ function buildRemindersFromDraft(draft: ReminderDraft): Omit<
       title: draft.title,
       message: draft.message,
       reminderType: draft.reminderType,
-      scheduledAt: draft.scheduledAt,
+      scheduledAt:
+        draft.scheduledAt ??
+        (draft.dailyTimes?.length
+          ? nextMultiDailyFire(draft.dailyTimes)
+          : undefined),
       recurrenceRule: draft.recurrenceRule,
+      dailyTimes: draft.dailyTimes,
+      notificationChannel: draft.notificationChannel ?? "both",
       eventId: draft.eventId,
       eventTitle: draft.eventTitle,
       offsets: draft.offsets,
@@ -322,6 +702,17 @@ export function parseReminderDraft(
   const message = capitalize(stripTimePhrases(body)) || "Reminder";
   const title = message;
   const offsets = parseOffsets(text);
+
+  const multiTimes = parseDailyTimeList(text);
+  if (multiTimes && multiTimes.length > 1) {
+    return {
+      title,
+      message,
+      reminderType: "recurring",
+      dailyTimes: multiTimes,
+      missing: "frequency",
+    };
+  }
 
   if (offsets.length > 0 || EVENT_OFFSET_RE.test(text)) {
     const eventTitle =
@@ -482,7 +873,7 @@ export function parseReminderDraft(
       title,
       message,
       reminderType: "one_time",
-      missing: "time",
+      missing: isGenericReminderName(message) ? "name" : "time",
     };
   }
 
@@ -491,7 +882,7 @@ export function parseReminderDraft(
       title,
       message,
       reminderType: "recurring",
-      missing: "time",
+      missing: isGenericReminderName(message) ? "name" : "time",
     };
   }
 
@@ -499,7 +890,7 @@ export function parseReminderDraft(
     title,
     message,
     reminderType: "one_time",
-    missing: "time",
+    missing: isGenericReminderName(message) ? "name" : "time",
   };
 }
 
@@ -530,6 +921,72 @@ function continueReminderDraft(
   blocks: TimeBlock[],
   now: Date,
 ): ReminderTurnOutcome {
+  if (draft.missing === "name") {
+    const name = capitalize(answer.trim());
+    if (!name || isGenericReminderName(name)) {
+      return {
+        kind: "ask",
+        reply: "What should I remind you about?",
+        draft,
+      };
+    }
+    return {
+      kind: "ask",
+      reply: "When would you like the reminder?",
+      draft: { ...draft, title: name, message: name, missing: "time" },
+    };
+  }
+
+  if (draft.missing === "frequency") {
+    const freq = parseReminderFrequency(answer);
+    if (
+      freq === "weekdays" ||
+      /\b(?:weekdays?|monday\s*(?:through|thru|to|-)\s*friday|m-?f|mon-?fri|every\s+weekday)\b/i.test(
+        answer.trim(),
+      )
+    ) {
+      const times = draft.dailyTimes ?? [];
+      const rule = `weekdays-multi@${times.join(",")}`;
+      return finalizeDraft(
+        {
+          ...draft,
+          missing: null,
+          reminderType: "recurring",
+          recurrenceRule: rule,
+          scheduledAt: nextWeekdaysMultiFire(times, now) ?? undefined,
+          notificationChannel: draft.notificationChannel ?? "both",
+        },
+        blocks,
+        now,
+      );
+    }
+    if (
+      freq === "daily" ||
+      isReminderAffirmation(answer) ||
+      /\b(?:every day|daily|yes)\b/i.test(answer.trim())
+    ) {
+      const times = draft.dailyTimes ?? [];
+      const rule = `daily-multi@${times.join(",")}`;
+      return finalizeDraft(
+        {
+          ...draft,
+          missing: null,
+          reminderType: "recurring",
+          recurrenceRule: rule,
+          scheduledAt: nextMultiDailyFire(times, now) ?? undefined,
+          notificationChannel: draft.notificationChannel ?? "both",
+        },
+        blocks,
+        now,
+      );
+    }
+    return {
+      kind: "ask",
+      reply: buildMultiTimeAskReply(draft),
+      draft,
+    };
+  }
+
   if (draft.missing === "am_pm") {
     const isPm = /\bpm\b|p\.m\.?/i.test(answer);
     const isAm = /\bam\b|a\.m\.?/i.test(answer);
@@ -556,13 +1013,34 @@ function continueReminderDraft(
   }
 
   if (draft.missing === "time") {
+    if (isReminderAffirmation(answer)) {
+      return {
+        kind: "ask",
+        reply:
+          "When would you like the reminder? You can say a time like **2 PM**, **in 30 minutes**, or **10am, 1pm, and 5pm**.",
+        draft,
+      };
+    }
+    const multiTimes = parseDailyTimeList(answer);
+    if (multiTimes && multiTimes.length > 1) {
+      const nextDraft: ReminderDraft = {
+        ...draft,
+        dailyTimes: multiTimes,
+        missing: "frequency",
+      };
+      return {
+        kind: "ask",
+        reply: buildMultiTimeAskReply(nextDraft),
+        draft: nextDraft,
+      };
+    }
     const reparsed = parseReminderDraft(`remind me to ${draft.message} ${answer}`, now);
     if (reparsed && !reparsed.missing) {
       return finalizeDraft(reparsed, blocks, now);
     }
     return {
       kind: "ask",
-      reply: "When would you like me to remind you?",
+      reply: "When would you like the reminder?",
       draft,
     };
   }
@@ -602,10 +1080,24 @@ function finalizeDraft(
   blocks: TimeBlock[],
   now: Date,
 ): ReminderTurnOutcome {
+  if (draft.missing === "name") {
+    return {
+      kind: "ask",
+      reply: "What should I remind you about?",
+      draft,
+    };
+  }
+  if (draft.missing === "frequency") {
+    return {
+      kind: "ask",
+      reply: buildMultiTimeAskReply(draft),
+      draft,
+    };
+  }
   if (draft.missing === "time") {
     return {
       kind: "ask",
-      reply: "When would you like me to remind you?",
+      reply: "When would you like the reminder?",
       draft,
     };
   }
@@ -661,6 +1153,21 @@ export function nextRecurrenceFire(
   rule: string,
   from: Date,
 ): string | null {
+  if (rule.startsWith("daily-multi@")) {
+    const times = rule.replace("daily-multi@", "").split(",").filter(Boolean);
+    return advanceMultiDailyFire(times, from);
+  }
+  if (rule.startsWith("weekdays-multi@")) {
+    const times = rule.replace("weekdays-multi@", "").split(",").filter(Boolean);
+    return advanceWeekdaysMultiFire(times, from);
+  }
+  if (
+    rule.startsWith("weekly-days@") ||
+    rule.startsWith("monthly@") ||
+    rule.startsWith("custom-days@")
+  ) {
+    return advanceBuilderRecurrenceFire(rule, from);
+  }
   if (rule === "hourly") {
     const d = new Date(from);
     d.setHours(d.getHours() + 1);
@@ -720,6 +1227,7 @@ export function remindersReadyToFire(
 ): Reminder[] {
   return reminders.filter((r) => {
     if (r.status !== "active") return false;
+    if (r.paused) return false;
     if (r.snoozedUntil && new Date(r.snoozedUntil).getTime() > now) return false;
     if (r.lastFiredAt) {
       const fired = new Date(r.lastFiredAt).getTime();

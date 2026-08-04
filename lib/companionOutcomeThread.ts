@@ -5,6 +5,11 @@
 
 import type { AppSection } from "./companionUi";
 import type { ConversationWorkflowKind } from "./conversationWorkflowContinuation";
+import {
+  assistantQuestionOwnsDecisionContext,
+  detectWorkflowOwnerFromAssistant,
+  workflowOwnerContinuationFallback,
+} from "./workflowOwnershipAuthority";
 
 export type OutcomeThread = {
   currentGoal?: string;
@@ -147,8 +152,30 @@ export function outcomeThreadHintForChat(thread: OutcomeThread | null): string |
   return parts.join("\n");
 }
 
+export function ambiguousAcceptanceReply(
+  thread?: OutcomeThread | null,
+  lastAssistantText?: string,
+): string {
+  const owner = lastAssistantText
+    ? detectWorkflowOwnerFromAssistant(lastAssistantText)
+    : null;
+  if (owner && !assistantQuestionOwnsDecisionContext(lastAssistantText ?? "")) {
+    return workflowOwnerContinuationFallback(owner);
+  }
+  return threadAwareAcceptanceFallback(thread ?? null, lastAssistantText);
+}
+
 /** Non-resetting reply when acceptance cannot be resolved but a thread exists. */
-export function threadAwareAcceptanceFallback(thread: OutcomeThread | null): string {
+export function threadAwareAcceptanceFallback(
+  thread: OutcomeThread | null,
+  lastAssistantText?: string,
+): string {
+  const owner = lastAssistantText
+    ? detectWorkflowOwnerFromAssistant(lastAssistantText)
+    : null;
+  if (owner && !assistantQuestionOwnsDecisionContext(lastAssistantText ?? "")) {
+    return workflowOwnerContinuationFallback(owner);
+  }
   if (thread?.pendingAction) {
     return `Continuing **${thread.pendingAction}** — here's the next step on that.`;
   }

@@ -1,21 +1,23 @@
 import { describe, expect, it } from "vitest";
-import { SAVE_DESTINATION_OPTIONS, suggestSaveDestination } from "./saveDestinations";
-import { SIDEBAR_NAV, sidebarNavForSection } from "./companionUi";
+import {
+  GROWTH_MENU,
+  SIDEBAR_NAV,
+  resolveGrowthDestination,
+  sidebarNavForSection,
+} from "./companionUi";
 
-describe("navigation architecture", () => {
-  it("maps user intents to single sidebar destinations", () => {
-    expect(sidebarNavForSection("brain-dump")).toBeNull();
-    expect(sidebarNavForSection("plan-my-day")).toBeNull();
-    expect(sidebarNavForSection("home")).toBe("chat");
-    expect(sidebarNavForSection("focus")).toBe("focus");
-    expect(sidebarNavForSection("visual-focus")).toBe("visual-thinking");
-    expect(sidebarNavForSection("growth")).toBe("growth");
-    expect(sidebarNavForSection("my-work")).toBe("other");
-    expect(sidebarNavForSection("how-do-i")).toBe("how-do-i");
+describe("navigation architecture P0.43 / P0.50", () => {
+  it("maps growth destinations without a Growth Center landing page", () => {
+    expect(resolveGrowthDestination("growth")).toBe("growth-vault");
+    expect(sidebarNavForSection("growth-vault")).toBe("growth-vault");
+    expect(sidebarNavForSection("outcome-goals")).toBe("outcome-goals");
+    expect(sidebarNavForSection("wins-this-week")).toBe("growth");
+    expect(sidebarNavForSection("evidence-bank")).toBe("growth");
   });
 
-  it("keeps sidebar doors in companion-first order", () => {
+  it("keeps P0.50 sidebar door order with Growth flyout destinations", () => {
     expect(SIDEBAR_NAV.map((item) => item.id)).toEqual([
+      "today",
       "chat",
       "focus",
       "visual-thinking",
@@ -23,22 +25,18 @@ describe("navigation architecture", () => {
       "other",
       "how-do-i",
     ]);
-  });
-
-  it("offers save destinations for Keep For Later / Save flows", () => {
-    expect(SAVE_DESTINATION_OPTIONS.map((o) => o.id)).toEqual([
-      "visual-thinking",
-      "projects",
-      "strategies",
-      "templates",
-      "documents",
-      "decision-compass",
-      "sops",
-      "snippets",
+    expect(SIDEBAR_NAV.map((item) => item.label)).toEqual([
+      "Today",
+      "Chat",
+      "Focus",
+      "Visual Thinking",
+      "Growth",
+      "Other",
+      "How Do I...?",
     ]);
-    expect(suggestSaveDestination({ artifactType: "SOP draft" })).toBe("sops");
-    expect(
-      suggestSaveDestination({ sourceWorkspace: "visual-focus" }),
-    ).toBe("visual-thinking");
+    expect(GROWTH_MENU.map((item) => item.id)).toEqual([
+      "growth-vault",
+      "outcome-goals",
+    ]);
   });
 });

@@ -3,6 +3,7 @@
  * Visual recommendations must not run on ADHD/strategy/focus/overwhelm turns.
  */
 
+import { isSelfUnderstandingIntent } from "./relationshipIntelligenceBoundaries";
 import { shouldSuppressVisualThinkingForLearn } from "./visualLearnBoundary";
 
 const PROCRASTINATION_RE =
@@ -61,6 +62,7 @@ export function isActivationProblem(text: string): boolean {
 export function isRelationshipQuestion(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
+  if (isSelfUnderstandingIntent(t)) return false;
   if (isStrategyProblem(t)) return true;
   return RELATIONSHIP_RE.test(t);
 }
@@ -69,6 +71,14 @@ export function isRelationshipQuestion(text: string): boolean {
 export function shouldSuppressVisualRecommendation(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
+  if (
+    /\b(?:is there a feature|does this app|can this app help)\b/i.test(t)
+  ) {
+    return true;
+  }
+  if (/\b(?:write(?:ing)?\s+(?:a\s+)?book\s+about|book\s+about)\b/i.test(t)) {
+    return true;
+  }
   if (
     /\b(?:map(?:\s+\w+){0,2}\s+visually|visuali[sz]e (?:this|it|that)|show (?:me )?(?:this )?visually)\b/i.test(
       t,

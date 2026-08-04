@@ -7,6 +7,7 @@ import {
   BRAINDUMP_CATEGORY_GROUPS,
   normalizeCategory,
 } from "./brainDumpCategories";
+import type { ClusterOverrides } from "./brainDumpClusterPreferences";
 import type { BrainDumpEntry } from "./companionStore";
 import { isVisibleInMentalLandscape } from "./thoughtLifecycle";
 import type { VisualThinkingTone } from "./visualThinkingColors";
@@ -16,6 +17,8 @@ export const MAX_MAJOR_CLUSTERS = 5;
 export const MAX_VISIBLE_THOUGHTS = 3;
 export const OVERWHELM_THRESHOLD = 8;
 export const MAX_CLUSTER_DOT_WEIGHT = 8;
+export const MIN_SHARED_TOKENS_FOR_THEME = 2;
+export const MAX_RELATIONSHIPS = 24;
 
 /** Visual dot weight for relief clusters — no dominant numeric counts. */
 export function formatClusterDotWeight(count: number): {
@@ -42,8 +45,34 @@ export const MORE_CLUSTER_FALLBACK =
 /** Flatten visible thought previews for a major cluster (max per sub-cluster). */
 export function getClusterVisibleThoughts(
   cluster: ThoughtCluster,
+  showAll = false,
 ): ThoughtItem[] {
+  if (showAll) {
+    return cluster.subClusters.flatMap((sub) => sub.thoughts);
+  }
   return cluster.subClusters.flatMap((sub) => sub.visibleThoughts);
+}
+
+export function getClusterEntryIds(cluster: ThoughtCluster): string[] {
+  return cluster.subClusters.flatMap((sub) => sub.thoughts.map((t) => t.id));
+}
+
+/** Why thoughts landed in this cluster — shown when expanded. */
+export function clusterGroupingExplanation(cluster: ThoughtCluster): string {
+  if (cluster.id === "__more__") {
+    return "Extra themes are held here so the main view stays calm — open any cluster to move or recategorize thoughts.";
+  }
+  if (cluster.id === "__worries__") {
+    return "Grouped because these thoughts were marked urgent or emotional.";
+  }
+  const subLabels = cluster.subClusters.map((s) => s.label).filter(Boolean);
+  if (subLabels.length === 1) {
+    return `Grouped by category **${subLabels[0]}** — change a thought's category to move it.`;
+  }
+  if (subLabels.length > 1) {
+    return `Grouped by shared area ${cluster.label} with sub-categories: ${subLabels.join(", ")}.`;
+  }
+  return `Grouped by theme ${cluster.label} — rename or merge clusters below to adjust.`;
 }
 
 /** Calm copy when a cluster has no thought list to reveal. */
@@ -88,21 +117,73 @@ export type ThoughtCluster = {
   collapsed: boolean;
 };
 
+export type RelationshipKind =
+  | "same_project"
+  | "same_goal"
+  | "same_topic"
+  | "same_category"
+  | "same_deadline"
+  | "same_person"
+  | "shared_theme";
+
 export type ThoughtRelationship = {
   fromId: string;
   toId: string;
   fromLabel: string;
   toLabel: string;
+  kind: RelationshipKind;
   reason: string;
+  whyLabel: string;
 };
 
-/** Theme groups for Related Thoughts view — human-readable, not pairwise graphs. */
+/** Connection groups for the Connections view — explicit WHY, no fabricated themes. */
+export type ThoughtConnectionGroup = {
+  kind: RelationshipKind;
+  whyLabel: string;
+  detail?: string;
+  thoughtIds: string[];
+  thoughts: string[];
+};
+
+/** @deprecated Use ThoughtConnectionGroup */
 export type ThoughtThemeGroup = {
   reason: string;
   themeLabel: string;
   thoughts: string[];
   observation: string;
 };
+
+export type ClusterAlignmentAudit = {
+  clusterCount: number;
+  connectionGroupCount: number;
+  hiddenClusterCount: number;
+  summary: string;
+  factors: string[];
+};
+
+export function relationshipWhyLabel(
+  kind: RelationshipKind,
+  detail?: string,
+): string {
+  switch (kind) {
+    case "same_project":
+      return "Same project";
+    case "same_goal":
+      return "Same goal";
+    case "same_topic":
+      return detail ? `Same theme: ${detail}` : "Same theme";
+    case "same_category":
+      return detail ? `Same category: ${detail}` : "Same category";
+    case "same_deadline":
+      return detail ? `Same timing: ${detail}` : "Same deadline";
+    case "same_person":
+      return detail ? `Same person: ${detail}` : "Same person";
+    case "shared_theme":
+      return detail ? `Shared focus: ${detail}` : "Shared theme";
+    default:
+      return "Connected";
+  }
+}
 
 function themeLabelForReason(reason: string): string {
   const trimmed = reason.trim();
@@ -121,37 +202,105 @@ function themeObservation(reason: string, count: number): string {
     return "This thought stood out on its own — still safely held.";
   }
   if (count === 2) {
-    return `These two thoughts seem to connect around ${label}.`;
+    return `These two thoughts connect — ${label}.`;
   }
-  return `Several thoughts relate to ${label} — they're grouped so you can see the pattern without sorting everything now.`;
+  return `Several thoughts share ${label} — grouped so you can see the pattern without sorting everything now.`;
 }
 
-/** Group pairwise relationships into theme cards with bullet lists. */
+/** @deprecated Use buildConnectionGroups */
 export function groupRelationshipsByTheme(
   relationships: ThoughtRelationship[],
 ): ThoughtThemeGroup[] {
-  const byReason = new Map<string, Set<string>>();
+  return buildConnectionGroups(relationships).map((g) => ({
+    reason: g.detail ?? g.kind,
+    themeLabel: g.whyLabel,
+    thoughts: g.thoughts,
+    observation: themeObservation(g.detail ?? g.whyLabel, g.thoughts.length),
+  }));
+}
+
+/** Group relationships by meaningful connection kind — no single-token fabrications. */
+export function buildConnectionGroups(
+  relationships: ThoughtRelationship[],
+): ThoughtConnectionGroup[] {
+  const byKey = new Map<
+    string,
+    { kind: RelationshipKind; whyLabel: string; detail?: string; ids: Set<string>; labels: Set<string> }
+  >();
 
   for (const rel of relationships) {
-    const set = byReason.get(rel.reason) ?? new Set<string>();
-    set.add(rel.fromLabel);
-    set.add(rel.toLabel);
-    byReason.set(rel.reason, set);
+    const key = `${rel.kind}:${rel.reason}`;
+    const bucket =
+      byKey.get(key) ??
+      {
+        kind: rel.kind,
+        whyLabel: rel.whyLabel,
+        detail: rel.reason,
+        ids: new Set<string>(),
+        labels: new Set<string>(),
+      };
+    bucket.ids.add(rel.fromId);
+    bucket.ids.add(rel.toId);
+    bucket.labels.add(rel.fromLabel);
+    bucket.labels.add(rel.toLabel);
+    byKey.set(key, bucket);
   }
 
-  return [...byReason.entries()]
-    .map(([reason, thoughtSet]) => {
-      const thoughts = [...thoughtSet].sort((a, b) =>
+  return [...byKey.values()]
+    .map((bucket) => ({
+      kind: bucket.kind,
+      whyLabel: bucket.whyLabel,
+      detail: bucket.detail,
+      thoughtIds: [...bucket.ids],
+      thoughts: [...bucket.labels].sort((a, b) =>
         a.localeCompare(b, undefined, { sensitivity: "base" }),
-      );
-      return {
-        reason,
-        themeLabel: themeLabelForReason(reason),
-        thoughts,
-        observation: themeObservation(reason, thoughts.length),
-      };
-    })
+      ),
+    }))
     .sort((a, b) => b.thoughts.length - a.thoughts.length);
+}
+
+export function auditClusterConnectionAlignment(
+  graph: BrainDumpClusterGraph,
+): ClusterAlignmentAudit {
+  const major = graph.clusters.filter((c) => c.id !== "__more__");
+  const connectionGroups = buildConnectionGroups(graph.relationships);
+  const hidden = graph.clusters.find((c) => c.id === "__more__");
+
+  const factors: string[] = [];
+
+  if (major.length > connectionGroups.length) {
+    factors.push(
+      "Clusters group by topic or category area; Connections only appear when at least two thoughts share a specific link (project, goal, category, timing, or strong shared words).",
+    );
+  }
+  if (hidden && hidden.count > 0) {
+    factors.push(
+      `${hidden.count} thought(s) sit in "More themes" because only ${MAX_MAJOR_CLUSTERS} major clusters show at once.`,
+    );
+  }
+  if (graph.relationships.length >= MAX_RELATIONSHIPS) {
+    factors.push(
+      `Connection list is capped at ${MAX_RELATIONSHIPS} links — some weaker ties may be hidden.`,
+    );
+  }
+  if (connectionGroups.length === 0 && graph.totalThoughts >= 2) {
+    factors.push(
+      "No strong pairwise links met the threshold — thoughts may still share a cluster without a specific connection reason.",
+    );
+  }
+
+  const summary =
+    major.length > connectionGroups.length
+      ? `${major.length} clusters visible, ${connectionGroups.length} connection group${connectionGroups.length === 1 ? "" : "s"} found — clusters and connections use different rules.`
+      : `${major.length} cluster${major.length === 1 ? "" : "s"}, ${connectionGroups.length} connection group${connectionGroups.length === 1 ? "" : "s"}.`;
+
+  return {
+    clusterCount: major.length,
+    connectionGroupCount: connectionGroups.length,
+    hiddenClusterCount: hidden?.count ?? 0,
+    summary,
+    factors,
+  };
 }
 
 export type BrainDumpClusterGraph = {
@@ -163,6 +312,7 @@ export type BrainDumpClusterGraph = {
   relationships: ThoughtRelationship[];
   focusSuggestion: string | null;
   hasContent: boolean;
+  alignmentAudit: ClusterAlignmentAudit;
 };
 
 const STOP_WORDS = new Set([
@@ -185,7 +335,12 @@ const STOP_WORDS = new Set([
   "it",
   "is",
   "be",
+  "call",
+  "email",
+  "text",
 ]);
+
+const PERSON_CATEGORIES = new Set(["Family", "Networking", "Admin"]);
 
 function categoryGroupName(category: string): string | null {
   const cat = normalizeCategory(category);
@@ -234,7 +389,33 @@ function clusterKeyForEntry(entry: BrainDumpEntry): string {
   return normalizeCategory(entry.category);
 }
 
-function clusterLabel(key: string): { label: string; icon: string; tone: VisualThinkingTone } {
+export function resolveClusterKey(
+  entry: BrainDumpEntry,
+  overrides?: ClusterOverrides,
+): string {
+  let key = clusterKeyForEntry(entry);
+  if (overrides?.mergeInto[key]) {
+    key = overrides.mergeInto[key]!;
+  }
+  return key;
+}
+
+function clusterLabel(
+  key: string,
+  overrides?: ClusterOverrides,
+): { label: string; icon: string; tone: VisualThinkingTone } {
+  if (overrides?.rename[key]?.trim()) {
+    const base = clusterLabelBase(key);
+    return { ...base, label: overrides.rename[key]!.trim() };
+  }
+  return clusterLabelBase(key);
+}
+
+function clusterLabelBase(key: string): {
+  label: string;
+  icon: string;
+  tone: VisualThinkingTone;
+} {
   if (key === "__worries__") {
     return { label: "Worries", icon: "🔴", tone: "concern" };
   }
@@ -258,6 +439,56 @@ function tokenize(text: string): string[] {
     .filter((w) => w.length > 2 && !STOP_WORDS.has(w));
 }
 
+function extractPersonHint(text: string): string | null {
+  const match = text.match(
+    /\b(?:call|email|text|meet|contact)\s+([A-Z][a-z]{2,})\b/,
+  );
+  return match?.[1] ?? null;
+}
+
+function detectRelationship(
+  a: BrainDumpEntry,
+  b: BrainDumpEntry,
+): { kind: RelationshipKind; reason: string } | null {
+  if (a.projectId && b.projectId && a.projectId === b.projectId) {
+    return { kind: "same_project", reason: a.projectId };
+  }
+  if (a.outcomeGoalId && b.outcomeGoalId && a.outcomeGoalId === b.outcomeGoalId) {
+    return { kind: "same_goal", reason: a.outcomeGoalId };
+  }
+  if (a.topic && b.topic && a.topic === b.topic && a.topic !== "Other") {
+    return { kind: "same_topic", reason: a.topic };
+  }
+  const catA = normalizeCategory(a.category);
+  const catB = normalizeCategory(b.category);
+  if (catA === catB && catA !== "Other") {
+    return { kind: "same_category", reason: catA };
+  }
+  if (
+    a.schedulingIntent &&
+    b.schedulingIntent &&
+    a.schedulingIntent === b.schedulingIntent
+  ) {
+    return { kind: "same_deadline", reason: a.schedulingIntent };
+  }
+  const personA = extractPersonHint(a.text);
+  const personB = extractPersonHint(b.text);
+  if (
+    personA &&
+    personB &&
+    personA === personB &&
+    (PERSON_CATEGORIES.has(catA) || PERSON_CATEGORIES.has(catB))
+  ) {
+    return { kind: "same_person", reason: personA };
+  }
+  const ta = new Set(tokenize(a.text));
+  const shared = tokenize(b.text).filter((w) => ta.has(w));
+  if (shared.length >= MIN_SHARED_TOKENS_FOR_THEME) {
+    return { kind: "shared_theme", reason: shared.slice(0, 3).join(", ") };
+  }
+  return null;
+}
+
 function buildRelationships(entries: BrainDumpEntry[]): ThoughtRelationship[] {
   const rels: ThoughtRelationship[] = [];
   const seen = new Set<string>();
@@ -266,40 +497,38 @@ function buildRelationships(entries: BrainDumpEntry[]): ThoughtRelationship[] {
     for (let j = i + 1; j < entries.length; j++) {
       const a = entries[i]!;
       const b = entries[j]!;
-      let reason: string | null = null;
+      const hit = detectRelationship(a, b);
+      if (!hit) continue;
 
-      if (a.topic && b.topic && a.topic === b.topic) {
-        reason = a.topic;
-      } else if (
-        normalizeCategory(a.category) === normalizeCategory(b.category) &&
-        normalizeCategory(a.category) !== "Other"
-      ) {
-        reason = normalizeCategory(a.category);
-      } else {
-        const ta = new Set(tokenize(a.text));
-        const shared = tokenize(b.text).filter((w) => ta.has(w));
-        if (shared.length >= 1) {
-          reason = shared[0]!;
-        }
-      }
+      const key = [a.id, b.id].sort().join(":");
+      if (seen.has(key)) continue;
+      seen.add(key);
 
-      if (reason) {
-        const key = [a.id, b.id].sort().join(":");
-        if (!seen.has(key)) {
-          seen.add(key);
-          rels.push({
-            fromId: a.id,
-            toId: b.id,
-            fromLabel: truncateItem(a.text, 40),
-            toLabel: truncateItem(b.text, 40),
-            reason,
-          });
-        }
-      }
+      rels.push({
+        fromId: a.id,
+        toId: b.id,
+        fromLabel: truncateItem(a.text, 40),
+        toLabel: truncateItem(b.text, 40),
+        kind: hit.kind,
+        reason: hit.reason,
+        whyLabel: relationshipWhyLabel(hit.kind, hit.reason),
+      });
     }
   }
 
-  return rels.slice(0, 12);
+  const priority: Record<RelationshipKind, number> = {
+    same_project: 0,
+    same_goal: 1,
+    same_topic: 2,
+    same_category: 3,
+    same_deadline: 4,
+    same_person: 5,
+    shared_theme: 6,
+  };
+
+  return rels
+    .sort((x, y) => priority[x.kind] - priority[y.kind])
+    .slice(0, MAX_RELATIONSHIPS);
 }
 
 function focusSuggestionFromGraph(
@@ -313,9 +542,17 @@ function focusSuggestionFromGraph(
 
 export function buildBrainDumpClusterGraph(
   entries: BrainDumpEntry[],
+  overrides?: ClusterOverrides,
 ): BrainDumpClusterGraph {
   const active = entries.filter(isVisibleInMentalLandscape);
   if (!active.length) {
+    const emptyAudit: ClusterAlignmentAudit = {
+      clusterCount: 0,
+      connectionGroupCount: 0,
+      hiddenClusterCount: 0,
+      summary: "No active thoughts.",
+      factors: [],
+    };
     return {
       centerLabel: "My Thoughts",
       centerIcon: "🧠",
@@ -325,12 +562,13 @@ export function buildBrainDumpClusterGraph(
       relationships: [],
       focusSuggestion: null,
       hasContent: false,
+      alignmentAudit: emptyAudit,
     };
   }
 
   const byCluster = new Map<string, BrainDumpEntry[]>();
   for (const e of active) {
-    const key = clusterKeyForEntry(e);
+    const key = resolveClusterKey(e, overrides);
     const list = byCluster.get(key) ?? [];
     list.push(e);
     byCluster.set(key, list);
@@ -351,7 +589,7 @@ export function buildBrainDumpClusterGraph(
   const overflowCount = overflow.reduce((n, [, list]) => n + list.length, 0);
 
   const clusters: ThoughtCluster[] = major.map(([key, list]) => {
-    const { label, icon, tone } = clusterLabel(key);
+    const { label, icon, tone } = clusterLabel(key, overrides);
     const bySub = new Map<string, BrainDumpEntry[]>();
     for (const e of list) {
       const sk = subClusterKey(e);
@@ -404,14 +642,24 @@ export function buildBrainDumpClusterGraph(
     });
   }
 
-  return {
+  const relationships = buildRelationships(active);
+  const graph: BrainDumpClusterGraph = {
     centerLabel: "My Thoughts",
     centerIcon: "🧠",
     totalThoughts: active.length,
     clusters,
     overflowCount,
-    relationships: buildRelationships(active),
+    relationships,
     focusSuggestion: focusSuggestionFromGraph(subCounts),
     hasContent: true,
+    alignmentAudit: {
+      clusterCount: 0,
+      connectionGroupCount: 0,
+      hiddenClusterCount: 0,
+      summary: "",
+      factors: [],
+    },
   };
+  graph.alignmentAudit = auditClusterConnectionAlignment(graph);
+  return graph;
 }

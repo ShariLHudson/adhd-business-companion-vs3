@@ -44,7 +44,9 @@ describe("pendingAcceptanceAuthority", () => {
     expect(result.outcome).toBe("conversation");
     if (result.outcome === "conversation") {
       expect(result.message).not.toMatch(/what would you like help with next/i);
-      expect(result.message).toMatch(/still here|next step|next piece/i);
+      expect(result.message).toMatch(
+        /still here|next step|next piece|continuing where we left off/i,
+      );
     }
   });
 

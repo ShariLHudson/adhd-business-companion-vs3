@@ -14,17 +14,11 @@ import {
   type SavedGrowthWin,
 } from "@/lib/growthWinsStore";
 import { buildSuggestedGrowthMoments } from "@/lib/suggestedGrowthMoments";
-import {
-  isInGrowthArchivePeriod,
-  type GrowthArchivePeriod,
-} from "@/lib/growthArchive";
+import { groupSavedWinsByDate } from "@/lib/growthWinDateGroups";
 import type { GrowthPanelNav } from "@/lib/growthNavigation";
 import { GrowthInbox } from "@/components/companion/GrowthInbox";
 import { GrowthAttachmentsField, GrowthAttachmentsList } from "@/components/companion/GrowthAttachmentsField";
-import {
-  GrowthArchiveBar,
-  GrowthSectionHeader,
-} from "@/components/companion/GrowthSectionHeader";
+import { GrowthSectionHeader } from "@/components/companion/GrowthSectionHeader";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import type { GrowthAttachment } from "@/lib/growthAttachments";
@@ -46,7 +40,8 @@ export function WinsThisWeekPanel({
 }) {
   const [tick, setTick] = useState(0);
   const [search, setSearch] = useState("");
-  const [archivePeriod, setArchivePeriod] = useState<GrowthArchivePeriod>("week");
+  const [openDateGroup, setOpenDateGroup] = useState<string | null>(null);
+  const [expandedWinId, setExpandedWinId] = useState<string | null>(null);
   const [attachWinId, setAttachWinId] = useState<string | null>(null);
   const [pendingAttachments, setPendingAttachments] = useState<GrowthAttachment[]>([]);
 
@@ -69,11 +64,15 @@ export function WinsThisWeekPanel({
   const savedWins = useMemo(() => {
     const q = search.trim().toLowerCase();
     return getSavedGrowthWins().filter((win) => {
-      if (!isInGrowthArchivePeriod(win.ts, archivePeriod)) return false;
       if (!q) return true;
       return win.whatHappened.toLowerCase().includes(q);
     });
-  }, [tick, search, archivePeriod]);
+  }, [tick, search]);
+
+  const dateGroups = useMemo(
+    () => groupSavedWinsByDate(savedWins),
+    [savedWins],
+  );
 
   function handleAttachChange(win: SavedGrowthWin, next: GrowthAttachment[]) {
     updateSavedGrowthWin(win.id, { attachments: next });
@@ -81,8 +80,84 @@ export function WinsThisWeekPanel({
   }
 
   function closeAll() {
+    setOpenDateGroup(null);
+    setExpandedWinId(null);
     setAttachWinId(null);
     setPendingAttachments([]);
+  }
+
+  function toggleDateGroup(id: string) {
+    setOpenDateGroup((current) => (current === id ? null : id));
+    setExpandedWinId(null);
+    setAttachWinId(null);
+  }
+
+  function toggleWin(id: string) {
+    setExpandedWinId((current) => (current === id ? null : id));
+    setAttachWinId(null);
+  }
+
+  function renderWin(win: SavedGrowthWin) {
+    const expanded = expandedWinId === win.id;
+    const savedEvidence = win.sourceId ? hasEvidenceForWin(win.sourceId) : false;
+
+    return (
+      <li
+        key={win.id}
+        className="overflow-hidden rounded-xl border border-[#e7d9c8] bg-white"
+      >
+        <button
+          type="button"
+          onClick={() => toggleWin(win.id)}
+          className="flex w-full items-start gap-2 px-3 py-2.5 text-left hover:bg-[#faf7f2]/80"
+        >
+          <span className="shrink-0 text-xs text-[#9a8f82]" aria-hidden>
+            {expanded ? "▼" : "▶"}
+          </span>
+          <span aria-hidden="true">{win.icon}</span>
+          <span className="min-w-0 flex-1 text-sm text-[#2f261f]">{win.whatHappened}</span>
+        </button>
+        {expanded ? (
+          <div className="border-t border-[#efe8de] px-3 pb-3 pt-2">
+            <GrowthAttachmentsList attachments={win.attachments} compact />
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() =>
+                  setAttachWinId((id) => (id === win.id ? null : win.id))
+                }
+                className="rounded-full border border-[#e7d9c8] bg-[#faf7f2] px-3 py-1.5 text-xs font-semibold text-[#2f261f]"
+              >
+                {attachWinId === win.id ? "Hide attach" : "Attach"}
+              </button>
+              {onSaveToEvidenceBank && win.sourceId && !savedEvidence ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    onSaveToEvidenceBank(win.whatHappened, win.sourceId!)
+                  }
+                  className="rounded-full border border-[#e7d9c8] bg-[#faf7f2] px-3 py-1.5 text-xs font-semibold text-[#2f261f]"
+                >
+                  Save to Evidence
+                </button>
+              ) : savedEvidence ? (
+                <span className="self-center text-xs font-semibold text-[#9a8f82]">
+                  In Evidence Bank
+                </span>
+              ) : null}
+            </div>
+            {attachWinId === win.id ? (
+              <div className="mt-3 border-t border-[#efe8de] pt-3">
+                <GrowthAttachmentsField
+                  attachments={win.attachments}
+                  onAttachmentsChange={(next) => handleAttachChange(win, next)}
+                />
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+      </li>
+    );
   }
 
   return (
@@ -93,6 +168,7 @@ export function WinsThisWeekPanel({
         onSearchChange={setSearch}
         searchPlaceholder="Search wins…"
         onCloseAll={closeAll}
+        toolsInMore
         onQuickAttach={(atts) => {
           setPendingAttachments((prev) => [...prev, ...atts]);
           if (savedWins[0]) {
@@ -116,119 +192,77 @@ export function WinsThisWeekPanel({
         />
       </div>
 
-      <div className="mt-4">
-        <GrowthArchiveBar period={archivePeriod} onPeriodChange={setArchivePeriod} />
-      </div>
+      {snapshot.stats.length > 0 ? (
+        <details className="mt-4 rounded-2xl border border-[#e7d9c8] bg-white px-4 py-3">
+          <summary className="cursor-pointer text-sm font-semibold text-[#6f6259]">
+            Activity summary — {snapshot.weekLabel}
+          </summary>
+          <ul className="mt-2 space-y-2">
+            {snapshot.stats.map((stat) => (
+              <li
+                key={stat.id}
+                className="flex items-start gap-2 text-sm text-[#6f6259]"
+              >
+                <span aria-hidden="true">{stat.icon}</span>
+                <span>{formatWeeklyWinLine(stat)}</span>
+              </li>
+            ))}
+          </ul>
+        </details>
+      ) : null}
 
-      <div className="mt-5 rounded-3xl border border-[#e7d9c8] bg-white p-5">
-        <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
-          {snapshot.weekLabel}
-        </p>
-        {snapshot.stats.length === 0 ? (
-          <p className="mt-3 text-sm text-[#6f6259]">
-            Activity summary will appear here as you work.
-          </p>
-        ) : (
-          <>
-            <p className="mt-2 text-xs text-[#9a8f82]">Activity this week (summary)</p>
-            <ul className="mt-2 space-y-2">
-              {snapshot.stats.map((stat) => (
-                <li
-                  key={stat.id}
-                  className="flex items-start gap-2 text-sm text-[#6f6259]"
-                >
-                  <span aria-hidden="true">{stat.icon}</span>
-                  <span>{formatWeeklyWinLine(stat)}</span>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-      </div>
-
-      <div className="mt-4 rounded-3xl border border-[#e7d9c8] bg-[#faf7f2] p-5">
+      <div className="mt-5">
         <h3 className="text-sm font-bold text-[#2f261f]">Your wins</h3>
-        <p className="mt-1 text-xs text-[#6f6259]">
-          Confirmed wins — attach proof when you have it.
-        </p>
         {pendingAttachments.length > 0 && !savedWins.length ? (
           <p className="mt-2 text-xs text-[#9a8f82]">
             {pendingAttachments.length} file(s) ready — save a win from Growth Inbox first.
           </p>
         ) : null}
-        {savedWins.length === 0 ? (
+        {dateGroups.length === 0 ? (
           <p className="mt-3 text-sm text-[#6f6259]">
-            No wins in this period. Review items in Growth Inbox above.
+            No wins yet. Review items in Growth Inbox above.
           </p>
         ) : (
-          <ul className="mt-3 space-y-2">
-            {savedWins.map((win) => {
-              const savedEvidence = win.sourceId
-                ? hasEvidenceForWin(win.sourceId)
-                : false;
+          <div className="mt-3 space-y-2">
+            {dateGroups.map((group) => {
+              const groupOpen = openDateGroup === group.id;
               return (
-                <li
-                  key={win.id}
-                  className="rounded-2xl border border-[#e7d9c8] bg-white px-3 py-3"
+                <div
+                  key={group.id}
+                  className="overflow-hidden rounded-2xl border border-[#e7d9c8] bg-[#faf7f2]/50"
                 >
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="flex min-w-0 items-start gap-2 text-sm text-[#2f261f]">
-                      <span aria-hidden="true">{win.icon}</span>
-                      <div className="min-w-0">
-                        <span>{win.whatHappened}</span>
-                        <GrowthAttachmentsList
-                          attachments={win.attachments}
-                          compact
-                        />
-                      </div>
-                    </div>
-                    <div className="flex shrink-0 flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setAttachWinId((id) => (id === win.id ? null : win.id))
-                        }
-                        className="rounded-full border border-[#e7d9c8] bg-[#faf7f2] px-3 py-1.5 text-xs font-semibold text-[#2f261f]"
-                      >
-                        {attachWinId === win.id ? "Hide attach" : "Attach"}
-                      </button>
-                      {onSaveToEvidenceBank && win.sourceId && !savedEvidence ? (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            onSaveToEvidenceBank(win.whatHappened, win.sourceId!)
-                          }
-                          className="rounded-full border border-[#e7d9c8] bg-[#faf7f2] px-3 py-1.5 text-xs font-semibold text-[#2f261f]"
-                        >
-                          Save to Evidence
-                        </button>
-                      ) : savedEvidence ? (
-                        <span className="self-center text-xs font-semibold text-[#9a8f82]">
-                          In Evidence Bank
-                        </span>
-                      ) : null}
-                    </div>
-                  </div>
-                  {attachWinId === win.id ? (
-                    <div className="mt-3 border-t border-[#efe8de] pt-3">
-                      <GrowthAttachmentsField
-                        attachments={win.attachments}
-                        onAttachmentsChange={(next) =>
-                          handleAttachChange(win, next)
-                        }
-                      />
-                    </div>
+                  <button
+                    type="button"
+                    onClick={() => toggleDateGroup(group.id)}
+                    className="flex w-full items-center gap-2 px-4 py-3 text-left hover:bg-[#faf7f2]"
+                  >
+                    <span className="text-sm text-[#9a8f82]" aria-hidden>
+                      {groupOpen ? "▼" : "▶"}
+                    </span>
+                    <span className="text-sm font-semibold text-[#2f261f]">
+                      {group.label}
+                    </span>
+                    <span className="ml-auto text-xs text-[#9a8f82]">
+                      {group.wins.length}
+                    </span>
+                  </button>
+                  {groupOpen ? (
+                    <ul className="space-y-2 border-t border-[#efe8de] p-3">
+                      {group.wins.map((win) => renderWin(win))}
+                    </ul>
                   ) : null}
-                </li>
+                </div>
               );
             })}
-          </ul>
+          </div>
         )}
       </div>
 
       {history.length > 0 ? (
-        <div className="mt-4 rounded-3xl border border-[#e7d9c8] bg-[#faf7f2] p-5">
-          <h3 className="text-sm font-bold text-[#2f261f]">Previous weeks</h3>
+        <details className="mt-4 rounded-2xl border border-[#e7d9c8] bg-[#faf7f2]/50 px-4 py-3">
+          <summary className="cursor-pointer text-sm font-semibold text-[#6f6259]">
+            Previous weeks
+          </summary>
           <ul className="mt-3 space-y-3">
             {history.slice(0, 8).map((entry) => (
               <li key={entry.weekKey} className="text-sm text-[#2f261f]">
@@ -245,7 +279,7 @@ export function WinsThisWeekPanel({
               </li>
             ))}
           </ul>
-        </div>
+        </details>
       ) : null}
     </section>
   );

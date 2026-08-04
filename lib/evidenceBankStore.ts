@@ -5,16 +5,78 @@
 
 import type { GrowthAttachment } from "./growthAttachments";
 
-export const EVIDENCE_CATEGORIES = [
-  "Business Growth",
-  "Client Impact",
+export const EVIDENCE_DEFAULT_CATEGORIES = [
+  "Client Testimonial",
+  "Business Result",
+  "Revenue Proof",
+  "Social Proof",
   "Personal Growth",
-  "Health & Wellbeing",
-  "Courage",
-  "Problem Solving",
+  "Team Feedback",
+  "Confidence Builder",
+  "Custom",
 ] as const;
 
-export type EvidenceCategory = (typeof EVIDENCE_CATEGORIES)[number];
+/** @deprecated Use EVIDENCE_DEFAULT_CATEGORIES */
+export const EVIDENCE_CATEGORIES = EVIDENCE_DEFAULT_CATEGORIES;
+
+export type EvidenceDefaultCategory = (typeof EVIDENCE_DEFAULT_CATEGORIES)[number];
+export type EvidenceCategory = string;
+
+const CUSTOM_CATEGORIES_KEY = "companion-evidence-custom-categories-v1";
+
+const LEGACY_CATEGORY_MAP: Record<string, EvidenceDefaultCategory> = {
+  "Business Growth": "Business Result",
+  "Client Impact": "Client Testimonial",
+  "Health & Wellbeing": "Personal Growth",
+  Courage: "Confidence Builder",
+  "Problem Solving": "Business Result",
+};
+
+export function normalizeEvidenceCategory(category: string): string {
+  const trimmed = category.trim();
+  if (!trimmed) return "Business Result";
+  return LEGACY_CATEGORY_MAP[trimmed] ?? trimmed;
+}
+
+export function getCustomEvidenceCategories(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(CUSTOM_CATEGORIES_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((c): c is string => typeof c === "string" && c.trim().length > 0);
+  } catch {
+    return [];
+  }
+}
+
+export function addCustomEvidenceCategory(name: string): string {
+  const trimmed = name.trim();
+  if (!trimmed || typeof window === "undefined") return trimmed;
+  const existing = getCustomEvidenceCategories();
+  if (
+    EVIDENCE_DEFAULT_CATEGORIES.includes(trimmed as EvidenceDefaultCategory) ||
+    existing.includes(trimmed)
+  ) {
+    return trimmed;
+  }
+  try {
+    localStorage.setItem(
+      CUSTOM_CATEGORIES_KEY,
+      JSON.stringify([...existing, trimmed]),
+    );
+  } catch {
+    /* noop */
+  }
+  return trimmed;
+}
+
+export function getEvidenceCategories(): string[] {
+  const custom = getCustomEvidenceCategories();
+  const defaults = EVIDENCE_DEFAULT_CATEGORIES.filter((c) => c !== "Custom");
+  return [...defaults, ...custom, "Custom"];
+}
 
 export type EvidenceEntry = {
   id: string;
@@ -31,6 +93,10 @@ export type EvidenceEntry = {
   updatedAt: string;
   /** Momentum event or win moment id when saved from Wins This Week */
   sourceWinId?: string;
+  /** P0.33 — explicit Outcome Goal™ link */
+  outcomeGoalId?: string;
+  /** P0.34 — multiple Outcome Goal™ links */
+  outcomeGoalIds?: string[];
 };
 
 export type EvidenceDashboardStats = {
@@ -72,6 +138,7 @@ function readAll(): EvidenceEntry[] {
       )
       .map((e) => ({
         ...e,
+        category: normalizeEvidenceCategory(e.category),
         attachments: Array.isArray(e.attachments) ? e.attachments : [],
       }));
   } catch {
@@ -103,7 +170,9 @@ export function getEvidenceDashboardStats(): EvidenceDashboardStats {
     problemsSolved: entries.filter((e) => hasText(e.whatProblemSolved)).length,
     thingsImproved: entries.filter((e) => hasText(e.whatImproved)).length,
     peopleBenefited: entries.filter((e) => hasText(e.whoBenefited)).length,
-    courageMoments: entries.filter((e) => e.category === "Courage").length,
+    courageMoments: entries.filter(
+      (e) => e.category === "Confidence Builder" || e.category === "Courage",
+    ).length,
   };
 }
 
@@ -229,7 +298,7 @@ export function consumeEvidencePrefill(): EvidencePrefill | null {
 }
 
 export const EMPTY_EVIDENCE_DRAFT: EvidenceEntryInput = {
-  category: "Business Growth",
+  category: "Client Testimonial",
   whatHappened: "",
   whatImproved: "",
   whatMovedForward: "",

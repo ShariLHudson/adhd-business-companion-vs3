@@ -28,6 +28,12 @@ import { useCompanionLanguage } from "@/components/companion/CompanionLanguagePr
 import { playChime, unlockChime } from "@/lib/chime";
 import { RemindersPanel } from "@/components/companion/RemindersPanel";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
+import {
+  GOAL_PROGRESS_STYLES,
+  goalProgressStyleLabel,
+  normalizeGoalProgressStyle,
+  type GoalProgressStyle,
+} from "@/lib/goals/goalProgressStyle";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { MENU_LIST_LABEL, MENU_SECTION_HEADING } from "@/lib/menuNavStyles";
@@ -117,6 +123,7 @@ type Section =
   | "notifications"
   | "appearance"
   | "planning"
+  | "goals"
   | "celebrations"
   | "pattern"
   | "plan"
@@ -209,6 +216,8 @@ export function SettingsPanel({
   const visualMode = useVisualMode();
   const [pattern, setPattern] = useState<PatternAwareness>("light");
   const [planningView, setPlanningView] = useState<PlanningViewMode>("list");
+  const [goalProgressStyle, setGoalProgressStyle] =
+    useState<GoalProgressStyle>("progress-bars");
   const [plan, setPlan] = useState<Plan>("essential");
   const [advanced, setAdvanced] = useState(false);
   const [alerts, setAlerts] = useState(true);
@@ -252,6 +261,7 @@ export function SettingsPanel({
     setSupportStyle(p.supportStyle);
     setPattern(p.patternAwareness);
     setPlanningView(getDefaultPlanningView() ?? "list");
+    setGoalProgressStyle(normalizeGoalProgressStyle(p.goalProgressStyle));
     setPlan(p.plan);
     setAdvanced(p.advancedAiTools);
     setAlerts(p.timeBlockAlerts);
@@ -326,6 +336,11 @@ export function SettingsPanel({
       id: "planning",
       label: "Planning",
       value: planningViewLabel(planningView),
+    },
+    {
+      id: "goals",
+      label: "Goals",
+      value: goalProgressStyleLabel(goalProgressStyle),
     },
     {
       id: "celebrations",
@@ -645,6 +660,30 @@ export function SettingsPanel({
       </div>
     );
   }
+  if (open === "goals") {
+    const GOAL_STYLE_OPTIONS = GOAL_PROGRESS_STYLES.map((id) => ({
+      id,
+      label: goalProgressStyleLabel(id),
+      desc: "Applies to every tracker on your Outcome Goals dashboard.",
+    }));
+    return (
+      <div className={wrap}>
+        {header("Goals")}
+        <p className="mt-1 text-sm text-[#6b635a]">
+          Choose how progress appears on your Outcome Goals dashboard.
+        </p>
+        <p className={`${LABEL} mt-4`}>Default progress style</p>
+        <Options
+          items={GOAL_STYLE_OPTIONS}
+          current={goalProgressStyle}
+          onPick={(v) => {
+            setGoalProgressStyle(v);
+            savePrefs({ goalProgressStyle: v });
+          }}
+        />
+      </div>
+    );
+  }
   if (open === "celebrations") {
     function saveBirthday(
       month: number | "",
@@ -919,8 +958,9 @@ export function SettingsPanel({
       <div className={wrap}>
         {header("Pattern awareness")}
         <p className="mt-1 text-sm text-[#6b635a]">
-          A gentle weekly reflection on what moved you forward. No scores, no
-          judgment — and you can turn it off anytime.
+          When on, Shari may gently surface pattern observations in chat. When
+          off, proactive pattern insights are paused — you can still ask anytime.
+          No scores, no judgment.
         </p>
         <Options
           items={PATTERNS}

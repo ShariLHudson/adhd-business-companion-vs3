@@ -18,6 +18,13 @@ export const CREATE_LAUNCHER_TYPE_OPTIONS = [
   "Video Script",
   "Podcast Outline",
   "Book Chapter",
+  "PDF",
+  "Document",
+  "Letter",
+  "SOP",
+  "Strategy",
+  "Spreadsheet",
+  "Calendar",
   OTHER_OPTION,
 ] as const;
 

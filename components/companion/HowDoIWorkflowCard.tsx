@@ -55,7 +55,7 @@ export function HowDoIWorkflowCard({
             {article.title}
           </span>
           <span className="shrink-0 text-sm text-[#9a8f82]" aria-hidden="true">
-            {open ? "▲" : "▼"}
+            {open ? "▼" : "▶"}
           </span>
         </button>
 

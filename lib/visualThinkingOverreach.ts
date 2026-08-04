@@ -104,6 +104,9 @@ export function isVisualThinkingAllowListRequest(text: string): boolean {
 export function shouldBlockVisualThinking(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
+  if (/\b(?:write(?:ing)?\s+(?:a\s+)?book\s+about|book\s+about)\b/i.test(t)) {
+    return true;
+  }
   if (isVisualThinkingAllowListRequest(t)) return false;
   return shouldSuppressVisualRecommendation(t);
 }
@@ -114,6 +117,9 @@ export function matchVisualGoalRecommendation(text: string): {
 } | null {
   const t = text.trim();
   if (!t || shouldBlockVisualThinking(t)) return null;
+  if (/\b(?:write(?:ing)?\s+(?:a\s+)?book\s+about|book\s+about)\b/i.test(t)) {
+    return null;
+  }
   for (const rule of VISUAL_GOAL_RULES) {
     if (rule.test.test(t)) {
       return { recommended: rule.recommended, other: rule.other };

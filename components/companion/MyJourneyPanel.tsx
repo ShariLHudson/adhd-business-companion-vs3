@@ -23,6 +23,8 @@ import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWor
 import { GrowthSectionHeader } from "@/components/companion/GrowthSectionHeader";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import type { GrowthPanelNav } from "@/lib/growthNavigation";
+import { OutcomeGoalMultiLinkPicker } from "@/components/companion/OutcomeGoalMultiLinkPicker";
+import { getLinkedGoalIds, packGoalLinks } from "@/lib/goals/goalLinking";
 
 const INPUT_CLASS =
   "mt-1 w-full rounded-xl border border-[#e4ddd2] bg-white px-3 py-2.5 text-sm text-[#2d2926] placeholder:text-[#9a8f82] focus:border-[#c9a66b] focus:outline-none focus:ring-2 focus:ring-[#c9a66b]/25";
@@ -126,6 +128,7 @@ export function MyJourneyPanel({
     createJourneyEntry({
       ...draft,
       title: draft.title.trim(),
+      ...packGoalLinks(getLinkedGoalIds(draft)),
     });
     setDraft(EMPTY_JOURNEY_DRAFT);
     setShowForm(false);
@@ -222,22 +225,12 @@ export function MyJourneyPanel({
       ) : null}
 
       {stats.total === 0 ? (
-        <div className="mt-5 rounded-3xl border border-[#e7d9c8] bg-gradient-to-b from-[#faf7f2] to-white p-5 text-center">
-          <p className="font-semibold text-[#2f261f]">Preserve your story as it unfolds.</p>
-          <p className="mt-2 text-sm text-[#6f6259]">
-            Add milestones, lessons, and chapters — not a resume, a meaningful life record.
-          </p>
-          <button
-            type="button"
-            onClick={() => setShowForm(true)}
-            className="mt-4 rounded-full bg-[#2f261f] px-4 py-2 text-sm font-semibold text-white"
-          >
-            Add First Entry
-          </button>
-        </div>
+        <p className="mt-4 text-sm text-[#6f6259]">
+          No entries yet — tap <strong>Add entry</strong> to start your timeline.
+        </p>
       ) : null}
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-4 flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={() => setShowForm((v) => !v)}
@@ -263,15 +256,22 @@ export function MyJourneyPanel({
         >
           Chapters
         </button>
-        <button type="button" onClick={() => window.print()} className="rounded-full border border-[#e7d9c8] px-3 py-1.5 text-xs font-semibold text-[#6f6259]">
-          🖨 Print
-        </button>
-        <button type="button" disabled className="cursor-not-allowed rounded-full border border-dashed border-[#e7d9c8] px-3 py-1.5 text-xs text-[#b8afa4]">
-          📄 PDF Export
-        </button>
-        <button type="button" disabled className="cursor-not-allowed rounded-full border border-dashed border-[#e7d9c8] px-3 py-1.5 text-xs text-[#b8afa4]">
-          📚 My Journey Book
-        </button>
+        <details className="relative">
+          <summary className="cursor-pointer list-none rounded-full border border-[#e7d9c8] bg-white px-3 py-1.5 text-xs font-semibold text-[#6f6259] marker:content-none [&::-webkit-details-marker]:hidden">
+            More ▾
+          </summary>
+          <div className="absolute left-0 top-full z-10 mt-1 flex min-w-[10rem] flex-col gap-1 rounded-xl border border-[#e7d9c8] bg-white p-2 shadow-lg">
+            <button type="button" onClick={() => window.print()} className="rounded-lg px-3 py-2 text-left text-xs font-semibold text-[#2f261f] hover:bg-[#faf7f2]">
+              🖨 Print
+            </button>
+            <button type="button" disabled className="cursor-not-allowed rounded-lg px-3 py-2 text-left text-xs text-[#b8afa4]">
+              📄 PDF Export
+            </button>
+            <button type="button" disabled className="cursor-not-allowed rounded-lg px-3 py-2 text-left text-xs text-[#b8afa4]">
+              📚 Journey Book
+            </button>
+          </div>
+        </details>
       </div>
 
       {showForm ? (
@@ -317,6 +317,12 @@ export function MyJourneyPanel({
             attachments={draft.attachments}
             onAttachmentsChange={(next) => updateDraft("attachments", next)}
           />
+          <OutcomeGoalMultiLinkPicker
+            value={getLinkedGoalIds(draft)}
+            onChange={(ids) =>
+              setDraft((d) => ({ ...d, ...packGoalLinks(ids) }))
+            }
+          />
           <button type="button" onClick={handleSave} disabled={!draft.title.trim()} className="rounded-full bg-[#2f261f] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-40">
             Save to My Journey
           </button>
@@ -325,13 +331,15 @@ export function MyJourneyPanel({
 
       <div className="mt-6">
         <input type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search title, story, lessons, wisdom, attachments…" className="w-full rounded-full border border-[#e4ddd2] bg-white px-4 py-2 text-sm" />
-        <div className="mt-2 flex flex-wrap gap-1">
-          {FILTERS.map((f) => (
-            <button key={f.id} type="button" onClick={() => setFilter(f.id)} className={`rounded-full px-3 py-1 text-xs font-semibold ${filter === f.id ? "bg-[#2f261f] text-white" : "border border-[#e7d9c8] bg-white text-[#6f6259]"}`}>
-              {f.label}
-            </button>
-          ))}
-        </div>
+        {stats.total > 0 ? (
+          <div className="mt-2 flex flex-wrap gap-1">
+            {FILTERS.map((f) => (
+              <button key={f.id} type="button" onClick={() => setFilter(f.id)} className={`rounded-full px-3 py-1 text-xs font-semibold ${filter === f.id ? "bg-[#2f261f] text-white" : "border border-[#e7d9c8] bg-white text-[#6f6259]"}`}>
+                {f.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
 
         {view === "timeline" ? (
           <ul className="mt-3 space-y-3">

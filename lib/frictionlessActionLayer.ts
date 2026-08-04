@@ -28,11 +28,13 @@ import {
   type IntentRoutingDecision,
 } from "./intentRoutingIntelligence";
 import { shouldSuppressRelationshipIntelligenceForUserText } from "./relationshipIntelligenceBoundaries";
+import { isSelfUnderstandingIntent } from "./relationshipIntelligenceBoundaries";
 import {
   containsVisualStructurePhrase,
   resolveVisualStructureRoute,
   resolveVisualStructureWorkspaceOffer,
 } from "./visualStructureRouting";
+import { isExplicitVisualStructureRequest } from "./visualThinkingStudio";
 import { shouldSuppressVisualThinkingForLearn } from "./visualLearnBoundary";
 import {
   buildOverwhelmTodayOffers,
@@ -47,10 +49,15 @@ import { recommendStrategyFromUserText } from "./strategyIntelligence";
 import {
   resolveUnavailableVisualTypeReply,
 } from "./visualTypeAvailability";
-import { clearVisualRecommendationPending } from "./visualThinkingContinuation";
+import {
+  clearVisualRecommendationPending,
+  clearVisualThinkingMenuPending,
+} from "./visualThinkingContinuation";
+import { clearOutcomeThread } from "./companionOutcomeThread";
 import { isVisualThinkingMenuOfferMessage } from "./visualThinkingContinuation";
 import {
   isActivationProblem,
+  isFocusProblem,
   isMotivationProblem,
   isOverwhelmProblem,
   isRelationshipQuestion,
@@ -74,15 +81,22 @@ import {
 } from "./visualThinkingStudio";
 import {
   detectSheetIntent,
+  getGoogleSheetTemplate,
   shouldExcludeSheetOffer,
   startGoogleSheetIntake,
   type GoogleSheetIntakeSession,
   type GoogleSheetTypeId,
 } from "./googleSheetsIntelligence";
+import {
+  applyWorkspaceAwareFrictionless,
+  buildWorkspaceContinuationLine,
+  isTargetWorkspaceOpen,
+} from "./workspaceContinuity";
 import type { WorkspaceOffer } from "./workspaceMode";
 import type { TimeBlock } from "./companionStore";
 import {
   reminderHintForChat,
+  isReminderRequest,
   resolveReminderTurn,
   type ReminderDraft,
 } from "./reminderIntelligence";
@@ -91,6 +105,14 @@ import {
   buildVisualSourceAskReply,
   validateVisualSourceContent,
 } from "./visualSourceContentValidation";
+import {
+  isArtifactExecutionIntent,
+  resolveArtifactExecutionTurn,
+  type ArtifactExecutionDraft,
+} from "./artifactExecutionAuthority";
+import { artifactExecutionHintForChat } from "./artifactExecutionEngine";
+import type { ArtifactExecutionSession } from "./artifactExecutionSession";
+import { clearArtifactExecutionSession } from "./artifactExecutionSession";
 
 export type FrictionlessActionCategory =
   | "direct_action"
@@ -98,9 +120,14 @@ export type FrictionlessActionCategory =
   | "emotional_regulation"
   | "adhd_emotional_friction"
   | "focus_support"
+  | "focus"
   | "decision_support"
   | "google_sheet"
   | "reminder"
+  | "artifact_execution"
+  | "strategy"
+  | "organize"
+  | "emotional"
   | "none";
 
 export type FrictionlessPendingAction = {
@@ -142,6 +169,8 @@ export type FrictionlessActionInput = {
   workspace?: AppSection | null;
   timeBlocks?: TimeBlock[];
   reminderDraft?: ReminderDraft | null;
+  messages?: { role: "user" | "assistant"; content: string }[];
+  artifactExecutionDraft?: ArtifactExecutionDraft | null;
 };
 
 export type FrictionlessActionDecision = {
@@ -157,6 +186,8 @@ export type FrictionlessActionDecision = {
   intentRouting: IntentRoutingDecision | null;
   googleSheetIntake?: GoogleSheetIntakeSession;
   reminderIntake?: ReminderIntakeSession | null;
+  artifactExecutionIntake?: ArtifactExecutionSession | null;
+  executeArtifactNow?: boolean;
   immediateVisualOpen?: {
     mode: import("./visualFocus/types").VisualFocusMode;
     viewId: VisualThinkingViewId;
@@ -413,6 +444,14 @@ function buildAdhdEmotionalFrictionDecision(
   };
 }
 
+export function clearStaleWorkflowPendingsForNewIntent(): void {
+  clearFrictionlessPending();
+  clearVisualThinkingMenuPending();
+  clearVisualRecommendationPending();
+  clearArtifactExecutionSession();
+  clearOutcomeThread();
+}
+
 function buildReminderDecision(
   userText: string,
   currentTurn: number,
@@ -424,6 +463,12 @@ function buildReminderDecision(
     timeBlocks: input.timeBlocks ?? [],
   });
   if (outcome.kind === "not_reminder") return null;
+
+  const isNewReminder =
+    !input.reminderDraft && isReminderRequest(userText.trim());
+  if (isNewReminder) {
+    clearStaleWorkflowPendingsForNewIntent();
+  }
 
   const base: FrictionlessActionDecision = {
     category: "reminder",
@@ -451,6 +496,67 @@ function buildReminderDecision(
   }
 
   return base;
+}
+
+function buildArtifactExecutionDecision(
+  userText: string,
+  currentTurn: number,
+  input: FrictionlessActionInput,
+): FrictionlessActionDecision | null {
+  const outcome = resolveArtifactExecutionTurn({
+    userText,
+    draft: input.artifactExecutionDraft ?? null,
+    messages: input.messages,
+    lastAssistantText: input.lastAssistantText,
+  });
+  if (outcome.kind === "not_execution" || outcome.kind === "workspace") {
+    return null;
+  }
+
+  const isNew =
+    !input.artifactExecutionDraft && isArtifactExecutionIntent(userText.trim());
+  if (isNew) {
+    clearStaleWorkflowPendingsForNewIntent();
+  }
+
+  const base: FrictionlessActionDecision = {
+    category: "artifact_execution",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint: artifactExecutionHintForChat(),
+    localReply: outcome.reply || null,
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: null,
+    reminderIntake: null,
+    artifactExecutionIntake: null,
+    executeArtifactNow: false,
+  };
+
+  if (outcome.kind === "ask") {
+    const phase =
+      outcome.draft.missing === "content" ? "collecting" : ("ready" as const);
+    return {
+      ...base,
+      artifactExecutionIntake: {
+        phase,
+        draft: outcome.draft,
+        startedAtTurn: currentTurn,
+      },
+    };
+  }
+
+  return {
+    ...base,
+    executeArtifactNow: true,
+    artifactExecutionIntake: {
+      phase: "ready",
+      draft: outcome.draft,
+      startedAtTurn: currentTurn,
+    },
+  };
 }
 
 function buildFocusSupportDecision(
@@ -503,6 +609,53 @@ function buildEmotionalRegulationDecision(
     workspaceOffer: null,
     intentRouting: null,
   };
+}
+
+function buildSpreadsheetCreateDecision(
+  sheetType: GoogleSheetTypeId,
+  userText: string,
+  currentTurn: number,
+  input: FrictionlessActionInput,
+): FrictionlessActionDecision {
+  const template = getGoogleSheetTemplate(sheetType);
+  const alreadyInCreate = isTargetWorkspaceOpen(
+    input.workspace,
+    "content-generator",
+  );
+  const localReply = alreadyInCreate
+    ? `You're already in Create — let's map out your ${template.label}. What columns or categories do you need?`
+    : `Spreadsheets live in Create — let's build your ${template.label} structure together.`;
+
+  return applyWorkspaceAwareFrictionless(
+    {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint:
+        "SPREADSHEET CREATE ROUTING (P0.42): Route spreadsheet requests to Create — not Connections or Google Sheets intake.",
+      localReply,
+      pendingAction: alreadyInCreate
+        ? null
+        : buildCreateFrictionlessPending({
+            target: "content-generator",
+            userText: `${template.label}: ${userText}`,
+            offeredAtTurn: currentTurn,
+            offerSummary: template.label,
+          }),
+      toolSuggestion: null,
+      workspaceOffer: alreadyInCreate
+        ? null
+        : {
+            section: "content-generator",
+            buttonLabel: "Open Create",
+            line: localReply,
+          },
+      intentRouting: null,
+    },
+    input.workspace,
+    userText,
+  );
 }
 
 function buildGoogleSheetsIntakeDecision(
@@ -658,18 +811,132 @@ function buildMotivationSupportDecision(
   currentTurn: number,
 ): FrictionlessActionDecision {
   return {
-    category: "focus_support",
+    category: "emotional",
     suppressRelationship: true,
     suppressRecap: true,
     suppressReflectionFirst: true,
     responseHint:
-      "MOTIVATION SUPPORT (P0.20.3): One small step first — not Visual Thinking. Offer Focus Mode or Focus Audio if helpful.",
+      "EMOTIONAL SUPPORT (P0.20.3): Acknowledge first. One small step or calming option — not Visual Thinking or Focus Audio by default.",
     localReply:
-      "Let's find one small step forward. What's the smallest piece you could touch right now?\n\nIf it helps, we can use **Focus Mode** or **Focus Audio** — want either?",
+      "Motivation can be hard to summon on command. What's one tiny piece you could touch — or would a short reset help first?",
     pendingAction: null,
     toolSuggestion: null,
     workspaceOffer: null,
-    intentRouting: null,
+    intentRouting: {
+      category: "understand",
+      routeMode: "conversation",
+      goal: { summary: "Find motivation without pressure", tags: ["emotional"] },
+      workspaceOffer: null,
+      secondaryWorkspaceOffer: null,
+      featureMatch: null,
+      secondaryFeatureMatch: null,
+      overwhelmTodayRoute: null,
+      surfaceOfferUi: false,
+      surfaceClarificationUi: false,
+      decisionCompassRecommended: false,
+      clarifyPrompt: null,
+      artifactDetected: false,
+      artifactKind: null,
+      suppressRelationshipIntelligence: true,
+      suppressRelationshipLead: true,
+      suppressReflectionFirst: true,
+      suppressConversationSummary: false,
+      learnFastPath: false,
+      suppressWisdomIntelligence: true,
+      suppressTransformationIntelligence: true,
+      suppressObservationEngine: true,
+      stayHereChatGuidance: null,
+      supportStyle: "guided",
+      supportStyleGuidance: null,
+      adaptMyDayRecommended: false,
+      continuity: null,
+      navigationLine: null,
+      stayHereLabel: "Stay Here",
+      featureLabel: "Emotional Regulation",
+    },
+  };
+}
+
+function buildFocusProcrastinationDecision(
+  currentTurn: number,
+): FrictionlessActionDecision {
+  return {
+    category: "focus",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint:
+      "FOCUS SUPPORT (P0.20.3): Procrastination → one focus thread. Offer Focus Mode or Focus Audio if helpful.",
+    localReply:
+      "Let's pick one thread to touch. What needs attention most right now?\n\nIf it helps, we can use **Focus Mode** or **Focus Audio** — want either?",
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: {
+      category: "plan",
+      routeMode: "conversation",
+      goal: { summary: "Choose one focus thread", tags: ["focus"] },
+      workspaceOffer: null,
+      secondaryWorkspaceOffer: null,
+      featureMatch: null,
+      secondaryFeatureMatch: null,
+      overwhelmTodayRoute: null,
+      surfaceOfferUi: false,
+      surfaceClarificationUi: false,
+      decisionCompassRecommended: false,
+      clarifyPrompt: null,
+      artifactDetected: false,
+      artifactKind: null,
+      suppressRelationshipIntelligence: true,
+      suppressRelationshipLead: true,
+      suppressReflectionFirst: true,
+      suppressConversationSummary: false,
+      learnFastPath: false,
+      suppressWisdomIntelligence: true,
+      suppressTransformationIntelligence: true,
+      suppressObservationEngine: true,
+      stayHereChatGuidance: null,
+      supportStyle: "direct",
+      supportStyleGuidance: null,
+      adaptMyDayRecommended: false,
+      continuity: null,
+      navigationLine: null,
+      stayHereLabel: "Stay Here",
+      featureLabel: "Focus",
+    },
+  };
+}
+
+function buildOrganizeOverwhelmDecision(
+  userText: string,
+  currentTurn: number,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision {
+  const offer: WorkspaceOffer = {
+    section: "brain-dump",
+    buttonLabel: "Open Clear My Mind",
+    line: "When everything feels loud, getting it out of your head can help.\nWould you like to open Clear My Mind?",
+  };
+  return {
+    category: "organize",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint:
+      "ORGANIZE (P0.20.3): Simple overwhelm → Clear My Mind first — never Visual Thinking.",
+    localReply: offer.line,
+    pendingAction: frictionlessPendingFromWorkspaceOffer(offer, currentTurn, {
+      userText,
+    }),
+    toolSuggestion: null,
+    workspaceOffer: offer,
+    intentRouting: {
+      ...routing,
+      category: "organize",
+      routeMode: "feature_offer",
+      workspaceOffer: offer,
+      featureLabel: "Organize",
+    },
   };
 }
 
@@ -705,9 +972,9 @@ function buildStrategyFrictionlessDecision(
   routing: IntentRoutingDecision,
 ): FrictionlessActionDecision | null {
   if (shouldSkipStrategyOfferForUserText(userText)) return null;
+  if (isSelfUnderstandingIntent(userText)) return null;
   if (
     !isStrategyProblem(userText) &&
-    !isRelationshipQuestion(userText) &&
     !isActivationProblem(userText)
   ) {
     return null;
@@ -720,7 +987,7 @@ function buildStrategyFrictionlessDecision(
     currentTurn,
   );
   return {
-    category: "direct_action",
+    category: "strategy",
     suppressRelationship: true,
     suppressRecap: true,
     suppressReflectionFirst: true,
@@ -730,7 +997,11 @@ function buildStrategyFrictionlessDecision(
     pendingAction: pending,
     toolSuggestion: null,
     workspaceOffer: null,
-    intentRouting: routing,
+    intentRouting: {
+      ...routing,
+      routeMode: "conversation",
+      featureLabel: "Strategy Intelligence",
+    },
   };
 }
 
@@ -774,43 +1045,58 @@ function buildDirectActionDecision(
   routing: IntentRoutingDecision,
   userText: string,
   currentTurn: number,
+  currentWorkspace?: AppSection | null,
 ): FrictionlessActionDecision {
+  const targetSection =
+    routing.workspaceOffer?.section ?? ("content-generator" as AppSection);
+  const alreadyOpen = isTargetWorkspaceOpen(currentWorkspace, targetSection);
   const execCategory = routing.category === "build" ? "build" : "execute";
-  const localReply =
-    routing.navigationLine ??
-    (routing.artifactKind
-      ? buildRegistryArtifactOfferLine(routing.artifactKind, execCategory)
-      : "I can help build that. Would you like to open Create?");
-  return {
-    category: "direct_action",
-    suppressRelationship: true,
-    suppressRecap: true,
-    suppressReflectionFirst: true,
-    responseHint:
-      "DIRECT ACTION (P0.9): Start the work or ask ONE needed detail. No relationship observations.",
-    localReply,
-    pendingAction:
-      routing.workspaceOffer?.section === "content-generator"
-        ? buildCreateFrictionlessPending({
-            target: "content-generator",
-            userText,
-            offeredAtTurn: currentTurn,
-            artifactKind: routing.artifactKind,
-            offerSummary: routing.featureLabel ?? "Create",
-          })
-        : routing.workspaceOffer
-          ? {
-              type: "open_workspace",
-              target: routing.workspaceOffer.section,
-              context: routing.artifactKind ?? "create",
-              offeredAtTurn: currentTurn,
-              offerSummary: routing.featureLabel ?? "Create",
-            }
-          : null,
-    toolSuggestion: null,
-    workspaceOffer: routing.workspaceOffer,
-    intentRouting: routing,
-  };
+  const localReply = alreadyOpen
+    ? buildWorkspaceContinuationLine(
+        targetSection,
+        userText,
+        routing.artifactKind,
+      )
+    : routing.navigationLine ??
+      (routing.artifactKind
+        ? buildRegistryArtifactOfferLine(routing.artifactKind, execCategory)
+        : "I can help build that. Would you like to open Create?");
+  return applyWorkspaceAwareFrictionless(
+    {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint:
+        "DIRECT ACTION (P0.9): Start the work or ask ONE needed detail. No relationship observations.",
+      localReply,
+      pendingAction:
+        alreadyOpen
+          ? null
+          : routing.workspaceOffer?.section === "content-generator"
+            ? buildCreateFrictionlessPending({
+                target: "content-generator",
+                userText,
+                offeredAtTurn: currentTurn,
+                artifactKind: routing.artifactKind,
+                offerSummary: routing.featureLabel ?? "Create",
+              })
+            : routing.workspaceOffer
+              ? {
+                  type: "open_workspace",
+                  target: routing.workspaceOffer.section,
+                  context: routing.artifactKind ?? "create",
+                  offeredAtTurn: currentTurn,
+                  offerSummary: routing.featureLabel ?? "Create",
+                }
+              : null,
+      toolSuggestion: null,
+      workspaceOffer: alreadyOpen ? null : routing.workspaceOffer,
+      intentRouting: routing,
+    },
+    currentWorkspace,
+    userText,
+  );
 }
 
 export function resolveFrictionlessAction(
@@ -833,12 +1119,31 @@ export function resolveFrictionlessAction(
 
   if (!userText) return none;
 
+  const reminderDecision = buildReminderDecision(userText, currentTurn, input);
+  if (reminderDecision) return reminderDecision;
+
+  const artifactExecutionDecision = buildArtifactExecutionDecision(
+    userText,
+    currentTurn,
+    input,
+  );
+  if (artifactExecutionDecision) return artifactExecutionDecision;
+
   const routing = resolveIntentRouting({
     userText,
     workspace: input.workspace,
     emotionalState: input.emotionalState,
     overwhelmed: input.overwhelmed,
   });
+
+  if (isSelfUnderstandingIntent(userText)) {
+    return {
+      ...none,
+      suppressRelationship: false,
+      suppressReflectionFirst: false,
+      intentRouting: routing,
+    };
+  }
 
   if (routing.learnFastPath || shouldSuppressVisualThinkingForLearn(userText)) {
     clearVisualRecommendationPending();
@@ -851,6 +1156,49 @@ export function resolveFrictionlessAction(
         "LEARN FAST PATH (P0.20.1): Answer the concept directly — no Visual Thinking open.",
       intentRouting: routing,
     };
+  }
+
+  if (
+    routing.category === "decide" ||
+    isDecisionCompassOfferSignal(userText) ||
+    /\b(?:help me decide|help me choose|stuck between|torn between)\b/i.test(
+      userText,
+    )
+  ) {
+    return buildDecisionSupportDecision(routing, currentTurn);
+  }
+
+  if (/\bkeep(?:s)?\s+procrastinat\w*\b/i.test(userText)) {
+    return buildFocusProcrastinationDecision(currentTurn);
+  }
+
+  const strategyDecision = buildStrategyFrictionlessDecision(
+    userText,
+    currentTurn,
+    routing,
+  );
+  if (strategyDecision) return strategyDecision;
+
+  if (/^i'?m\s+overwhelm(?:ed)?\.?$/i.test(userText)) {
+    return buildOrganizeOverwhelmDecision(userText, currentTurn, routing);
+  }
+
+  if (
+    routing.overwhelmTodayRoute &&
+    routing.routeMode === "feature_offer" &&
+    routing.workspaceOffer
+  ) {
+    return {
+      ...none,
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      intentRouting: routing,
+    };
+  }
+
+  if (isMotivationProblem(userText) && !EMOTIONAL_REGULATION_RE.test(userText)) {
+    return buildMotivationSupportDecision(currentTurn);
   }
 
   const plannedVisualReply = resolveUnavailableVisualTypeReply(userText, {
@@ -933,8 +1281,17 @@ export function resolveFrictionlessAction(
   }
 
   const sheetType = detectSheetIntent(userText);
-  if (sheetType && !shouldExcludeSheetOffer(userText)) {
-    return buildGoogleSheetsIntakeDecision(sheetType, userText, currentTurn);
+  if (
+    sheetType &&
+    !shouldExcludeSheetOffer(userText) &&
+    !isArtifactExecutionIntent(userText)
+  ) {
+    return buildSpreadsheetCreateDecision(
+      sheetType,
+      userText,
+      currentTurn,
+      input,
+    );
   }
 
   const artifact = detectArtifactRequest(userText);
@@ -946,11 +1303,9 @@ export function resolveFrictionlessAction(
       },
       userText,
       currentTurn,
+      input.workspace,
     );
   }
-
-  const reminderDecision = buildReminderDecision(userText, currentTurn, input);
-  if (reminderDecision) return reminderDecision;
 
   if (
     EMOTIONAL_REGULATION_RE.test(userText) &&
@@ -964,13 +1319,22 @@ export function resolveFrictionlessAction(
   }
 
   const audio = buildAudioPending(userText, currentTurn);
-  if (audio) return audio;
+  if (audio && !isMotivationProblem(userText)) return audio;
 
   if (FOCUS_SUPPORT_RE.test(userText) && !/\boverwhelm/i.test(userText)) {
     return buildFocusSupportDecision(currentTurn);
   }
 
-  if (isOverwhelmProblem(userText)) {
+  if (isOverwhelmProblem(userText) || routing.overwhelmTodayRoute) {
+    if (routing.routeMode === "feature_offer" && routing.workspaceOffer) {
+      return {
+        ...none,
+        suppressRelationship: true,
+        suppressRecap: routing.suppressConversationSummary,
+        suppressReflectionFirst: routing.suppressReflectionFirst,
+        intentRouting: routing,
+      };
+    }
     const overwhelm = buildOverwhelmFrictionlessDecision(
       userText,
       currentTurn,
@@ -978,17 +1342,6 @@ export function resolveFrictionlessAction(
     );
     if (overwhelm) return overwhelm;
   }
-
-  if (isMotivationProblem(userText) && !isAdhdEmotionalFrictionTurn(userText)) {
-    return buildMotivationSupportDecision(currentTurn);
-  }
-
-  const strategyDecision = buildStrategyFrictionlessDecision(
-    userText,
-    currentTurn,
-    routing,
-  );
-  if (strategyDecision) return strategyDecision;
 
   if (routing.learnFastPath) {
     clearVisualRecommendationPending();
@@ -1012,6 +1365,7 @@ export function resolveFrictionlessAction(
 
   if (
     !shouldRouteBusinessStrategyToCreate(userText) &&
+    !/\b(?:write(?:ing)?\s+(?:a\s+)?book\s+about|book\s+about)\b/i.test(userText) &&
     routing.category !== "learn" &&
     !routing.learnFastPath &&
     !shouldSuppressVisualRecommendation(userText) &&
@@ -1022,6 +1376,18 @@ export function resolveFrictionlessAction(
       currentTurn,
       routing,
       input.lastAssistantText,
+    );
+  }
+
+  if (
+    (routing.category === "build" || routing.category === "execute") &&
+    routing.workspaceOffer
+  ) {
+    return buildDirectActionDecision(
+      routing,
+      userText,
+      currentTurn,
+      input.workspace,
     );
   }
 
@@ -1069,6 +1435,11 @@ export function frictionlessHintForChat(
   }
   if (decision.category === "reminder") {
     lines.push("Short confirmation only. No relationship layer or tool offers.");
+  }
+  if (decision.category === "artifact_execution") {
+    lines.push(
+      "Execute the finished file (PDF, Google Doc, Sheet, Calendar). Do NOT open Create or Documents.",
+    );
   }
   return lines.join("\n");
 }

@@ -36,10 +36,14 @@ export type AppSection =
   | "wins-this-week"
   | "evidence-bank"
   | "growth"
+  | "growth-vault"
+  | "outcome-goals"
   | "confidence-vault"
-  | "my-journey";
+  | "my-journey"
+  | "portfolio";
 
 export type SidebarNavId =
+  | "today"
   | "chat"
   | "focus"
   | "visual-thinking"
@@ -59,8 +63,11 @@ export type SidebarNavId =
   | "wins-this-week"
   | "evidence-bank"
   | "growth"
+  | "growth-vault"
+  | "outcome-goals"
   | "confidence-vault"
-  | "my-journey";
+  | "my-journey"
+  | "portfolio";
 
 export type SidebarToolId =
   | "voice"
@@ -87,18 +94,19 @@ export const BRAND = {
   tagline: "Your Coach & Companion",
 } as const;
 
-// Six sidebar doors — Companion First: chat, regulation, visual thinking, growth, other, learning.
+// P0.43 — Today, Chat, Focus, Visual Thinking, Growth Center, Other, How Do I.
 export const SIDEBAR_NAV: {
   id: SidebarNavId;
   label: string;
   emoji: string;
   mode?: CoachingMode;
 }[] = [
-  { id: "chat", label: "Chat", emoji: "💬", mode: "today" },
-  { id: "focus", label: "Focus My Brain", emoji: "🚧", mode: "focus" },
-  { id: "visual-thinking", label: "Visual Thinking", emoji: "💡" },
+  { id: "today", label: "Today", emoji: "📅" },
+  { id: "chat", label: "Chat", emoji: "💬" },
+  { id: "focus", label: "Focus", emoji: "🎯" },
+  { id: "visual-thinking", label: "Visual Thinking", emoji: "🎨" },
   { id: "growth", label: "Growth", emoji: "📈" },
-  { id: "other", label: "Other", emoji: "➕" },
+  { id: "other", label: "Other", emoji: "📂" },
   { id: "how-do-i", label: "How Do I...?", emoji: "❓" },
 ];
 
@@ -113,9 +121,11 @@ export const MORE_NAV: {
 // Top-level nav items that open their own section (a panel) rather than
 // switching the chat into a coaching mode.
 export const SECTION_NAV: Partial<Record<SidebarNavId, AppSection>> = {
+  today: "today",
   focus: "focus",
   "visual-thinking": "visual-focus",
-  growth: "growth",
+  "growth-vault": "growth-vault",
+  "outcome-goals": "outcome-goals",
   other: "my-work",
   create: "content-generator",
   "my-work": "my-work",
@@ -142,9 +152,12 @@ export function normalizeSidebarNav(nav: SidebarNavId): SidebarNavId {
     nav === "wins-this-week" ||
     nav === "evidence-bank" ||
     nav === "confidence-vault" ||
-    nav === "my-journey"
+    nav === "my-journey" ||
+    nav === "portfolio" ||
+    nav === "growth-vault" ||
+    nav === "outcome-goals"
   ) {
-    return "growth";
+    return nav === "growth-vault" || nav === "outcome-goals" ? nav : "growth";
   }
   return nav;
 }
@@ -152,6 +165,9 @@ export function normalizeSidebarNav(nav: SidebarNavId): SidebarNavId {
 /** Primary sidebar nav for an open workspace section. */
 export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
   switch (section) {
+    case "today":
+    case "plan-my-day":
+      return "today";
     case "my-work":
     case "content-generator":
     case "projects":
@@ -171,16 +187,19 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
     case "spin-wheel":
     case "games":
       return "focus";
-    case "growth":
+    case "growth-vault":
+      return "growth-vault";
+    case "outcome-goals":
+      return "outcome-goals";
     case "wins-this-week":
     case "evidence-bank":
     case "confidence-vault":
     case "my-journey":
+    case "portfolio":
       return "growth";
     case "how-do-i":
       return "how-do-i";
     case "home":
-    case "today":
       return "chat";
     default:
       return null;
@@ -263,6 +282,53 @@ export const FOCUS_MENU: MenuNode[] = [
     ],
   },
 ];
+
+/** P0.50 — Growth flyout destinations (no Growth Center landing page). */
+export const GROWTH_MENU: {
+  id: "growth-vault" | "outcome-goals";
+  label: string;
+  emoji: string;
+  section: AppSection;
+}[] = [
+  {
+    id: "growth-vault",
+    label: "Growth Vault™",
+    emoji: "🏛",
+    section: "growth-vault",
+  },
+  {
+    id: "outcome-goals",
+    label: "Outcome Goals™",
+    emoji: "🎯",
+    section: "outcome-goals",
+  },
+];
+
+export const GROWTH_VAULT_SECTIONS: AppSection[] = [
+  "growth-vault",
+  "wins-this-week",
+  "evidence-bank",
+  "portfolio",
+  "my-journey",
+];
+
+export function isGrowthVaultSection(section: AppSection): boolean {
+  return GROWTH_VAULT_SECTIONS.includes(section);
+}
+
+export function isOutcomeGoalsSection(section: AppSection): boolean {
+  return section === "outcome-goals";
+}
+
+export function isGrowthNavSection(section: AppSection): boolean {
+  return isGrowthVaultSection(section) || isOutcomeGoalsSection(section);
+}
+
+/** P0.50 — Growth Center landing removed; legacy opens go to Growth Vault™. */
+export function resolveGrowthDestination(section: AppSection): AppSection {
+  if (section === "growth") return "growth-vault";
+  return section;
+}
 
 // Maps a tool action to the AppSection it opens (null = no section switch).
 export const TOOL_SECTION: Partial<Record<SidebarToolId, AppSection>> = {

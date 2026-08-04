@@ -44,7 +44,7 @@ export function sortProjects(
 
 export function recentActiveProjects(
   projects: Project[],
-  limit = 5,
+  limit = 10,
 ): Project[] {
   return sortProjects(
     projects.filter((p) => p.status !== "completed"),

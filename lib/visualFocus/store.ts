@@ -137,8 +137,9 @@ export function markVisualFocusMapSaving(map: VisualFocusMap): VisualFocusMap {
 export function createAndActivateMap(
   mode: VisualFocusMode,
   purposeAnswer?: string,
+  homeTypeId?: import("../visualThinkingHome").VisualThinkingHomeTypeId,
 ): VisualFocusMap {
-  const map = createVisualFocusMap(mode, purposeAnswer);
+  const map = createVisualFocusMap(mode, purposeAnswer, homeTypeId);
   const store = readStore();
   const next = { ...map, saveStatus: "saved" as const, workflowStage: "build" as const };
   writeStore({

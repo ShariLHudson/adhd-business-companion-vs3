@@ -57,6 +57,10 @@ export type JourneyEntry = {
   attachments: GrowthAttachment[];
   createdAt: string;
   updatedAt: string;
+  /** P0.33 — explicit Outcome Goal™ link */
+  outcomeGoalId?: string;
+  /** P0.34 — multiple Outcome Goal™ links */
+  outcomeGoalIds?: string[];
 };
 
 export type JourneyDashboardStats = {

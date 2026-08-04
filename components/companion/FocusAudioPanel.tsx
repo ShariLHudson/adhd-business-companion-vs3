@@ -15,7 +15,9 @@ import {
   type AudioLink,
 } from "@/lib/audioPlaylists";
 import { audioBackgroundMood, suggestAudioForEmotion } from "@/lib/audioSuggestions";
+import { focusAudioPanelTitle } from "@/lib/focusAudioPresentation";
 import { SceneBackground } from "./SceneBackground";
+import { BackButton } from "./BackButton";
 import type { EmotionalState } from "@/lib/companionEmotions";
 
 // Categories shown in the picker — "My Audio" and "Favorites" live in Saved
@@ -28,12 +30,15 @@ export function FocusAudioPanel({
   onDone,
   emotion = "unclear",
   initialCategory,
+  backLabel = "Back",
 }: {
   onDone?: () => void;
   emotion?: EmotionalState;
   initialCategory?: string;
+  backLabel?: string;
 }) {
   const suggestion = useMemo(() => suggestAudioForEmotion(emotion), [emotion]);
+  const panelTitle = focusAudioPanelTitle(initialCategory);
 
   const [category, setCategory] = useState<string>(
     initialCategory ?? suggestion.categoryId,
@@ -75,7 +80,8 @@ export function FocusAudioPanel({
         {/* All content sits on a readable card over the scene — consistent with
             Home / Focus / Continue, so text never floats on the image. */}
         <div className="rounded-2xl border border-[#1e4f4f]/15 bg-white/90 p-5 shadow-sm backdrop-blur-sm sm:p-6">
-        <p className="text-2xl font-semibold text-[#1f1c19]">Focus Audio</p>
+        <BackButton onClick={() => onDone?.()} label={backLabel} size="compact" className="mb-4" />
+        <p className="text-2xl font-semibold text-[#1f1c19]">{panelTitle}</p>
         <p className="mt-1 text-lg font-medium text-[#1f1c19]">
           What does your brain need right now?
         </p>
@@ -254,13 +260,7 @@ export function FocusAudioPanel({
         </div>
 
         <div className="mt-6">
-          <button
-            type="button"
-            onClick={() => onDone?.()}
-            className="rounded-xl border-2 border-[#1e4f4f] bg-white px-8 py-3 text-lg font-semibold text-[#1e4f4f]"
-          >
-            Back
-          </button>
+          <BackButton onClick={() => onDone?.()} label={backLabel} />
         </div>
       </div>
     </div>

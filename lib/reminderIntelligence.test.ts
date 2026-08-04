@@ -2,14 +2,24 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { TimeBlock } from "./companionStore";
 import {
   buildConfirmationReply,
+  isReminderIntakeMessage,
   isReminderRequest,
   parseOffsets,
   parseReminderDraft,
+  parseReminderFrequency,
   resolveReminderTurn,
+  getReminderIntakeStep,
+  isReminderIntakeAwaitingAnswer,
+  validateReminderTimes,
 } from "./reminderIntelligence";
-import { resolveFrictionlessAction } from "./frictionlessActionLayer";
+import {
+  clearFrictionlessPending,
+  loadFrictionlessPending,
+  resolveFrictionlessAction,
+  saveFrictionlessPending,
+} from "./frictionlessActionLayer";
 import { buildRelationshipLeadParagraph } from "./relationshipResponseContract";
-import { getReminders, clearReminderIntakeSession } from "./reminderStore";
+import { getActiveReminders, getReminders, clearReminderIntakeSession } from "./reminderStore";
 
 const NOW = new Date("2026-06-24T10:00:00.000Z");
 
@@ -40,6 +50,10 @@ describe("reminderIntelligence", () => {
 
   it("detects natural-language reminder requests", () => {
     expect(isReminderRequest("Remind me to drink water at 2 PM")).toBe(true);
+    expect(isReminderRequest("Set up a reminder for me to drink water")).toBe(
+      true,
+    );
+    expect(isReminderRequest("Create a reminder to stretch")).toBe(true);
     expect(isReminderRequest("Notify me 15 minutes before my sales call")).toBe(
       true,
     );
@@ -81,7 +95,7 @@ describe("reminderIntelligence", () => {
     });
     expect(outcome.kind).toBe("ask");
     if (outcome.kind !== "ask") return;
-    expect(outcome.reply).toMatch(/when would you like me to remind you/i);
+    expect(outcome.reply).toMatch(/when would you like the reminder/i);
   });
 
   it("asks am/pm for ambiguous clock times", () => {
@@ -192,5 +206,202 @@ describe("reminderIntelligence", () => {
     expect(decision.category).toBe("reminder");
     expect(decision.workspaceOffer).toBeNull();
     expect(decision.localReply).not.toMatch(/Visual Thinking|Create/i);
+  });
+
+  it("detects I need a reminder phrasing", () => {
+    expect(isReminderRequest("I need a reminder to drink water.")).toBe(true);
+    expect(isReminderRequest("Create a reminder for 10am")).toBe(true);
+    expect(isReminderRequest("Notify me every day at 2pm")).toBe(true);
+  });
+
+  it("P0.33 multi-time daily flow", () => {
+    const ask = resolveReminderTurn({
+      userText: "Remind me to drink water",
+      now: NOW,
+    });
+    expect(ask.kind).toBe("ask");
+    if (ask.kind !== "ask") return;
+
+    const times = resolveReminderTurn({
+      userText: "10am, 1pm, and 5pm",
+      draft: ask.draft,
+      now: NOW,
+    });
+    expect(times.kind).toBe("ask");
+    if (times.kind !== "ask") return;
+    expect(times.reply).toMatch(/Every day/i);
+    expect(times.draft.dailyTimes).toEqual(["10:00", "13:00", "17:00"]);
+
+    const confirm = resolveReminderTurn({
+      userText: "yes",
+      draft: times.draft,
+      now: NOW,
+    });
+    expect(confirm.kind).toBe("confirm");
+    if (confirm.kind !== "confirm") return;
+    expect(confirm.reply).toMatch(/Reminder created/i);
+    expect(confirm.reminders[0]?.dailyTimes).toHaveLength(3);
+    expect(confirm.reminders[0]?.recurrenceRule).toMatch(/^daily-multi@/);
+    expect(getActiveReminders().filter((r) => r.status === "active")).toHaveLength(
+      1,
+    );
+  });
+
+  it("parse Create a reminder asks for name first", () => {
+    const draft = parseReminderDraft("Create a reminder", NOW);
+    expect(draft?.missing).toBe("name");
+    expect(draft?.title).toBe("Reminder");
+  });
+
+  it("P0.57 golden path: createReminder → ask_name → ask_times → ask_frequency → save", () => {
+    const start = resolveReminderTurn({
+      userText: "Create a reminder",
+      now: NOW,
+    });
+    expect(start.kind).toBe("ask");
+    if (start.kind !== "ask") return;
+    expect(getReminderIntakeStep(start.draft, start)).toBe("ask_name");
+    expect(isReminderIntakeAwaitingAnswer(start.draft, start)).toBe(true);
+    expect(start.reply).toMatch(/what should I remind you about/i);
+
+    const named = resolveReminderTurn({
+      userText: "Drink Water",
+      draft: start.draft,
+      now: NOW,
+    });
+    expect(named.kind).toBe("ask");
+    if (named.kind !== "ask") return;
+    expect(getReminderIntakeStep(named.draft, named)).toBe("ask_times");
+    expect(named.draft.message).toBe("Drink Water");
+
+    const timed = resolveReminderTurn({
+      userText: "10am, 1pm, and 5pm",
+      draft: named.draft,
+      now: NOW,
+    });
+    expect(timed.kind).toBe("ask");
+    if (timed.kind !== "ask") return;
+    expect(getReminderIntakeStep(timed.draft, timed)).toBe("ask_frequency");
+
+    const saved = resolveReminderTurn({
+      userText: "weekdays",
+      draft: timed.draft,
+      now: NOW,
+    });
+    expect(saved.kind).toBe("confirm");
+    if (saved.kind !== "confirm") return;
+    expect(getReminderIntakeStep(timed.draft, saved)).toBe("complete");
+    expect(isReminderIntakeAwaitingAnswer(null, saved)).toBe(false);
+    expect(saved.reminders[0]?.recurrenceRule).toBe(
+      "weekdays-multi@10:00,13:00,17:00",
+    );
+  });
+
+  it("P0.57 multi-time weekdays flow: name → times → weekdays → save", () => {
+    // step=createReminder → ask_times (name captured from first message)
+    const askTimes = resolveReminderTurn({
+      userText: "Remind me to drink water",
+      now: NOW,
+    });
+    expect(askTimes.kind).toBe("ask");
+    if (askTimes.kind !== "ask") return;
+    expect(askTimes.draft.message).toMatch(/drink water/i);
+    expect(askTimes.draft.missing).toBe("time");
+
+    // times captured → ask_frequency
+    const askFrequency = resolveReminderTurn({
+      userText: "10am, 1pm, and 5pm",
+      draft: askTimes.draft,
+      now: NOW,
+    });
+    expect(askFrequency.kind).toBe("ask");
+    if (askFrequency.kind !== "ask") return;
+    expect(askFrequency.draft.missing).toBe("frequency");
+    expect(askFrequency.draft.dailyTimes).toEqual(["10:00", "13:00", "17:00"]);
+    expect(askFrequency.reply).toMatch(/weekdays/i);
+
+    // user: weekdays → saveReminder → SUCCESS
+    const saved = resolveReminderTurn({
+      userText: "weekdays",
+      draft: askFrequency.draft,
+      now: NOW,
+    });
+    expect(saved.kind).toBe("confirm");
+    if (saved.kind !== "confirm") return;
+    expect(saved.reply).toMatch(/Reminder created/i);
+    expect(saved.reminders[0]?.recurrenceRule).toBe(
+      "weekdays-multi@10:00,13:00,17:00",
+    );
+    expect(saved.reminders[0]?.dailyTimes).toEqual(["10:00", "13:00", "17:00"]);
+    expect(getActiveReminders().filter((r) => r.status === "active")).toHaveLength(
+      1,
+    );
+  });
+
+  it("starts intake immediately for set up a reminder phrasing", () => {
+    const outcome = resolveReminderTurn({
+      userText: "Set up a reminder for me to drink water",
+      now: NOW,
+    });
+    expect(outcome.kind).toBe("ask");
+    if (outcome.kind !== "ask") return;
+    expect(outcome.reply).toMatch(/when would you like the reminder/i);
+    expect(outcome.reply).not.toMatch(/would you like me to help you set a reminder/i);
+    expect(outcome.draft.message).toMatch(/drink water/i);
+  });
+
+  it("keeps yes inside reminder intake when time is still missing", () => {
+    const draft = parseReminderDraft("Remind me to drink water", NOW);
+    expect(draft?.missing).toBe("time");
+    const outcome = resolveReminderTurn({
+      userText: "yes",
+      draft,
+      now: NOW,
+    });
+    expect(outcome.kind).toBe("ask");
+    if (outcome.kind !== "ask") return;
+    expect(outcome.reply).toMatch(/when would you like the reminder/i);
+    expect(isReminderIntakeMessage(outcome.reply)).toBe(true);
+  });
+
+  it("clears stale strategy pending when a new reminder request starts", () => {
+    saveFrictionlessPending({
+      type: "strategy_offer",
+      target: "playbook",
+      context: "ugly-first-draft",
+      strategyId: "ugly-first-draft",
+      strategyTitle: "Start Ugly",
+      initialPrompt: "I keep putting off my sales calls.",
+      offeredAtTurn: 1,
+      offerSummary: "Use Start Ugly",
+    });
+    expect(loadFrictionlessPending()).not.toBeNull();
+
+    const decision = resolveFrictionlessAction({
+      userText: "Remind me to drink water.",
+      currentTurn: 4,
+      timeBlocks: [],
+    });
+    expect(decision.category).toBe("reminder");
+    expect(loadFrictionlessPending()).toBeNull();
+    clearFrictionlessPending();
+  });
+
+  it("P0.48 chat frequency parser still supports weekday phrases", () => {
+    for (const phrase of [
+      "m-f",
+      "mon-fri",
+      "monday through friday",
+      "weekdays",
+      "every weekday",
+    ]) {
+      expect(parseReminderFrequency(phrase)).toBe("weekdays");
+    }
+  });
+
+  it("P0.48 reports missing AM/PM instead of silent save failure", () => {
+    const result = validateReminderTimes("10:00, 1:00, 5:00");
+    expect(result.times).toBeNull();
+    expect(result.issues.some((i) => /AM or PM/i.test(i))).toBe(true);
   });
 });

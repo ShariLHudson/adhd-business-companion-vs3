@@ -9,6 +9,11 @@ import {
 } from "./googleSheetsLibrary";
 import type { GoogleSheetPendingPayload } from "./googleSheetsIntelligence";
 import {
+  GOOGLE_EXPORT_MESSAGES,
+  validateSpreadsheetCsv,
+  spreadsheetStructureErrorMessage,
+} from "./googleExportVerification";
+import {
   buildGoogleWorkspaceSession,
   googleFileIdFromUrl,
   type GoogleWorkspaceSession,
@@ -123,6 +128,14 @@ export async function createGoogleSheetFromPayload(
     };
   }
 
+  const structure = validateSpreadsheetCsv(payload.csv);
+  if (!structure.ok) {
+    return {
+      ok: false,
+      error: spreadsheetStructureErrorMessage(structure.reason),
+    };
+  }
+
   const res = await fetch("/api/google/create-doc", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -130,6 +143,7 @@ export async function createGoogleSheetFromPayload(
       title: payload.title.slice(0, 120),
       content: payload.csv,
       kind: "sheet",
+      alreadyCsv: true,
     }),
   });
 
@@ -137,7 +151,7 @@ export async function createGoogleSheetFromPayload(
   if (!res.ok || !data.url || !data.id) {
     return {
       ok: false,
-      error: data.error ?? "Couldn't create the Google Sheet.",
+      error: data.error ?? GOOGLE_EXPORT_MESSAGES.verifyFailed,
       needsConnection: res.status === 401,
     };
   }

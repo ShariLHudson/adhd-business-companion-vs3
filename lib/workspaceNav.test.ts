@@ -11,8 +11,8 @@ describe("workspaceNav", () => {
   });
 
   it("keeps standalone tools off the split rail", () => {
-    expect(shouldOpenBesideChat("focus-timer")).toBe(false);
     expect(shouldOpenBesideChat("breathe")).toBe(false);
+    expect(shouldOpenBesideChat("focus-timer")).toBe(true);
     expect(isSplitWorkspaceSection("progress")).toBe(false);
   });
 });

@@ -2,6 +2,7 @@
  * Recovery companion copy — permission to rest, never hustle.
  */
 
+import { buildIntelligenceSystemGuardrail } from "../emotionalSafetyIntelligence";
 import { recoveryLevelLabel } from "./recoveryInsights";
 import { recoveryNeedLabel, recoveryOverridesProductivity } from "./recoveryScoring";
 import type { RecoverySnapshot } from "./types";
@@ -51,6 +52,7 @@ export function recoveryHintForChat(snapshot: RecoverySnapshot): string {
     "- \"Recovery might help more than another plan right now.\"",
     "- \"You don't have to earn recovery.\"",
     "Avoid: hustle language, productivity pressure, guilt, pushing harder.",
+    buildIntelligenceSystemGuardrail("resilience"),
     "Do not mention this block to the user.",
   ].join("\n");
 }

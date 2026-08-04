@@ -46,8 +46,9 @@ describe("saveExportTrust", () => {
     expect(qs.some((q) => q.includes("business name"))).toBe(true);
   });
 
-  it("4. Google export failure receipt keeps local copy message", () => {
-    expect(googleFailureReceipt("doc")).toMatch(/still saved here/i);
+  it("4. Google export failure receipt surfaces API error or verify message", () => {
+    expect(googleFailureReceipt("doc")).toMatch(/couldn't finish/i);
+    expect(googleFailureReceipt("doc", "Custom error")).toBe("Custom error");
     expect(saveReceipt("google-fail")).toMatch(/still saved here/i);
     expect(saveReceipt("export-fail")).toMatch(/still saved here/i);
   });
@@ -78,8 +79,8 @@ describe("saveExportTrust", () => {
       url: "https://docs.google.com/document/d/file123/edit",
     });
     expect(ok).toBe(true);
-    expect(googleReceiptForKind("doc")).toMatch(/Google Doc/);
-    expect(googleReceiptForKind("sheet")).toMatch(/Google Sheet/);
+    expect(googleReceiptForKind("doc")).toBe("Google Doc created.");
+    expect(googleReceiptForKind("sheet")).toBe("Google Sheet created.");
     expect(googleReceiptForKind("form")).toMatch(/Google Form/);
   });
 

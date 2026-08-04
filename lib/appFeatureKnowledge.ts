@@ -6,6 +6,7 @@
 
 import { isHowToLearningQuestion } from "./howToLearningIntelligence";
 import { isConceptTeachingRequest } from "./teachingMode";
+import { hasExplicitCompanionFirstRoute } from "./companionFirstWorkflow";
 
 export type AppFeatureId =
   | "focus"
@@ -393,10 +394,12 @@ export function isAppHowToQuestion(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
   if (isConceptTeachingRequest(t)) return false;
+  if (hasExplicitCompanionFirstRoute(t)) return true;
 
   if (/\bhow do i\b/i.test(t)) {
-    if (isHowToLearningQuestion(t)) return false;
     if (matchAppFeatures(t).length > 0) return true;
+    if (/\bchange the colors?\b/i.test(t)) return true;
+    if (isHowToLearningQuestion(t)) return false;
     if (
       /\b(?:find|open|change|access|use)\b/i.test(t) &&
       /\b(?:app|settings|games?|focus|templates?|strateg|sidebar|color)/i.test(

@@ -13,7 +13,7 @@ export const SPLIT_BESIDE_SUGGESTIONS: readonly {
   { section: "projects", label: "Projects" },
   { section: "my-work", label: "Other" },
   { section: "visual-focus", label: "Visual Thinking" },
-  { section: "growth", label: "Growth" },
+  { section: "growth-vault", label: "Growth Vault" },
   { section: "templates-library", label: "Templates" },
   { section: "playbook", label: "Strategies" },
 ] as const;

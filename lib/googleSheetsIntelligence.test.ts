@@ -171,14 +171,14 @@ describe("googleSheetsIntelligence (P0.18)", () => {
     expect(createTurn.pending.csv).toContain("Platform");
   });
 
-  it("frictionless layer detects content calendar intake", () => {
+  it("frictionless layer routes content calendar to Create", () => {
     const decision = resolveFrictionlessAction({
       userText: "Help me create a content calendar",
       currentTurn: 1,
     });
-    expect(decision.category).toBe("google_sheet");
-    expect(decision.localReply).toMatch(/platform/i);
-    expect(decision.googleSheetIntake?.sheetType).toBe("content_calendar");
+    expect(decision.category).toBe("direct_action");
+    expect(decision.workspaceOffer?.section).toBe("content-generator");
+    expect(decision.localReply).toMatch(/Content Calendar/i);
   });
 
   it("frictionless does not hijack email requests", () => {

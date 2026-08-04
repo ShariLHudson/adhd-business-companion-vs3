@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   GROWTH_ARCHIVE_PERIODS,
   type GrowthArchivePeriod,
@@ -27,6 +27,8 @@ export function GrowthSectionHeader({
   onPrint,
   onQuickAttach,
   onCloseAll,
+  toolsInMore = false,
+  collapseAllLabel = "Collapse All",
 }: {
   nav: GrowthPanelNav;
   search?: string;
@@ -35,12 +37,15 @@ export function GrowthSectionHeader({
   onPrint?: () => void;
   onQuickAttach?: (attachments: GrowthAttachment[]) => void;
   onCloseAll?: () => void;
+  toolsInMore?: boolean;
+  collapseAllLabel?: string;
 }) {
   const showSearch = onSearchChange != null;
   const meta = GROWTH_SECTION_META[nav.current];
   const fileRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLInputElement>(null);
   const isSubPage = nav.current !== "growth";
+  const [moreOpen, setMoreOpen] = useState(false);
 
   async function ingestFiles(files: FileList | null) {
     if (!files?.length || !onQuickAttach) return;
@@ -52,6 +57,66 @@ export function GrowthSectionHeader({
     if (next.length) onQuickAttach(next);
   }
 
+  const toolButtons = (
+    <>
+      <button
+        type="button"
+        onClick={() => onPrint?.() ?? window.print()}
+        className={TOOL_BTN}
+      >
+        🖨 Print
+      </button>
+      <button
+        type="button"
+        disabled
+        title="PDF export coming soon"
+        className="cursor-not-allowed rounded-full border border-dashed border-[#e7d9c8] px-3 py-1.5 text-xs text-[#b8afa4]"
+      >
+        📄 Export PDF
+      </button>
+      {onQuickAttach ? (
+        <>
+          <input
+            ref={fileRef}
+            type="file"
+            multiple
+            accept=".pdf,.doc,.docx,.txt,image/*"
+            className="hidden"
+            onChange={(e) => {
+              void ingestFiles(e.target.files);
+              e.target.value = "";
+            }}
+          />
+          <input
+            ref={imageRef}
+            type="file"
+            multiple
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              void ingestFiles(e.target.files);
+              e.target.value = "";
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            className={TOOL_BTN}
+          >
+            📎 Attach File
+          </button>
+          <button
+            type="button"
+            onClick={() => imageRef.current?.click()}
+            className={TOOL_BTN}
+          >
+            🖼 Upload Image
+          </button>
+        </>
+      ) : null}
+    </>
+  );
+
   return (
     <header className="space-y-4">
       {isSubPage ? (
@@ -62,7 +127,7 @@ export function GrowthSectionHeader({
           />
           {onCloseAll ? (
             <button type="button" onClick={onCloseAll} className={SUB_HEADER_BTN}>
-              Close All
+              {collapseAllLabel}
             </button>
           ) : null}
         </div>
@@ -87,63 +152,25 @@ export function GrowthSectionHeader({
             className="min-w-[12rem] flex-1 rounded-full border border-[#e4ddd2] bg-white px-4 py-2 text-sm text-[#2d2926] placeholder:text-[#9a8f82] focus:border-[#c9a66b] focus:outline-none focus:ring-2 focus:ring-[#c9a66b]/25"
             aria-label={`Search ${meta.title}`}
           />
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => onPrint?.() ?? window.print()}
-              className={TOOL_BTN}
-            >
-              🖨 Print
-            </button>
-            <button
-              type="button"
-              disabled
-              title="PDF export coming soon"
-              className="cursor-not-allowed rounded-full border border-dashed border-[#e7d9c8] px-3 py-1.5 text-xs text-[#b8afa4]"
-            >
-              📄 Export PDF
-            </button>
-            {onQuickAttach ? (
-              <>
-                <input
-                  ref={fileRef}
-                  type="file"
-                  multiple
-                  accept=".pdf,.doc,.docx,.txt,image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    void ingestFiles(e.target.files);
-                    e.target.value = "";
-                  }}
-                />
-                <input
-                  ref={imageRef}
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    void ingestFiles(e.target.files);
-                    e.target.value = "";
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={() => fileRef.current?.click()}
-                  className={TOOL_BTN}
-                >
-                  📎 Attach File
-                </button>
-                <button
-                  type="button"
-                  onClick={() => imageRef.current?.click()}
-                  className={TOOL_BTN}
-                >
-                  🖼 Upload Image
-                </button>
-              </>
-            ) : null}
-          </div>
+          {toolsInMore ? (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setMoreOpen((v) => !v)}
+                className={TOOL_BTN}
+                aria-expanded={moreOpen}
+              >
+                More ▾
+              </button>
+              {moreOpen ? (
+                <div className="absolute right-0 top-full z-10 mt-1 flex min-w-[11rem] flex-col gap-1 rounded-xl border border-[#e7d9c8] bg-white p-2 shadow-lg">
+                  {toolButtons}
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-2">{toolButtons}</div>
+          )}
         </div>
       ) : null}
     </header>

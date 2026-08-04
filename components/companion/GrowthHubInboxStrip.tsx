@@ -1,5 +1,7 @@
 "use client";
 
+/** @deprecated P0.56 — Not mounted. Inbox strip is integrated in WinsThisWeekPanel. */
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   buildSuggestedGrowthMoments,

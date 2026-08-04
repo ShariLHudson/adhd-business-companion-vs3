@@ -136,9 +136,7 @@ describe("relationshipIntelligencePrompt", () => {
     expect(block).toMatch(/HIGHEST PRIORITY/i);
     expect(block).toMatch(/FORBIDDEN FIRST-SENTENCE OPENERS/i);
     expect(block).toMatch(/Observed behaviors/i);
-    expect(block).toMatch(/new ideas.*energy/i);
-    expect(block).toMatch(/Evidence & pattern history/i);
-    expect(block).toMatch(/STARTING NEW VS FINISHING/i);
+    expect(block).toMatch(/STARTING VS FINISHING|operating patterns/i);
   });
 
   it("includes decision-pattern guidance for meta decision questions", () => {

@@ -11,6 +11,7 @@ import {
   saveReceipt,
   shouldShowGoogleExportButtons,
 } from "@/lib/saveExportTrust";
+import { GOOGLE_EXPORT_MESSAGES } from "@/lib/googleExportVerification";
 
 // Send a finished piece where it's going: copy, print, push to a new Google
 // Doc, download, or copy-and-open the right social network to paste into.
@@ -159,7 +160,7 @@ export function ExportActions({
       return;
     }
     if (!text.trim()) {
-      note("Add some content before exporting.");
+      note(GOOGLE_EXPORT_MESSAGES.emptyDocument);
       return;
     }
     if (!shouldShowGoogleExportButtons(googleConfigured, googleConnected)) {
@@ -222,7 +223,7 @@ export function ExportActions({
         return;
       }
 
-      note(googleFailureReceipt(kind));
+      note(googleFailureReceipt(kind, j.error));
     } catch {
       note(saveReceipt("export-fail"));
     }

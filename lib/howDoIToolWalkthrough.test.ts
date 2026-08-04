@@ -17,8 +17,9 @@ describe("howDoIToolWalkthrough", () => {
     expect(shouldWalkThroughFromHowDoI(null)).toBe(false);
   });
 
-  it("treats Focus as a standalone beside-chat target", () => {
-    expect(isHowDoIStandaloneTarget("focus")).toBe(true);
+  it("treats Focus as a workspace beside-chat target", () => {
+    expect(isHowDoIStandaloneTarget("focus")).toBe(false);
+    expect(isHowDoIStandaloneTarget("breathe")).toBe(true);
     expect(isHowDoIStandaloneTarget("playbook")).toBe(false);
   });
 });

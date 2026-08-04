@@ -4,6 +4,7 @@ import { focusToolDifferentiationHintForChat } from "./focusToolDefinitions";
 import { momentumAppointmentHintForChat } from "./momentumAppointment";
 import { decisionCompassHintForChat } from "./decisionCompass";
 import { plainLanguageFormattingHintForPrompt } from "./plainLanguageFormatting";
+import { buildEmotionalSafetyPromptBlock } from "./emotionalSafetyIntelligence";
 
 // Spark Studio Companion — AI Routing Engine. This system prompt drives Shari:
 // silently detect intent, category, and emotional state, then route to the
@@ -206,7 +207,7 @@ When the user asks how to use THIS app, where to find something, or how to chang
 - Google Docs / Google account: you can connect a Google account in Settings → Connections → "Connect Google" (this only appears once the developer has added Google OAuth keys; if it's not there, it isn't set up yet). WHEN CONNECTED: the export row's "Google Docs" button creates the doc for you and opens it automatically. WHEN NOT CONNECTED: "Google Docs" copies the text and opens a blank doc to paste into (Ctrl/Cmd+V). Don't promise auto-create unless they're connected. The SAME Google connection also powers a "Google Sheets" export (creates a Sheet — good for tabular things). A "Calendar" button opens a pre-filled Google Calendar event with NO connection needed — handy for scheduling when to post content.
 - Print / Download: same export row on any generated piece or saved Template.
 - Post to Facebook / Instagram / LinkedIn: add your PROFILE LINKS (just the URLs, not a login) in Settings → Connections, then on a social post tap the network — it copies the post and opens your page so you can paste.
-- Settings → Connections holds your social profile LINKS only. It does NOT connect Google or any login-based account.
+- Settings → Connections contains two kinds of links: (1) Google account connection — OAuth for Google Docs, Sheets, and related exports (tap "Connect Google" when OAuth is configured); (2) Social profile links — plain URLs to your Facebook, Instagram, or LinkedIn pages for copy-and-open posting. Social links are NOT logins. Google exports require the Google connection.
 - Generate content: Templates → "Generate content with Shari," pick a type, add a brief.
 - Save work: every generated draft has Save to Templates and Add to Project.
 - Focus Audio: open it for preloaded sound categories (Focus, Calm, Energy, Sleep, etc.). Users can also paste their OWN link (YouTube, Spotify, anywhere) via "add your own audio" — it saves the link and opens it where they listen. NOTE what is NOT built: Focus Audio does not embed/play YouTube inside the app, does not accept file uploads, and has no in-app play/pause/volume controls or queue. So for "I want music," offer to open Focus Audio (preloaded) or to add their own link — do NOT promise inline playback, uploads, or transport controls.
@@ -470,6 +471,7 @@ export function buildCompanionSystemPrompt(
 
   const blocks = [
     COMPANION_SYSTEM_PROMPT,
+    buildEmotionalSafetyPromptBlock(),
     COGNITIVE_GROWTH_PROMPT_BLOCK,
     plainLanguageFormattingHintForPrompt(),
     APP_FEATURE_KNOWLEDGE_COMPACT,

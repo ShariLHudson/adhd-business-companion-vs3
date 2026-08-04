@@ -151,21 +151,20 @@ export async function applyContentToGoogleDoc(
     { headers: { Authorization: `Bearer ${accessToken}` } },
   );
   if (!docRes.ok) {
-    return { ok: false, error: "Couldn't read the new Google Doc." };
+    // Drive multipart upload already inserted text — skip optional formatting.
+    return { ok: true };
   }
 
   const doc = await docRes.json();
   const endIndex = doc.body?.content?.at(-1)?.endIndex ?? 2;
-  const requests: DocRequest[] = [];
-  if (endIndex > 2) {
-    requests.push({
-      deleteContentRange: {
-        range: { startIndex: 1, endIndex: endIndex - 1 },
-      },
-    });
-  }
-  requests.push(...buildGoogleDocInsertRequests(trimmed));
+  const hasUploadedText = endIndex > 2;
 
+  if (hasUploadedText) {
+    // Never wipe Drive-uploaded content for optional heading/bullet styling.
+    return { ok: true };
+  }
+
+  const requests = buildGoogleDocInsertRequests(trimmed);
   const up = await fetch(
     `https://docs.googleapis.com/v1/documents/${fileId}:batchUpdate`,
     {

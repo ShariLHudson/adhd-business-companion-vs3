@@ -4,6 +4,11 @@
 
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
 import {
+  isNotificationSettingsRequest,
+  notificationSettingsBrief,
+} from "./notificationSettingsBoundary";
+import { isReminderRequest } from "./reminderIntelligence";
+import {
   isAppHowToQuestion,
   matchAppFeatures,
   resolveAppFeatureKnowledge,
@@ -33,7 +38,8 @@ export type AppFeatureNavOffer = {
 };
 
 const SETTINGS_ROUTES: {
-  re: RegExp;
+  re?: RegExp;
+  match?: (text: string) => boolean;
   section: SettingsSection;
   label: string;
   brief: string;
@@ -59,10 +65,10 @@ const SETTINGS_ROUTES: {
     brief: "Shari's tone is in **Settings → How Shari Sounds**.",
   },
   {
-    re: /\b(?:notification|alert|desktop notif)\b/i,
+    match: isNotificationSettingsRequest,
     section: "notifications",
     label: "Notifications",
-    brief: "Alerts and notifications are in **Settings → Notifications**.",
+    brief: notificationSettingsBrief(),
   },
   {
     re: /\b(?:language|region|date format)\b/i,
@@ -83,9 +89,11 @@ export function resolveAppFeatureNavTarget(
 ): AppFeatureNavTarget | null {
   const t = text.trim();
   if (!t) return null;
+  if (isReminderRequest(t)) return null;
 
   for (const route of SETTINGS_ROUTES) {
-    if (route.re.test(t)) {
+    const hit = route.match ? route.match(t) : route.re?.test(t);
+    if (hit) {
       return {
         kind: "settings",
         section: route.section,
@@ -142,7 +150,8 @@ export function resolveAppFeatureNavTarget(
 
 function settingsBrief(text: string): string | null {
   for (const route of SETTINGS_ROUTES) {
-    if (route.re.test(text)) return route.brief;
+    const hit = route.match ? route.match(text) : route.re?.test(text);
+    if (hit) return route.brief;
   }
   return null;
 }

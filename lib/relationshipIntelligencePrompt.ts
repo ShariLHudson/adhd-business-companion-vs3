@@ -3,6 +3,8 @@
  * Prepended to the LLM system prompt so it overrides generic coaching openers.
  */
 
+import { buildEmotionalSafetyPromptBlock } from "./emotionalSafetyIntelligence";
+import { shouldSuppressProactivePatternInsights } from "./patternAwarenessPrefs";
 import { shouldSuppressRelationshipIntelligenceForUserText } from "./relationshipIntelligenceBoundaries";
 import { isPhase7BusinessIntelligenceEcosystemActive } from "./businessIntelligenceEcosystem";
 import {
@@ -218,6 +220,7 @@ export function buildRelationshipIntelligencePriorityBlock(
   now = new Date(),
   options?: { suppressContractForRouting?: boolean; workspace?: string | null },
 ): string | null {
+  if (shouldSuppressProactivePatternInsights()) return null;
   if (userText && shouldSuppressRelationshipIntelligenceForUserText(userText)) {
     return null;
   }
@@ -298,6 +301,8 @@ export function buildRelationshipIntelligencePriorityBlock(
       "Note: History is still forming — reflect what you have; invite correction; do not fabricate certainty.",
     );
   }
+
+  parts.push("", buildEmotionalSafetyPromptBlock());
 
   return parts.join("\n");
 }

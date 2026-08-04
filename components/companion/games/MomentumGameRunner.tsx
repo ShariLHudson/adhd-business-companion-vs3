@@ -169,7 +169,18 @@ export function QuickSort({ onDone }: GameProps) {
   }
 
   return (
-    <GameFrame title="Quick Sort" hint={`Sort: ${items[idx]} (${idx + 1}/${items.length})`}>
+    <GameFrame
+      title="Quick Sort"
+      hint={`Sort: ${items[idx]} (${idx + 1}/${items.length})`}
+    >
+      <p className="mt-2 max-w-sm text-xs text-[#6b635a]">
+        <span className="font-semibold text-[#1f1c19]">Goal:</span> decide what to
+        do with each item in under 10 seconds.
+        <br />
+        <span className="font-semibold text-[#1f1c19]">Do</span> = today ·{" "}
+        <span className="font-semibold text-[#1f1c19]">Later</span> = this week ·{" "}
+        <span className="font-semibold text-[#1f1c19]">Drop</span> = not needed
+      </p>
       <div className="mt-6 flex flex-wrap justify-center gap-2">
         {buckets.map((b) => (
           <button
@@ -187,9 +198,11 @@ export function QuickSort({ onDone }: GameProps) {
 }
 
 export function FocusSprint({ onDone }: GameProps) {
+  const VISIBLE = 4;
   const [left, setLeft] = useState(15);
   const [score, setScore] = useState(0);
-  const [target] = useState(() => rand(SWATCHES.length));
+  const [target, setTarget] = useState(() => rand(VISIBLE));
+  const targetColor = SWATCHES[target]!;
 
   useEffect(() => {
     if (left <= 0) {
@@ -197,6 +210,7 @@ export function FocusSprint({ onDone }: GameProps) {
       else {
         setLeft(15);
         setScore(0);
+        setTarget(rand(VISIBLE));
       }
       return;
     }
@@ -204,16 +218,37 @@ export function FocusSprint({ onDone }: GameProps) {
     return () => window.clearInterval(id);
   }, [left, score, onDone]);
 
+  const targetLabel =
+    target === 2 ? "green" : `the ${["red", "blue", "green", "amber"][target] ?? "highlighted"} block`;
+
   return (
-    <GameFrame title="Focus Sprint" hint={`Tap green ${score}/5 — ${left}s`}>
+    <GameFrame
+      title="Focus Sprint"
+      hint={`Tap ${targetLabel} — ${score}/5 · ${left}s left`}
+    >
+      <p className="mt-2 text-xs text-[#6b635a]">
+        Goal: tap the correct color 5 times before the timer ends.
+      </p>
       <div className="mt-6 flex gap-3">
-        {SWATCHES.slice(0, 4).map((c, i) => (
+        {SWATCHES.slice(0, VISIBLE).map((c, i) => (
           <button
             key={i}
             type="button"
-            onClick={() => i === target && setScore(score + 1)}
-            className="h-16 w-16 rounded-2xl"
-            style={{ background: c }}
+            onClick={() => {
+              if (i !== target) return;
+              setScore((s) => {
+                const next = s + 1;
+                if (next >= 5) onDone();
+                else setTarget(rand(VISIBLE));
+                return next;
+              });
+            }}
+            className="h-16 w-16 rounded-2xl ring-offset-2 transition-transform active:scale-95"
+            style={{
+              background: c,
+              boxShadow: i === target ? `0 0 0 3px ${targetColor}` : undefined,
+            }}
+            aria-label={`Color button ${i + 1}`}
           />
         ))}
       </div>

@@ -232,16 +232,18 @@ describe("relationshipObservationRelevance", () => {
 
   it("builds lead paragraphs with intent-relevant first sentence", () => {
     const marketingLead = buildRelationshipLeadParagraph(
-      "Help me create a marketing plan.",
+      "Why do I keep chasing new marketing ideas instead of finishing one?",
       now,
     );
     const sopLead = buildRelationshipLeadParagraph(
-      "Help me create an SOP.",
+      "Why do I struggle to finish processes once the exciting part is done?",
       now,
     );
 
-    expect(marketingLead).toMatch(/ideas|audience|marketing|focus on one/i);
-    expect(sopLead).toMatch(/process|visible steps|repeat/i);
+    expect(marketingLead).toMatch(
+      /ideas|audience|marketing|focus on one|finishing|momentum|creative phase|maintenance/i,
+    );
+    expect(sopLead).toMatch(/process|visible steps|repeat|finishing|maintenance/i);
     expect(marketingLead).not.toMatch(/talking things through/i);
     expect(sopLead).not.toMatch(/talking things through/i);
   });

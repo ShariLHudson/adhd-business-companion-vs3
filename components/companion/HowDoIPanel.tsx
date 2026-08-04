@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { formatHowDoIEntry } from "@/lib/howDoIContent";
 import {
   browseLocationForArticle,
+  browseLocationLabelForArticle,
   howDoIBrowseSections,
   articlesForBrowseSubgroup,
   articlesForNewUserStart,
@@ -41,14 +42,12 @@ export function HowDoIPanel({
   registerBack?: (fn: (() => boolean) | null) => void;
 }) {
   const [query, setQuery] = useState("");
-  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
+  const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
   const [searchDropdownOpen, setSearchDropdownOpen] = useState(false);
-  const [openTopSections, setOpenTopSections] = useState<Set<HowDoITopSectionId>>(
-    new Set(),
+  const [openTopSection, setOpenTopSection] = useState<HowDoITopSectionId | null>(
+    null,
   );
-  const [openSubgroups, setOpenSubgroups] = useState<Set<HowDoISubgroupId>>(
-    new Set(),
-  );
+  const [openSubgroup, setOpenSubgroup] = useState<HowDoISubgroupId | null>(null);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const searchWrapRef = useRef<HTMLDivElement>(null);
@@ -99,57 +98,41 @@ export function HowDoIPanel({
   }
 
   function toggleCard(id: string) {
-    setExpandedCards((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    setExpandedCardId((prev) => (prev === id ? null : id));
   }
 
   function closeAll() {
-    setOpenTopSections(new Set());
-    setOpenSubgroups(new Set());
-    setExpandedCards(new Set());
+    setOpenTopSection(null);
+    setOpenSubgroup(null);
+    setExpandedCardId(null);
     setHighlightedId(null);
     setSearchDropdownOpen(false);
   }
 
   const hasExpanded =
-    openTopSections.size > 0 ||
-    openSubgroups.size > 0 ||
-    expandedCards.size > 0;
+    openTopSection != null || openSubgroup != null || expandedCardId != null;
 
   function toggleTopSection(id: HowDoITopSectionId) {
-    setOpenTopSections((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    setOpenTopSection((prev) => (prev === id ? null : id));
+    setOpenSubgroup(null);
+    setExpandedCardId(null);
   }
 
   function toggleSubgroup(id: HowDoISubgroupId) {
-    setOpenSubgroups((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    setOpenSubgroup((prev) => (prev === id ? null : id));
+    setExpandedCardId(null);
   }
 
   function jumpToArticle(article: HowDoIHelpArticle) {
     setSearchDropdownOpen(false);
     setQuery("");
-    setExpandedCards((prev) => new Set(prev).add(article.id));
+    setExpandedCardId(article.id);
     setHighlightedId(article.id);
 
     const location = browseLocationForArticle(article.id);
     if (location) {
-      setOpenTopSections((prev) => new Set(prev).add(location.topSectionId));
-      if (location.subgroupId) {
-        setOpenSubgroups((prev) => new Set(prev).add(location.subgroupId!));
-      }
+      setOpenTopSection(location.topSectionId);
+      setOpenSubgroup(location.subgroupId ?? null);
     }
 
     window.setTimeout(() => {
@@ -183,8 +166,13 @@ export function HowDoIPanel({
     if (q && onAsk) onAsk(`How do I ${q}?`);
   }
 
+  function helpResultLocation(result: EcosystemSearchResult): string | null {
+    if (result.action.kind !== "help-article") return null;
+    return browseLocationLabelForArticle(result.action.articleId);
+  }
+
   const cardProps = {
-    expandedCards,
+    expandedCards: new Set(expandedCardId ? [expandedCardId] : []),
     highlightedId,
     onToggleCard: toggleCard,
     onOpen,
@@ -204,10 +192,10 @@ export function HowDoIPanel({
         <div>
           <h1 className="text-xl font-bold text-[#1f1c19] sm:text-2xl">
             <span aria-hidden="true">📖 </span>
-            How Do I
+            Help Center
           </h1>
           <p className="mt-1 text-sm text-[#6b635a]">
-            Feature documentation — search, browse, or expand any topic.
+            Where to start, how the ecosystem works, and where to find help.
           </p>
         </div>
         <EcosystemCloseAllButton onClick={closeAll} disabled={!hasExpanded} />
@@ -222,8 +210,7 @@ export function HowDoIPanel({
           Search Help
         </h2>
         <p className="mt-1 text-sm text-[#6b635a]">
-          Can&apos;t find what you&apos;re looking for? Search topics, features,
-          and questions.
+          Search every section — results show where each topic lives.
         </p>
 
         <div ref={searchWrapRef} className="relative mt-3">
@@ -269,30 +256,39 @@ export function HowDoIPanel({
                       {group.type}
                     </p>
                     <ul role="listbox">
-                      {group.items.map((result) => (
-                        <li key={result.id} role="option">
-                          <button
-                            type="button"
-                            onClick={() => openSearchResult(result)}
-                            className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-[#faf7f2]"
-                          >
-                            <span
-                              className="text-base leading-none"
-                              aria-hidden="true"
+                      {group.items.map((result) => {
+                        const foundIn = helpResultLocation(result);
+                        return (
+                          <li key={result.id} role="option">
+                            <button
+                              type="button"
+                              onClick={() => openSearchResult(result)}
+                              className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-[#faf7f2]"
                             >
-                              {result.emoji ?? "•"}
-                            </span>
-                            <span className="min-w-0 flex-1">
-                              <span className="block text-sm font-semibold text-[#1f1c19]">
-                                {result.title}
+                              <span
+                                className="text-base leading-none"
+                                aria-hidden="true"
+                              >
+                                {result.emoji ?? "•"}
                               </span>
-                              <span className="block truncate text-xs text-[#6b635a]">
-                                {result.description}
+                              <span className="min-w-0 flex-1">
+                                <span className="block text-sm font-semibold text-[#1f1c19]">
+                                  {result.title}
+                                </span>
+                                {foundIn ? (
+                                  <span className="block text-xs text-[#9a8f82]">
+                                    Found in: {foundIn}
+                                  </span>
+                                ) : (
+                                  <span className="block truncate text-xs text-[#6b635a]">
+                                    {result.description}
+                                  </span>
+                                )}
                               </span>
-                            </span>
-                          </button>
-                        </li>
-                      ))}
+                            </button>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 ))
@@ -304,7 +300,7 @@ export function HowDoIPanel({
 
       <div className="mt-4 flex flex-col gap-3">
         {browseSections.map((section) => {
-          const sectionOpen = openTopSections.has(section.id);
+          const sectionOpen = openTopSection === section.id;
 
           return (
             <EcosystemCollapsibleSection
@@ -325,7 +321,7 @@ export function HowDoIPanel({
                 />
               ) : (
                 section.subgroups?.map((subgroup) => {
-                  const subgroupOpen = openSubgroups.has(subgroup.id);
+                  const subgroupOpen = openSubgroup === subgroup.id;
                   const articles = articlesForBrowseSubgroup(subgroup);
 
                   return (
@@ -336,14 +332,14 @@ export function HowDoIPanel({
                         aria-expanded={subgroupOpen}
                         className="mb-2 flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left hover:bg-white/80"
                       >
-                        <span className="min-w-0 flex-1 text-sm font-semibold text-[#1f1c19]">
-                          {subgroup.label}
-                        </span>
                         <span
                           className="shrink-0 text-xs text-[#9a8f82]"
                           aria-hidden="true"
                         >
-                          {subgroupOpen ? "▲" : "▼"}
+                          {subgroupOpen ? "▼" : "▶"}
+                        </span>
+                        <span className="min-w-0 flex-1 text-sm font-semibold text-[#1f1c19]">
+                          {subgroup.label}
                         </span>
                       </button>
                       {subgroupOpen ? (

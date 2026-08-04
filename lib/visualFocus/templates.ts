@@ -1,6 +1,7 @@
 import { createEmptyBusinessCanvas } from "./businessCanvas/factory";
+import { createPriorityMatrixKanban } from "./priorityMatrix";
+import { purposeAnchorTitle, purposeQuestionForMode } from "@/lib/companionEntry/purposeAnchor";import type { VisualThinkingHomeTypeId } from "../visualThinkingHome";
 import { getStudioCardByMode } from "./studioCards";
-import { purposeAnchorTitle, purposeQuestionForMode } from "@/lib/companionEntry/purposeAnchor";
 import type {
   VisualFocusMap,
   VisualFocusMode,
@@ -31,8 +32,45 @@ function chainFromLabels(labels: string[]): VisualFocusNode {
   return node(head!, [chainFromLabels(rest)]);
 }
 
-function treeTemplate(mode: VisualFocusMode): { title: string; root: VisualFocusNode } {
+function treeTemplate(
+  mode: VisualFocusMode,
+  homeTypeId?: VisualThinkingHomeTypeId,
+): { title: string; root: VisualFocusNode } {
   const card = getStudioCardByMode(mode);
+
+  if (homeTypeId === "process-flow") {
+    return {
+      title: "New process",
+      root: chainFromLabels([
+        "Start",
+        "Step 1",
+        "Step 2",
+        "Finish",
+      ]),
+    };
+  }
+  if (homeTypeId === "workflow-map") {
+    return {
+      title: "New workflow",
+      root: chainFromLabels([
+        "Trigger",
+        "Process",
+        "Handoff",
+        "Complete",
+      ]),
+    };
+  }
+  if (homeTypeId === "timeline") {
+    return {
+      title: "Project timeline",
+      root: chainFromLabels([
+        "Phase 1",
+        "Phase 2",
+        "Phase 3",
+        "Launch",
+      ]),
+    };
+  }
 
   switch (mode) {
     case "mind-map":
@@ -99,10 +137,11 @@ function treeTemplate(mode: VisualFocusMode): { title: string; root: VisualFocus
 export function createVisualFocusMap(
   mode: VisualFocusMode,
   purposeAnswer?: string,
+  homeTypeId?: VisualThinkingHomeTypeId,
 ): VisualFocusMap {
   const now = new Date().toISOString();
   const id = `vf-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-  const { title: templateTitle, root } = treeTemplate(mode);
+  const { title: templateTitle, root } = treeTemplate(mode, homeTypeId);
   const purposeAnchor: VisualFocusPurposeAnchor | undefined = purposeAnswer?.trim()
     ? {
         question: purposeQuestionForMode(mode),
@@ -119,38 +158,89 @@ export function createVisualFocusMap(
     : root;
 
   if (mode === "visual-kanban") {
-    const c1 = `col-${id}-ideas`;
-    const c2 = `col-${id}-grouping`;
-    const c3 = `col-${id}-exploring`;
-    const c4 = `col-${id}-ready`;
+    if (homeTypeId === "priority-matrix") {
+      const { columns, cards } = createPriorityMatrixKanban(id);
+      return {
+        id,
+        title: purposeAnchor ? title : "Priority Matrix",
+        mode,
+        homeTypeId,
+        root: rooted,
+        purposeAnchor,
+        kanban: { columns, cards },
+        createdAt: now,
+        updatedAt: now,
+      };
+    }
+
+    const isComparison = homeTypeId === "comparison-map";
+    const isContentCalendar = homeTypeId === "content-calendar";
+    const isPinterest = homeTypeId === "pinterest-planner";
+    const c1 = `col-${id}-a`;
+    const c2 = `col-${id}-b`;
+    const c3 = `col-${id}-c`;
     const card1 = `card-${id}-1`;
+    const columnDefs = isComparison
+      ? [
+          { id: c1, label: "Option A", cardIds: [card1] as string[] },
+          { id: c2, label: "Option B", cardIds: [] as string[] },
+          { id: c3, label: "Criteria", cardIds: [] as string[] },
+        ]
+      : isContentCalendar
+        ? [
+            { id: c1, label: "Week 1", cardIds: [card1] as string[] },
+            { id: c2, label: "Week 2", cardIds: [] as string[] },
+            { id: c3, label: "Week 3", cardIds: [] as string[] },
+          ]
+        : isPinterest
+          ? [
+              { id: c1, label: "Launch board", cardIds: [card1] as string[] },
+              { id: c2, label: "Tips board", cardIds: [] as string[] },
+              { id: c3, label: "Testimonials", cardIds: [] as string[] },
+            ]
+          : [
+              { id: c1, label: "Ideas", cardIds: [card1] as string[] },
+              { id: c2, label: "Grouping", cardIds: [] as string[] },
+              { id: `col-${id}-exploring`, label: "Exploring", cardIds: [] as string[] },
+              { id: `col-${id}-ready`, label: "Ready to act", cardIds: [] as string[] },
+            ];
+    const defaultTitle = isComparison
+      ? "Compare options"
+      : isContentCalendar
+        ? "Content Calendar"
+        : isPinterest
+          ? "Pinterest Plan"
+          : "Visual Kanban";
+    const defaultCardLabel = isComparison
+      ? "First note"
+      : isContentCalendar
+        ? "First content piece"
+        : isPinterest
+          ? "Pin idea"
+          : "First idea";
     return {
       id,
-      title: purposeAnchor ? title : "Visual Kanban",
+      title: purposeAnchor ? title : defaultTitle,
       mode,
+      homeTypeId,
       root: rooted,
       purposeAnchor,
       kanban: {
-        columns: [
-          { id: c1, label: "Ideas", cardIds: [card1] },
-          { id: c2, label: "Grouping", cardIds: [] },
-          { id: c3, label: "Exploring", cardIds: [] },
-          { id: c4, label: "Ready to act", cardIds: [] },
-        ],
+        columns: columnDefs,
         cards: {
-          [card1]: { id: card1, label: "First idea" },
+          [card1]: { id: card1, label: defaultCardLabel },
         },
       },
       createdAt: now,
       updatedAt: now,
     };
   }
-
   if (mode === "business-canvas") {
     return {
       id,
       title: purposeAnchor ? title : "Business Canvas",
       mode,
+      homeTypeId,
       root: rooted,
       purposeAnchor,
       businessCanvas: createEmptyBusinessCanvas(),
@@ -164,6 +254,7 @@ export function createVisualFocusMap(
     id,
     title,
     mode,
+    homeTypeId,
     root: rooted,
     purposeAnchor,
     createdAt: now,

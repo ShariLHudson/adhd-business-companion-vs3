@@ -129,8 +129,8 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
           tool(
             "stretch-break",
             "Stretch Break",
-            { kind: "activity", activityId: "recharge-menu", toolId: "stretch-break" },
-            "Physical movement and body reset.",
+            { kind: "activity", activityId: "stretch-break", toolId: "stretch-break" },
+            "Neck, shoulders, and gentle movement reset.",
           ),
           tool(
             "calm-moment",
@@ -159,7 +159,7 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
           tool(
             "nature-audio",
             "Nature Audio",
-            { kind: "audio", categoryId: "calm-brain", toolId: "nature-audio" },
+            { kind: "audio", categoryId: "nature", toolId: "nature-audio" },
           ),
           tool(
             "sleep-audio",
@@ -186,8 +186,9 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
           ),
           tool(
             "walk-reminder",
-            "Walk Reminder",
-            { kind: "activity", activityId: "recharge-menu", toolId: "walk-reminder" },
+            "Walk Exercise",
+            { kind: "activity", activityId: "walk-reminder", toolId: "walk-reminder" },
+            "2–5 minute gentle walk to reset.",
           ),
         ],
       },

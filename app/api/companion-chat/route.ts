@@ -16,6 +16,7 @@ import {
   firstParagraphForTrace,
   logRelationshipResponseTrace,
 } from "@/lib/relationshipResponseTrace";
+import { filterEmotionalSafety } from "@/lib/emotionalSafetyIntelligence";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -229,7 +230,8 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    const message = enforcement.message;
+    const emotionalSafety = filterEmotionalSafety(enforcement.message);
+    const message = emotionalSafety.message;
 
     logRelationshipResponseTrace({
       responseId: relationshipResponseId,

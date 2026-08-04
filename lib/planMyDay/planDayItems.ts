@@ -614,6 +614,9 @@ export type QuickPlanItemInput = {
   category?: PlanLifeDomain | "auto";
   startTime?: string;
   durationMinutes?: number;
+  priority?: PlanItemPriority;
+  /** P0.33 — linked Outcome Goal™ */
+  outcomeGoalId?: string;
 };
 
 export function countActivePlanItems(): number {
@@ -639,10 +642,12 @@ export function addQuickPlanItem(
     column: "ready",
     done: false,
     category: explicitCategory,
+    priority: parsed.priority,
     startTime: hasTime ? parsed.startTime!.trim() : undefined,
     flexible: !parsed.durationMinutes,
     durationMinutes: parsed.durationMinutes,
     createdAt: new Date().toISOString(),
+    outcomeGoalId: parsed.outcomeGoalId,
   };
   return saveTodayPlanItems([...items, next]);
 }

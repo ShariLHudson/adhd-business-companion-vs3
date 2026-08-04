@@ -9,7 +9,12 @@ import {
   CREATE_LAUNCHER_TYPE_OPTIONS,
   type CreateLauncherDisplayType,
 } from "@/lib/createLauncherTypes";
+import { createTitleLabelForType } from "@/lib/createTitleLabels";
 import { OTHER_OPTION } from "@/lib/createTypePickers";
+import {
+  COMPANION_INPUT_CLASS,
+  COMPANION_SETUP_LABEL_CLASS,
+} from "@/lib/companionFormControls";
 import { initialSectionOpen } from "@/lib/expandableUi";
 import { getWorkspaceHelpContent } from "@/lib/workspaceHelpContent";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
@@ -55,32 +60,40 @@ function CreateHelpBody() {
 export function CreateLauncherPanel({
   onCreate,
 }: {
-  onCreate: (catalogLabel: string, customLabel?: string) => void;
+  onCreate: (catalogLabel: string, customLabel?: string, title?: string) => void;
 }) {
   const [helpOpen, setHelpOpen] = useState(initialSectionOpen);
-  const [audienceOpen, setAudienceOpen] = useState(initialSectionOpen);
+  const [title, setTitle] = useState("");
   const [selectedType, setSelectedType] = useState<
     CreateLauncherDisplayType | typeof NO_CATEGORY
   >(NO_CATEGORY);
   const [customType, setCustomType] = useState("");
 
   const isCustom = selectedType === OTHER_OPTION;
+  const typeForLabel = isCustom
+    ? customType.trim() || OTHER_OPTION
+    : selectedType === NO_CATEGORY
+      ? ""
+      : selectedType;
+  const titleLabel = createTitleLabelForType(typeForLabel);
+
   const canCreate =
+    title.trim().length > 0 &&
     selectedType !== NO_CATEGORY &&
     (!isCustom || customType.trim().length > 0);
 
   function toggleSection(id: string) {
     if (id === "create-help") setHelpOpen((open) => !open);
-    if (id === "audience-build") setAudienceOpen((open) => !open);
   }
 
   function handleCreate() {
     if (!canCreate) return;
+    const artifactTitle = title.trim();
     if (isCustom) {
-      onCreate(OTHER_OPTION, customType.trim());
+      onCreate(OTHER_OPTION, customType.trim(), artifactTitle);
       return;
     }
-    onCreate(selectedType as string);
+    onCreate(selectedType as string, undefined, artifactTitle);
   }
 
   const typeOptions = CREATE_LAUNCHER_TYPE_OPTIONS.map((label) => ({
@@ -97,7 +110,7 @@ export function CreateLauncherPanel({
       })}
       data-testid="create-launcher"
     >
-      <div className="shrink-0 border-b border-[#e7dfd4] px-4 py-3 sm:px-6">
+      <div className="shrink-0 border-b border-[#e7dfd4] px-4 py-2 sm:px-6">
         <CollapsibleSection
           id="create-help"
           title="How To Use Create"
@@ -107,29 +120,30 @@ export function CreateLauncherPanel({
           <CreateHelpBody />
         </CollapsibleSection>
 
-        <div className="mt-2">
-          <CollapsibleSection
-            id="audience-build"
-            title="Audience Build"
-            open={audienceOpen}
-            onToggle={toggleSection}
-          >
-            <AudienceSelector compact />
-            <p className="mt-3 text-xs text-[#9a8f82]">
-              Future creation settings will live here — defaults for format,
-              length, and style.
-            </p>
-          </CollapsibleSection>
+        <div className="mt-2 space-y-2">
+          <label htmlFor="create-artifact-title" className={COMPANION_SETUP_LABEL_CLASS}>
+            {titleLabel}
+          </label>
+          <input
+            id="create-artifact-title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder={`Enter ${titleLabel.toLowerCase()}…`}
+            className={COMPANION_INPUT_CLASS}
+            data-testid="create-artifact-title"
+          />
+          <AudienceSelector />
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col items-center justify-center px-4 py-8 sm:px-6">
-        <div className="w-full max-w-md">
-          <h2 className="text-center text-2xl font-bold text-[#1f1c19]">
-            What Would You Like To Create?
+      <div className="flex min-h-0 flex-1 flex-col px-4 py-4 sm:px-6">
+        <div className="mx-auto w-full max-w-md">
+          <h2 className="text-lg font-bold text-[#1f1c19]">
+            What would you like to create?
           </h2>
 
-          <div className="mt-6">
+          <div className="mt-3">
             <CategoryPickerSelect
               label="Content type"
               hideLabel
@@ -147,7 +161,7 @@ export function CreateLauncherPanel({
             <div className="mt-3">
               <label
                 htmlFor="create-custom-type"
-                className="text-sm font-semibold text-[#6b635a]"
+                className={COMPANION_SETUP_LABEL_CLASS}
               >
                 Describe your custom piece
               </label>
@@ -160,7 +174,7 @@ export function CreateLauncherPanel({
                   if (e.key === "Enter" && canCreate) handleCreate();
                 }}
                 placeholder="e.g. Case study, podcast show notes…"
-                className="mt-1.5 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                className={`${COMPANION_INPUT_CLASS} mt-1`}
                 autoFocus
               />
             </div>
@@ -170,7 +184,7 @@ export function CreateLauncherPanel({
             type="button"
             disabled={!canCreate}
             onClick={handleCreate}
-            className="mt-5 w-full rounded-xl bg-[#1e4f4f] px-4 py-3 text-base font-semibold text-white transition-colors hover:bg-[#163c3c] disabled:cursor-not-allowed disabled:opacity-40"
+            className="mt-4 w-full rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-base font-semibold text-white transition-colors hover:bg-[#163c3c] disabled:cursor-not-allowed disabled:opacity-40"
           >
             Create
           </button>

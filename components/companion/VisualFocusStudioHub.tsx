@@ -1,34 +1,35 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { BackButton } from "@/components/companion/BackButton";
 import { ContinueThinkingCard } from "@/components/companion/ContinueThinkingCard";
-import { VisualFocusStudioCardView } from "@/components/companion/VisualFocusStudioCard";
+import { VisualThinkingGuidancePanel } from "@/components/companion/VisualThinkingGuidancePanel";
+import { VisualThinkingHomeBox } from "@/components/companion/VisualThinkingHomeBox";
 import { LibraryCloseButton } from "@/components/companion/LibraryOrientationChrome";
-import {
-  VISUAL_FOCUS_STUDIO_CARDS,
-  VISUAL_FOCUS_STUDIO_HERO,
-  VISUAL_FOCUS_WORK_WITH_SHARI,
-} from "@/lib/visualFocus/studioCards";
 import { listContinueThinkingMaps } from "@/lib/visualFocus/continueThinking";
-import type { VisualFocusMap, VisualFocusMode } from "@/lib/visualFocus";
+import type { VisualFocusMap } from "@/lib/visualFocus";
+import {
+  listVisualThinkingHomeByCategory,
+  type VisualThinkingHomeCategoryId,
+  type VisualThinkingHomeTypeId,
+} from "@/lib/visualThinkingHome";
 
 export function VisualFocusStudioHub({
   maps,
-  onCreate,
+  onOpenHomeType,
   onOpenMap,
   onRemoveMap,
   onDeleteMap,
-  onWorkWithShari,
+  onWorkWithShari: _onWorkWithShari,
   onBack,
   onClose,
 }: {
   maps: VisualFocusMap[];
-  onCreate: (mode: VisualFocusMode) => void;
+  onOpenHomeType: (homeTypeId: VisualThinkingHomeTypeId) => void;
   onOpenMap: (id: string) => void;
   onRemoveMap?: (id: string) => void;
   onDeleteMap?: (id: string) => void;
-  onWorkWithShari?: () => void;
+  onWorkWithShari?: (context?: { fromHub?: boolean }) => void;
   onBack?: () => void;
   onClose?: () => void;
 }) {
@@ -37,89 +38,118 @@ export function VisualFocusStudioHub({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [maps],
   );
+  const categories = listVisualThinkingHomeByCategory();
+  const [continueOpen, setContinueOpen] = useState(false);
+  const [browseOpen, setBrowseOpen] = useState(false);
+  const [openCategory, setOpenCategory] =
+    useState<VisualThinkingHomeCategoryId | null>(null);
+
+  function toggleCategory(category: VisualThinkingHomeCategoryId) {
+    setOpenCategory((current) => (current === category ? null : category));
+  }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col" data-testid="visual-focus-studio-hub">
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#e7dfd4] pb-4">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-semibold text-[#1f1c19] lg:text-3xl">
-            {VISUAL_FOCUS_STUDIO_HERO.title}
-          </h1>
-          <p className="mt-1 text-base font-medium text-[#1f1c19]">
-            {VISUAL_FOCUS_STUDIO_HERO.tagline}
-          </p>
-          <p className="mt-2 max-w-2xl text-base leading-relaxed text-[#6b635a]">
-            {VISUAL_FOCUS_STUDIO_HERO.microCopy}
-          </p>
-          <p className="mt-4 text-lg font-semibold text-[#1e4f4f]">
-            {VISUAL_FOCUS_STUDIO_HERO.question}
-          </p>
-        </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
+      {(onBack || onClose) ? (
+        <div className="mb-4 flex shrink-0 flex-wrap items-center justify-end gap-2">
           {onBack ? (
             <BackButton onClick={onBack} size="compact" label="Back" />
           ) : null}
           {onClose ? <LibraryCloseButton onClose={onClose} /> : null}
         </div>
-      </div>
+      ) : null}
+
+      <VisualThinkingGuidancePanel
+        onOpenHomeType={onOpenHomeType}
+        onWorkWithShari={onWorkWithShari}
+      />
 
       {continueThinking.length > 0 ? (
-        <section className="mt-6" data-testid="continue-thinking">
-          <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
-            Continue Thinking™
-          </p>
-          <p className="mt-1 text-sm text-[#6b635a]">
-            Resume momentum — not storage. Up to three active maps. Use{" "}
-            <span className="font-semibold text-[#1f1c19]">Remove</span> to free a
-            slot (map stays in Saved™) or <span className="font-semibold text-[#9b2c2c]">Delete</span>{" "}
-            to remove it permanently.
-          </p>
-          <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-            {continueThinking.map((map) => (
-              <ContinueThinkingCard
-                key={map.id}
-                map={map}
-                onOpen={() => onOpenMap(map.id)}
-                onRemove={onRemoveMap ? () => onRemoveMap(map.id) : undefined}
-                onDelete={onDeleteMap ? () => onDeleteMap(map.id) : undefined}
-              />
-            ))}
-          </div>
+        <section className="mt-4" data-testid="continue-thinking">
+          <button
+            type="button"
+            onClick={() => setContinueOpen((v) => !v)}
+            aria-expanded={continueOpen}
+            className="flex w-full items-center justify-between gap-2 rounded-xl border border-[#e7dfd4] bg-white/80 px-3.5 py-2.5 text-left hover:bg-[#faf7f2]"
+          >
+            <span className="text-sm font-semibold text-[#1f1c19]">
+              {continueOpen ? "▼" : "▶"} Continue Thinking™ ({continueThinking.length})
+            </span>
+            <span className="text-xs text-[#6b635a]">Pick up where you left off</span>
+          </button>
+          {continueOpen ? (
+            <div className="mt-3 flex flex-col gap-3">
+              {continueThinking.map((map) => (
+                <ContinueThinkingCard
+                  key={map.id}
+                  map={map}
+                  onOpen={() => onOpenMap(map.id)}
+                  onRemove={onRemoveMap ? () => onRemoveMap(map.id) : undefined}
+                  onDelete={onDeleteMap ? () => onDeleteMap(map.id) : undefined}
+                />
+              ))}
+            </div>
+          ) : null}
         </section>
       ) : null}
 
-      <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-2">
-        {VISUAL_FOCUS_STUDIO_CARDS.map((card) => (
-          <VisualFocusStudioCardView
-            key={card.mode}
-            card={card}
-            onCreate={() => onCreate(card.mode)}
-          />
-        ))}
-      </div>
-
-      {onWorkWithShari ? (
-        <div
-          className="mt-6 rounded-2xl border border-[#c5e0e0] bg-gradient-to-br from-[#f0f8f8] to-[#faf7f2] px-5 py-4"
-          data-testid="visual-focus-shari-strip"
+      <section className="mt-4" data-testid="browse-visual-tools">
+        <button
+          type="button"
+          onClick={() => setBrowseOpen((v) => !v)}
+          aria-expanded={browseOpen}
+          className="flex w-full items-center justify-between gap-2 rounded-xl border border-[#e7dfd4] bg-white/80 px-3.5 py-2.5 text-left hover:bg-[#faf7f2]"
         >
-          <p className="text-sm font-semibold text-[#1f1c19]">
-            {VISUAL_FOCUS_WORK_WITH_SHARI.headline}
-          </p>
-          <p className="mt-1 text-sm text-[#6b635a]">
-            {VISUAL_FOCUS_WORK_WITH_SHARI.body}
-          </p>
-          <button
-            type="button"
-            onClick={onWorkWithShari}
-            className="mt-3 rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163c3c]"
-          >
-            {VISUAL_FOCUS_WORK_WITH_SHARI.actionLabel}
-          </button>
-        </div>
-      ) : null}
-
-      <p className="mt-8 text-sm text-[#9a8f82]">{VISUAL_FOCUS_STUDIO_HERO.footer}</p>
+          <span className="text-sm font-semibold text-[#1f1c19]">
+            {browseOpen ? "▼" : "▶"} Browse Visual Tools
+          </span>
+          <span className="text-xs text-[#6b635a]">All maps by category</span>
+        </button>
+        {browseOpen ? (
+          <div className="mt-3 space-y-2">
+            {categories.map((group) => {
+              const expanded = openCategory === group.category;
+              return (
+                <div
+                  key={group.category}
+                  className="overflow-hidden rounded-xl border border-[#e7dfd4] bg-white"
+                  data-testid={`visual-thinking-category-${group.category}`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleCategory(group.category)}
+                    aria-expanded={expanded}
+                    className="flex w-full items-center gap-2 px-3.5 py-2.5 text-left hover:bg-[#faf7f2]/80"
+                  >
+                    <span className="text-sm text-[#9a8f82]" aria-hidden>
+                      {expanded ? "▼" : "▶"}
+                    </span>
+                    <span className="text-sm font-semibold text-[#1f1c19]">
+                      {group.label}
+                    </span>
+                    <span className="ml-auto text-xs text-[#9a8f82]">
+                      {group.types.length}
+                    </span>
+                  </button>
+                  {expanded ? (
+                    <ul className="border-t border-[#efe8de] p-2">
+                      {group.types.map((type) => (
+                        <li key={type.id} className="p-1">
+                          <VisualThinkingHomeBox
+                            type={type}
+                            compact
+                            onOpen={() => onOpenHomeType(type.id)}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+        ) : null}
+      </section>
     </div>
   );
 }

@@ -23,6 +23,9 @@ import {
   type PlanLifeDomain,
 } from "@/lib/planMyDay/types";
 import { PLAN_CATEGORY_OPTIONS } from "@/lib/planMyDay/planItemColors";
+import { OutcomeGoalLinkPicker } from "@/components/companion/OutcomeGoalLinkPicker";
+import { outcomeGoalLabel } from "@/lib/goals/goalLinking";
+import { listOutcomeGoals } from "@/lib/goals/outcomeGoals";
 
 export type PlanItemDetailMode =
   | "form"
@@ -69,6 +72,7 @@ function useItemForm(item: PlanDayItem) {
   const [projectId, setProjectId] = useState(item.projectId ?? "");
   const [dueDate, setDueDate] = useState(item.dueDate ?? "");
   const [startTime, setStartTime] = useState(item.startTime ?? "");
+  const [outcomeGoalId, setOutcomeGoalId] = useState(item.outcomeGoalId ?? "");
 
   useEffect(() => {
     setTitle(item.title);
@@ -79,6 +83,7 @@ function useItemForm(item: PlanDayItem) {
     setProjectId(item.projectId ?? "");
     setDueDate(item.dueDate ?? "");
     setStartTime(item.startTime ?? "");
+    setOutcomeGoalId(item.outcomeGoalId ?? "");
   }, [item]);
 
   return {
@@ -98,6 +103,8 @@ function useItemForm(item: PlanDayItem) {
     setDueDate,
     startTime,
     setStartTime,
+    outcomeGoalId,
+    setOutcomeGoalId,
   };
 }
 
@@ -171,6 +178,7 @@ export function PlanDayItemDetail({
       projectId: form.projectId || undefined,
       dueDate: form.dueDate || undefined,
       startTime: form.startTime.trim() || undefined,
+      outcomeGoalId: form.outcomeGoalId || undefined,
     };
   }
 
@@ -477,6 +485,22 @@ export function PlanDayItemDetail({
             ))}
           </select>
         </label>
+
+        <OutcomeGoalLinkPicker
+          value={form.outcomeGoalId || undefined}
+          onChange={(id) => form.setOutcomeGoalId(id ?? "")}
+          label="Link to goal"
+        />
+
+        {form.outcomeGoalId ? (
+          <p className="text-xs text-[#6b635a]">
+            This task supports:{" "}
+            <span className="font-semibold text-[#1f1c19]">
+              {outcomeGoalLabel(form.outcomeGoalId, listOutcomeGoals()) ??
+                "Linked goal"}
+            </span>
+          </p>
+        ) : null}
 
         {form.projectId && relatedProjectName ? (
           <div className="rounded-xl border border-[#c5e0e0] bg-[#f0f8f8] px-3 py-2.5">

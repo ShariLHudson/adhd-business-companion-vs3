@@ -13,6 +13,7 @@ import {
 import { getPhase2DiscoveryState } from "./phase2ProgressiveDiscovery";
 import { daysSinceRelationshipStart } from "./phase3AdaptiveRelationship";
 import { buildPersonalOperatingManual } from "./phase5CompanionIntelligenceEcosystem";
+import { shouldSuppressProactivePatternInsights } from "./patternAwarenessPrefs";
 
 export type LifeDomainId =
   | "business"
@@ -459,6 +460,7 @@ export function maybeEcosystemInsight(input: {
   userText: string;
   now?: Date;
 }): string | null {
+  if (shouldSuppressProactivePatternInsights()) return null;
   if (!isPhase11EcosystemIntelligenceActive(input.now)) return null;
 
   const now = input.now ?? new Date();
@@ -571,6 +573,7 @@ export function phase11EcosystemIntelligenceHintForChat(input?: {
   userText?: string;
   insight?: string | null;
 }): string | null {
+  if (shouldSuppressProactivePatternInsights()) return null;
   if (!isPhase11EcosystemIntelligenceActive()) return null;
 
   const snapshot = buildEcosystemIntelligenceSnapshot();

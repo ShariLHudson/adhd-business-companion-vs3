@@ -234,11 +234,18 @@ export function userDeclinedWorkflow(text: string): boolean {
 
 function guidedContinuationContextFromThread(
   thread?: OutcomeThread | null,
+  assistantText?: string,
 ): GuidedContinuationContext | undefined {
   if (!thread) return undefined;
+  const useDecisionContext =
+    Boolean(thread.pendingDecision) &&
+    assistantText &&
+    /\b(?:decision|path|offer|expansion|product line|pricing|which feels closest|keep your current)\b/i.test(
+      assistantText,
+    );
   if (!thread.pendingDecision && !thread.currentProblem) return undefined;
   return {
-    pendingDecision: thread.pendingDecision,
+    pendingDecision: useDecisionContext ? thread.pendingDecision : undefined,
     currentProblem: thread.currentProblem,
   };
 }
@@ -417,7 +424,10 @@ export function resolveConversationWorkflowAcceptance(input: {
 
   return continuationForWorkflowWithIntent(
     input.workflow,
-    guidedContinuationContextFromThread(input.outcomeThread),
+    guidedContinuationContextFromThread(
+      input.outcomeThread,
+      input.lastAssistantText,
+    ),
   );
 }
 

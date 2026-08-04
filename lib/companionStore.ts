@@ -143,6 +143,8 @@ export type BrainDumpEntry = {
   schedulingIntent?: string; // today | week | later | tomorrow
   captureSessionId?: string;
   routedAction?: string;
+  /** Linked Outcome Goal™ when converted from a cluster or thought */
+  outcomeGoalId?: string;
   sorted?: boolean;
   done?: boolean;
 };
@@ -1841,6 +1843,10 @@ export type Project = {
   color: string;
   createdAt: string;
   updatedAt: string;
+  /** P0.33 — linked Outcome Goal™ */
+  outcomeGoalId?: string;
+  /** P0.34 — multiple Outcome Goal™ links */
+  outcomeGoalIds?: string[];
 };
 
 // Calm, distinct palette projects draw from (teal / purple / gray / blue …).
@@ -1987,6 +1993,12 @@ export function saveProject(
     notes: input.notes,
     color:
       input.color ?? PROJECT_PALETTE[list.length % PROJECT_PALETTE.length]!,
+    outcomeGoalId: input.outcomeGoalId ?? input.outcomeGoalIds?.[0],
+    outcomeGoalIds: input.outcomeGoalIds?.length
+      ? input.outcomeGoalIds
+      : input.outcomeGoalId
+        ? [input.outcomeGoalId]
+        : undefined,
     createdAt: now,
     updatedAt: now,
   };
@@ -2355,7 +2367,7 @@ export const PLAN_VOICE_MINUTES: Record<Plan, number> = {
   "voice-pro": 120,
 };
 
-// How Shari behaves (separate from tone = how it sounds).
+import type { GoalProgressStyle } from "./goals/goalProgressStyle";
 export type HelpMode = "step-by-step" | "ask-first" | "direct" | "navigate";
 
 // How support feels — empathy vs action balance, plus an overwhelm-safe SOS.
@@ -2381,6 +2393,8 @@ export type Prefs = {
     | "cards"
     | "kanban"
     | "visual-focus";
+  /** Outcome Goals™ tracker visualization style. */
+  goalProgressStyle: GoalProgressStyle;
   patternAwareness: PatternAwareness;
   plan: Plan;
   activeAvatarId: string; // the client avatar currently "in use" app-wide
@@ -2407,6 +2421,7 @@ const DEFAULT_PREFS: Prefs = {
   timeBlockAlerts: true,
   desktopNotifications: true,
   visualMode: "off",
+  goalProgressStyle: "progress-bars",
   patternAwareness: "light",
   plan: "essential",
   activeAvatarId: "",
@@ -2431,6 +2446,21 @@ export function normalizeVisualMode(v: unknown): VisualMode {
   return "off";
 }
 
+function normalizeGoalProgressStylePref(v: unknown): GoalProgressStyle {
+  const styles = [
+    "progress-bars",
+    "circular",
+    "donut",
+    "line-graph",
+    "dashboard-cards",
+    "compact-numbers",
+  ] as const;
+  if (typeof v === "string" && styles.includes(v as GoalProgressStyle)) {
+    return v as GoalProgressStyle;
+  }
+  return "progress-bars";
+}
+
 export function getPrefs(): Prefs {
   if (typeof window === "undefined") return DEFAULT_PREFS;
   try {
@@ -2439,6 +2469,7 @@ export function getPrefs(): Prefs {
     const parsed = JSON.parse(raw) as Partial<Prefs>;
     const merged = { ...DEFAULT_PREFS, ...parsed };
     merged.visualMode = normalizeVisualMode(merged.visualMode);
+    merged.goalProgressStyle = normalizeGoalProgressStylePref(merged.goalProgressStyle);
     merged.aiTone = normalizeAiTone(merged.aiTone);
     Object.assign(merged, normalizeLanguageCommunication(merged));
     return merged;

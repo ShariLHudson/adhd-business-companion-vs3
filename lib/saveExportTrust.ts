@@ -3,6 +3,7 @@
  */
 
 import type { GoogleFileKind } from "./googleWorkspace";
+import { GOOGLE_EXPORT_MESSAGES } from "./googleExportVerification";
 
 export type SaveLevel = "resume" | "saved-work" | "permanent-export";
 
@@ -61,13 +62,9 @@ export function saveReceipt(
     case "print":
       return "Opening print view…";
     case "google-doc":
-      return detail
-        ? `Created a Google Doc in your Drive. ${detail}`
-        : "Created a Google Doc in your Drive.";
+      return GOOGLE_EXPORT_MESSAGES.docCreated;
     case "google-sheet":
-      return detail
-        ? `Created a Google Sheet in your Drive. ${detail}`
-        : "Created a Google Sheet in your Drive.";
+      return GOOGLE_EXPORT_MESSAGES.sheetCreated;
     case "google-form":
       return detail
         ? `Created a Google Form in your Drive. ${detail}`
@@ -83,14 +80,9 @@ export function saveReceipt(
   }
 }
 
-export function googleFailureReceipt(kind: GoogleFileKind): string {
-  const label =
-    kind === "sheet"
-      ? "Google Sheet"
-      : kind === "form"
-        ? "Google Form"
-        : "Google Doc";
-  return `I couldn't create the ${label}. Your draft is still saved here.`;
+export function googleFailureReceipt(kind: GoogleFileKind, apiError?: string): string {
+  if (apiError?.trim()) return apiError.trim();
+  return GOOGLE_EXPORT_MESSAGES.verifyFailed;
 }
 
 export type GoogleCreateResponse = {
@@ -109,16 +101,15 @@ export function isGoogleCreateSuccess(
 
 export function googleReceiptForKind(
   kind: GoogleFileKind,
-  url?: string,
+  _url?: string,
 ): string {
-  const link = url ? `Open: ${url}` : "";
   switch (kind) {
     case "sheet":
-      return saveReceipt("google-sheet", link);
+      return saveReceipt("google-sheet");
     case "form":
-      return saveReceipt("google-form", link);
+      return saveReceipt("google-form");
     default:
-      return saveReceipt("google-doc", link);
+      return saveReceipt("google-doc");
   }
 }
 

@@ -22,11 +22,11 @@ export function WorkspaceViewSizeControl({
     <div
       className="flex flex-wrap items-center gap-1"
       role="group"
-      aria-label="View size"
+      aria-label="Layout"
       data-testid="workspace-view-size-control"
     >
       <span className="hidden text-xs font-semibold text-[#6b635a] sm:inline">
-        View:
+        Layout:
       </span>
       {PRESET_ORDER.map((preset) => {
         const active = preset === value;

@@ -2,6 +2,10 @@
  * Convert draft content to CSV for Google Sheets export.
  */
 
+import { isLikelyCsv, validateSpreadsheetCsv } from "./googleExportVerification";
+
+export { isLikelyCsv, validateSpreadsheetCsv };
+
 export function isTableFriendlyContent(content: string): boolean {
   const t = content.trim();
   if (!t) return false;
@@ -41,6 +45,11 @@ function markdownTableToRows(content: string): string[][] | null {
 }
 
 export function contentToSheetCsv(content: string): string {
+  const trimmed = content.trim();
+  if (isLikelyCsv(trimmed)) {
+    return trimmed;
+  }
+
   const table = markdownTableToRows(content);
   if (table) {
     return table.map((row) => row.map(escapeCsvCell).join(",")).join("\n");

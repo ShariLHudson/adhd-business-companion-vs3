@@ -16,6 +16,7 @@ import {
 
 type TopBarProps = {
   showPlanMyDay?: boolean;
+  planMyDayActive?: boolean;
   onOpenPlanMyDay?: () => void;
   onOpenAdaptMyDay?: () => void;
   onOpenClearMyMind?: () => void;
@@ -46,14 +47,16 @@ function HeaderActionButton({
   onClick,
   href,
   badge,
+  active = false,
 }: {
   emoji: string;
   label: string;
   onClick: () => void;
   href?: string;
   badge?: number;
+  active?: boolean;
 }) {
-  const className = BTN;
+  const className = active ? `${BTN} companion-nav-active shadow-sm` : BTN;
   const content = (
     <>
       <span aria-hidden="true">{emoji}</span>
@@ -177,6 +180,7 @@ function NewConversationDropdown({
 
 export function TopBar({
   showPlanMyDay = false,
+  planMyDayActive = false,
   onOpenPlanMyDay,
   onOpenAdaptMyDay,
   onOpenClearMyMind,
@@ -234,6 +238,7 @@ export function TopBar({
           label="Plan My Day"
           onClick={() => runHeaderAction(onOpenPlanMyDay)}
           badge={planActiveCount}
+          active={planMyDayActive}
         />
       ) : null}
 

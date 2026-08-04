@@ -33,7 +33,7 @@ import { FocusTimerPanel } from "@/components/companion/FocusTimerPanel";
 import { IdentityBar } from "@/components/companion/IdentityBar";
 import { SimpleHomeWelcome } from "@/components/companion/SimpleHomeWelcome";
 import { StressReliefOptionsCard } from "@/components/companion/StressReliefOptionsCard";
-import { TodayPanel } from "@/components/companion/TodayPanel";
+import { TodayHubPanel } from "@/components/companion/TodayHubPanel";
 const PlanMyDayPanel = dynamic(
   () =>
     import("@/components/companion/PlanMyDayPanel").then((mod) => ({
@@ -65,7 +65,9 @@ const VisualFocusWorkspacePanel = dynamic(
 import { PlanMyDayQuickDrawer } from "@/components/companion/PlanMyDayQuickDrawer";
 import { WinsThisWeekPanel } from "@/components/companion/WinsThisWeekPanel";
 import { EvidenceBankPanel } from "@/components/companion/EvidenceBankPanel";
-import { GrowthCenterPanel } from "@/components/companion/GrowthCenterPanel";
+import { PortfolioPanel } from "@/components/companion/PortfolioPanel";
+import { GrowthVaultHubPanel } from "@/components/companion/GrowthVaultHubPanel";
+import { OutcomeGoalsHubPanel } from "@/components/companion/OutcomeGoalsHubPanel";
 import { ConfidenceVaultPanel } from "@/components/companion/ConfidenceVaultPanel";
 import { MyJourneyPanel } from "@/components/companion/MyJourneyPanel";
 import type { HomeResumeItem } from "@/lib/homeResumeItem";
@@ -183,7 +185,7 @@ import {
   saveWorkspaceViewSizePreference,
   type WorkspaceViewSizePreset,
 } from "@/lib/workspaceViewSize";
-import type { FocusHubAction } from "@/lib/focusHub";
+import type { FocusFeelingId, FocusHubAction } from "@/lib/focusHub";
 import {
   saveBrainDumpVisualView,
   saveBrainDumpVisualVisible,
@@ -242,6 +244,12 @@ import {
   upsertCreateDraftEntry,
 } from "@/lib/createDraftLibrary";
 import { createNavigationHistoryStack } from "@/lib/navigationHistory";
+import {
+  focusAudioBackLabelForContext,
+  shouldOpenFocusAudioBesideChat,
+  type NavigationScreenSnapshot,
+  type NavigationStrategyOpenView,
+} from "@/lib/navigationStack";
 import {
   loadWorkflowRecord,
   saveWorkflowRecord,
@@ -689,6 +697,7 @@ import {
 import { knowledgeIntelligenceHintForChat } from "@/lib/knowledgeIntelligence";
 import {
   clearFrictionlessPending,
+  clearStaleWorkflowPendingsForNewIntent,
   frictionlessHintForChat,
   frictionlessPendingFromToolOffer,
   frictionlessPendingFromWorkspaceOffer,
@@ -703,6 +712,11 @@ import {
 } from "@/lib/frictionlessActionLayer";
 import { shouldSuppressRelationshipIntelligenceForUserText } from "@/lib/relationshipIntelligenceBoundaries";
 import { resolveHardNavigationCommand } from "@/lib/hardNavigationCommands";
+import {
+  getActiveWorkflowOwner,
+  workflowOwnerBlocksFrictionlessPending,
+  workflowOwnerBlocksStrategyPending,
+} from "@/lib/workflowOwnershipAuthority";
 import {
   logCreateOfferRegistration,
   logYesContinuationResolution,
@@ -723,7 +737,25 @@ import {
   loadReminderIntakeSession,
   saveReminderIntakeSession,
 } from "@/lib/reminderStore";
-import { resolveReminderTurn } from "@/lib/reminderIntelligence";
+import {
+  isReminderIntakeMessage,
+  isReminderRequest,
+  isReminderSetupOfferMessage,
+  findRecentReminderUserText,
+  resolveReminderTurn,
+} from "@/lib/reminderIntelligence";
+import {
+  clearArtifactExecutionSession,
+  loadArtifactExecutionSession,
+  saveArtifactExecutionSession,
+} from "@/lib/artifactExecutionSession";
+import {
+  detectArtifactKindFromOffer,
+  extractContentForArtifactExecution,
+  isArtifactExecutionOfferMessage,
+  resolveArtifactExecutionTurn,
+} from "@/lib/artifactExecutionAuthority";
+import { executeArtifactGeneration } from "@/lib/artifactExecutionEngine";
 import {
   afterReminderFired,
   collectDueReminderAlerts,
@@ -756,6 +788,11 @@ import {
   visualThinkingViewTitle,
   type VisualThinkingViewId,
 } from "@/lib/visualThinkingStudio";
+import {
+  homeTypeIdForViewId,
+  getVisualThinkingHomeType,
+} from "@/lib/visualThinkingHome";
+import { shariPromptForVisualContext } from "@/lib/visualThinkingCoachContext";
 import type { VisualFocusMode } from "@/lib/visualFocus/types";
 import {
   CREATE_PANEL_SECTION,
@@ -1193,6 +1230,7 @@ import {
   SECTION_NAV,
   sidebarNavForSection,
   normalizeSidebarNav,
+  resolveGrowthDestination,
   type AppSection,
   type SidebarNavId,
   type SidebarToolId,
@@ -1730,6 +1768,16 @@ export default function CompanionPageClient() {
   const [focusAudioCategory, setFocusAudioCategory] = useState<string | null>(
     null,
   );
+  const focusAudioCategoryRef = useRef<string | null>(null);
+  focusAudioCategoryRef.current = focusAudioCategory;
+  const [focusHubFeeling, setFocusHubFeeling] = useState<FocusFeelingId | null>(
+    null,
+  );
+  const focusHubFeelingRef = useRef<FocusFeelingId | null>(null);
+  focusHubFeelingRef.current = focusHubFeeling;
+  const [focusAudioBackLabel, setFocusAudioBackLabel] = useState("Back");
+  const focusAudioBackLabelRef = useRef("Back");
+  focusAudioBackLabelRef.current = focusAudioBackLabel;
   // A time block whose start time has arrived (shows the trigger popup).
   const [triggeredBlock, setTriggeredBlock] = useState<TimeBlock | null>(null);
   // A time block starting in ~15 minutes (shows a gentle heads-up toast).
@@ -3154,14 +3202,16 @@ export default function CompanionPageClient() {
       setActionBridge(null);
 
       const open = createOpenRef.current;
-      if (
-        open.panel === "content-generator" &&
+        if (open.panel === "content-generator" &&
         genSeedEqual(open.seed, saved.genSeed) &&
         creationContextEqual(open.ctx, saved.creationContext)
       ) {
         dbgWorkspace("restoreCreateSession skipped — unchanged");
+        revealWorkspace();
         if (ack) {
-          setMessages((prev) => [...prev, { role: "assistant", content: ack }]);
+          appendVerifiedWorkspaceMessage("content-generator", ack, {
+            appendOnly: true,
+          });
         }
         return true;
       }
@@ -3185,9 +3235,12 @@ export default function CompanionPageClient() {
       setActiveNav("other");
       applyWorkspaceFocus(null);
       setWorkspaceSession(null);
+      revealWorkspace();
 
       if (ack) {
-        setMessages((prev) => [...prev, { role: "assistant", content: ack }]);
+        appendVerifiedWorkspaceMessage("content-generator", ack, {
+          appendOnly: true,
+        });
       }
       const wfRecord = loadWorkflowRecordForExplicitResume();
       if (wfRecord) {
@@ -5044,23 +5097,23 @@ export default function CompanionPageClient() {
     backInterceptorRef.current = fn;
   }, []);
 
-  type NavigationSnapshot = {
-    activeSection: AppSection;
-    activeNav: SidebarNavId;
-    workspacePanel: AppSection | null;
-    companionStandaloneSection: AppSection | null;
+  type NavigationSnapshot = NavigationScreenSnapshot & {
     activitySession: ActivitySessionState;
-    strategyOpenView?: "home" | "adhd" | "business" | "saved" | "recommended";
   };
 
   function captureNavigationSnapshot(
-    strategyOpenView?: NavigationSnapshot["strategyOpenView"],
+    strategyOpenView?: NavigationStrategyOpenView,
   ): NavigationSnapshot {
+    const detail = workspaceDetailRef.current;
     return {
       activeSection: activeSectionRef.current,
       activeNav: activeNavRef.current,
       workspacePanel: workspacePanelRef.current,
       companionStandaloneSection: companionStandaloneSectionRef.current,
+      workspaceDetail: detail ? { ...detail } : null,
+      focusHubFeeling: focusHubFeelingRef.current,
+      focusAudioCategory: focusAudioCategoryRef.current,
+      focusAudioBackLabel: focusAudioBackLabelRef.current,
       activitySession: { ...activitySessionRef.current },
       strategyOpenView,
     };
@@ -5074,6 +5127,10 @@ export default function CompanionPageClient() {
       setActiveNav(snap.activeNav);
       patchWorkspacePanel(snap.workspacePanel);
       setCompanionStandaloneSection(snap.companionStandaloneSection);
+      setWorkspaceDetail(snap.workspaceDetail);
+      setFocusHubFeeling(snap.focusHubFeeling);
+      setFocusAudioCategory(snap.focusAudioCategory);
+      setFocusAudioBackLabel(snap.focusAudioBackLabel);
       setActivitySession(snap.activitySession);
       if (snap.strategyOpenView) {
         setStrategyPanelCommand({
@@ -5086,7 +5143,7 @@ export default function CompanionPageClient() {
   );
 
   const pushNavigationRestore = useCallback(
-    (strategyOpenView?: NavigationSnapshot["strategyOpenView"]) => {
+    (strategyOpenView?: NavigationStrategyOpenView) => {
       const snap = captureNavigationSnapshot(strategyOpenView);
       navHistoryRef.current.push(() => restoreNavigationSnapshot(snap));
     },
@@ -5122,14 +5179,6 @@ export default function CompanionPageClient() {
     }
 
     if (activeSection === "home" && workspacePanel) {
-      if (
-        (activeNavRef.current === "other" ||
-          activeNavRef.current === "my-work") &&
-        workspacePanel !== "my-work"
-      ) {
-        returnToMyWorkHub();
-        return;
-      }
       closeWorkspacePanel();
       return;
     }
@@ -5415,7 +5464,15 @@ export default function CompanionPageClient() {
       current,
       onBack: goBack,
       backLabel: workspacePanelBackLabel,
-      onOpenSection: (section) => openSectionBesideChatCore(section, "growth"),
+      onOpenSection: (section) => {
+        const navId: SidebarNavId =
+          section === "outcome-goals"
+            ? "outcome-goals"
+            : section === "growth-vault"
+              ? "growth-vault"
+              : "growth";
+        openSectionBesideChatCore(section, navId, { userInitiated: true });
+      },
     };
   }
 
@@ -5592,6 +5649,7 @@ export default function CompanionPageClient() {
     options?: { userInitiated?: boolean },
   ) {
     if (shouldBlockWorkspaceOpenForPhase1(options)) return;
+    section = resolveGrowthDestination(section);
     if (isClearMyMindSection(section)) {
       openClearMyMindStandaloneCore();
       return;
@@ -5636,6 +5694,9 @@ export default function CompanionPageClient() {
 
     pushNavigationRestore();
     patchWorkspacePanel(section, options);
+    if (section === "focus" && !goingBackRef.current) {
+      setFocusHubFeeling(null);
+    }
     if (section === "visual-focus" && !peekVisualFocusPendingOpen()) {
       requestVisualFocusStudio();
     }
@@ -6267,7 +6328,7 @@ export default function CompanionPageClient() {
     options?: {
       decisionCompassPrefill?: DecisionCompassPrefill | null;
       pushRestore?: boolean;
-      strategyOpenView?: NavigationSnapshot["strategyOpenView"];
+      strategyOpenView?: NavigationStrategyOpenView;
     },
   ) {
     if (session.activityId === "decision-compass") {
@@ -6369,9 +6430,21 @@ export default function CompanionPageClient() {
     const normalizedNav = normalizeSidebarNav(nav);
 
     if (normalizedNav === "chat") {
+      if (overlay) {
+        setOverlay(null);
+        setSettingsSection(null);
+        setProfileGettingToKnowYou(false);
+      }
+      setCompanionStandaloneSection(null);
+      setGuideBesideSession(null);
+      patchWorkspacePanel(null);
+      clearSplitBesideWorkspace();
+      setActivitySession(EMPTY_ACTIVITY_SESSION);
+      setWorkspaceFirstSplit(false);
+      openChatBesideWorkspace();
       setActiveNav("chat");
       setActiveSection("home");
-      setWorkspaceFirstSplit(false);
+      activeSectionRef.current = "home";
       if (mode) setCoachingMode(mode);
       inputRef.current?.focus();
       return;
@@ -6405,13 +6478,41 @@ export default function CompanionPageClient() {
   }
 
   function openFocusAudioCore(categoryId?: string | null) {
+    pushNavigationRestore();
     clearParallelCoachingOffers();
     const fromIntent = detectAudioRequest(lastUserTextRef.current);
-    setFocusAudioCategory(
-      categoryId ?? (fromIntent.isAudio ? fromIntent.categoryId : null),
-    );
+    const nextCategory =
+      categoryId ?? (fromIntent.isAudio ? fromIntent.categoryId : null);
+    setFocusAudioCategory(nextCategory);
     noteWorkspaceOpened("focus-audio", "recommendation_or_nav");
+
+    const besideChat = shouldOpenFocusAudioBesideChat({
+      activeSection: activeSectionRef.current,
+      workspacePanel: workspacePanelRef.current,
+      companionStandaloneSection: companionStandaloneSectionRef.current,
+    });
+    if (besideChat) {
+      setFocusAudioBackLabel(
+        focusAudioBackLabelForContext({
+          focusHubFeeling: focusHubFeelingRef.current,
+          fromFocusBeside: true,
+        }),
+      );
+      setCompanionStandaloneSection(null);
+      patchWorkspacePanel("focus-audio");
+      setActiveSection("home");
+      activeSectionRef.current = "home";
+      setActiveNav("focus");
+      focusWorkspaceLayout();
+      revealWorkspace();
+      return;
+    }
+
+    setFocusAudioBackLabel("Focus");
+    setCompanionStandaloneSection(null);
+    patchWorkspacePanel(null);
     setActiveSection("focus-audio");
+    activeSectionRef.current = "focus-audio";
     setActiveNav("focus");
   }
 
@@ -7197,6 +7298,15 @@ export default function CompanionPageClient() {
       currentTurn: chatTurnRef.current,
       workflow: conversationWorkflow,
       outcomeThread: getOutcomeThread(),
+      workflowOwner: getActiveWorkflowOwner({
+        lastAssistantText,
+        reminderIntakeActive:
+          loadReminderIntakeSession()?.phase === "collecting",
+        artifactExecutionIntakeActive: Boolean(loadArtifactExecutionSession()),
+        menuPending: loadPendingMenuSelection(),
+        createBuilderActive: workspacePanelRef.current === "content-generator",
+        conversationWorkflow,
+      }),
       pendingInput: {
         workspacePanel: workspacePanelRef.current,
         record: pendingAcceptanceRecord,
@@ -7777,11 +7887,18 @@ export default function CompanionPageClient() {
     viewId?: VisualThinkingViewId;
     viewTitle?: string;
     purposeAnswer?: string;
+    homeTypeId?: import("@/lib/visualThinkingHome").VisualThinkingHomeTypeId;
     ack: string;
   }) {
     const prompt = input.purposeAnswer?.trim();
     if (prompt) lastUserTextRef.current = prompt;
-    const map = createAndActivateMap(input.mode, prompt || undefined);
+    const homeTypeId =
+      input.homeTypeId ??
+      (input.viewId ? homeTypeIdForViewId(input.viewId) : undefined);
+    const mode = homeTypeId
+      ? getVisualThinkingHomeType(homeTypeId).mode
+      : input.mode;
+    const map = createAndActivateMap(mode, prompt || undefined, homeTypeId);
     queueVisualFocusOpen(map.id);
     openSectionBesideChatCore("visual-focus", undefined, { userInitiated: true });
     clearVisualThinkingMenuPending();
@@ -7818,10 +7935,7 @@ export default function CompanionPageClient() {
     };
 
     const activeReminderSession = loadReminderIntakeSession();
-    if (
-      activeReminderSession?.phase === "collecting" &&
-      !isFrictionlessAffirmation(trimmed)
-    ) {
+    if (activeReminderSession?.phase === "collecting") {
       const reminderTurn = resolveReminderTurn({
         userText: trimmed,
         draft: activeReminderSession.draft,
@@ -7843,6 +7957,130 @@ export default function CompanionPageClient() {
         setMessages((prev) => [
           ...prev,
           { role: "assistant", content: reminderTurn.reply },
+        ]);
+        setIsLoading(false);
+        inputRef.current?.focus();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
+    const lastAssistantForYesEarly =
+      [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
+    const priorUserForYesEarly = [...messages]
+      .reverse()
+      .find((m) => m.role === "user")?.content;
+
+    if (
+      isFrictionlessAffirmation(trimmed) &&
+      !activeReminderSession &&
+      ((priorUserForYesEarly && isReminderRequest(priorUserForYesEarly)) ||
+        isReminderIntakeMessage(lastAssistantForYesEarly) ||
+        isReminderSetupOfferMessage(lastAssistantForYesEarly))
+    ) {
+      const seedText =
+        priorUserForYesEarly && isReminderRequest(priorUserForYesEarly)
+          ? priorUserForYesEarly
+          : findRecentReminderUserText(messages) ?? "remind me";
+      const reminderTurn = resolveReminderTurn({
+        userText: seedText,
+        timeBlocks: getTimeBlocks(),
+      });
+      if (reminderTurn.kind === "ask" || reminderTurn.kind === "confirm") {
+        const userMessage: Message = { role: "user", content: trimmed };
+        setMessages((prev) => [...prev, userMessage]);
+        setInput("");
+        voiceUsedRef.current = false;
+        clearStaleWorkflowPendingsForNewIntent();
+        clearPendingAcceptanceAuthority();
+        if (reminderTurn.kind === "confirm") {
+          clearReminderIntakeSession();
+        } else {
+          saveReminderIntakeSession({
+            phase: "collecting",
+            draft: reminderTurn.draft,
+            startedAtTurn: chatTurnRef.current,
+          });
+        }
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: reminderTurn.reply },
+        ]);
+        setIsLoading(false);
+        inputRef.current?.focus();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
+    const activeArtifactSession = loadArtifactExecutionSession();
+    if (activeArtifactSession) {
+      const artifactTurn = resolveArtifactExecutionTurn({
+        userText: trimmed,
+        draft: activeArtifactSession.draft,
+        messages: toChatTurns(messages),
+        lastAssistantText: lastAssistantForYesEarly,
+      });
+      if (artifactTurn.kind === "ask" || artifactTurn.kind === "confirm") {
+        const userMessage: Message = { role: "user", content: trimmed };
+        setMessages((prev) => [...prev, userMessage]);
+        setInput("");
+        voiceUsedRef.current = false;
+        if (artifactTurn.kind === "confirm" && !artifactTurn.reply) {
+          clearStaleWorkflowPendingsForNewIntent();
+          clearPendingAcceptanceAuthority();
+          clearArtifactExecutionSession();
+          const result = await executeArtifactGeneration(artifactTurn.draft);
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: result.message },
+          ]);
+        } else {
+          saveArtifactExecutionSession({
+            phase:
+              artifactTurn.draft.missing === "content" ? "collecting" : "ready",
+            draft: artifactTurn.draft,
+            startedAtTurn: activeArtifactSession.startedAtTurn,
+          });
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: artifactTurn.reply },
+          ]);
+        }
+        setIsLoading(false);
+        inputRef.current?.focus();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
+    if (
+      isFrictionlessAffirmation(trimmed) &&
+      isArtifactExecutionOfferMessage(lastAssistantForYesEarly) &&
+      !activeArtifactSession
+    ) {
+      const kind = detectArtifactKindFromOffer(lastAssistantForYesEarly);
+      const content = extractContentForArtifactExecution(
+        toChatTurns(messages),
+        lastAssistantForYesEarly,
+      );
+      if (kind && content) {
+        const userMessage: Message = { role: "user", content: trimmed };
+        setMessages((prev) => [...prev, userMessage]);
+        setInput("");
+        voiceUsedRef.current = false;
+        clearStaleWorkflowPendingsForNewIntent();
+        clearPendingAcceptanceAuthority();
+        const result = await executeArtifactGeneration({
+          kind,
+          title: content.title,
+          body: content.body,
+          missing: null,
+        });
+        clearArtifactExecutionSession();
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: result.message },
         ]);
         setIsLoading(false);
         inputRef.current?.focus();
@@ -7898,11 +8136,6 @@ export default function CompanionPageClient() {
       !isFrictionlessPendingExpired(frictionlessPendingRaw, chatTurnRef.current)
         ? frictionlessPendingRaw
         : null;
-    const lastAssistantForYesEarly =
-      [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
-    const priorUserForYesEarly = [...messages]
-      .reverse()
-      .find((m) => m.role === "user")?.content;
 
     const visualMenuPendingEarly =
       loadVisualThinkingMenuPending() ??
@@ -7937,22 +8170,36 @@ export default function CompanionPageClient() {
       }
     }
 
+    const workflowOwnerEarly = getActiveWorkflowOwner({
+      lastAssistantText: lastAssistantForYesEarly,
+      reminderIntakeActive:
+        loadReminderIntakeSession()?.phase === "collecting",
+      artifactExecutionIntakeActive: Boolean(loadArtifactExecutionSession()),
+      menuPending: loadPendingMenuSelection(),
+      createBuilderActive: workspacePanelRef.current === "content-generator",
+      conversationWorkflow,
+    });
+
     const strategyOfferOnLastTurn =
       isFrictionlessAffirmation(trimmed) &&
-      isStrategyIntelligenceOfferMessage(lastAssistantForYesEarly);
-    const recoveredStrategyPending = strategyOfferOnLastTurn
-      ? recoverStrategyOfferPendingFromChat({
-          userText: trimmed,
-          lastAssistantText: lastAssistantForYesEarly,
-          priorUserText: priorUserForYesEarly,
-          currentTurn: chatTurnRef.current,
-        })
-      : null;
+      isStrategyIntelligenceOfferMessage(lastAssistantForYesEarly) &&
+      workflowOwnerEarly?.owner === "strategy_workflow";
+    const recoveredStrategyPending =
+      strategyOfferOnLastTurn && !workflowOwnerBlocksStrategyPending(workflowOwnerEarly)
+        ? recoverStrategyOfferPendingFromChat({
+            userText: trimmed,
+            lastAssistantText: lastAssistantForYesEarly,
+            priorUserText: priorUserForYesEarly,
+            currentTurn: chatTurnRef.current,
+          })
+        : null;
     const strategyPendingForYes =
-      recoveredStrategyPending ??
-      (frictionlessPending?.type === "strategy_offer"
-        ? frictionlessPending
-        : null);
+      workflowOwnerBlocksStrategyPending(workflowOwnerEarly)
+        ? null
+        : recoveredStrategyPending ??
+          (frictionlessPending?.type === "strategy_offer"
+            ? frictionlessPending
+            : null);
 
     if (strategyPendingForYes && strategyOfferOnLastTurn) {
       const continuation = resolveFrictionlessContinuation(
@@ -7984,7 +8231,14 @@ export default function CompanionPageClient() {
     if (
       frictionlessPending &&
       isFrictionlessAffirmation(trimmed) &&
-      !strategyOfferOnLastTurn
+      !strategyOfferOnLastTurn &&
+      !workflowOwnerBlocksStrategyPending(workflowOwnerEarly) &&
+      !loadReminderIntakeSession() &&
+      !isReminderIntakeMessage(lastAssistantForYesEarly) &&
+      !workflowOwnerBlocksFrictionlessPending(
+        workflowOwnerEarly,
+        frictionlessPending.type,
+      )
     ) {
       const lastAssistantForYes = lastAssistantForYesEarly;
       if (
@@ -8124,6 +8378,12 @@ export default function CompanionPageClient() {
             ...prev,
             { role: "assistant", content: ack },
           ]);
+        } else if (frictionlessPending.target === "plan-my-day") {
+          lastUserTextRef.current = trimmed;
+          openSectionBesideChatCore("plan-my-day", undefined, {
+            userInitiated: true,
+          });
+          appendVerifiedWorkspaceMessage("plan-my-day");
         } else if (frictionlessPending.target === "content-generator") {
           const prompt = frictionlessPending.initialPrompt?.trim() ?? "";
           if (prompt) lastUserTextRef.current = prompt;
@@ -8191,13 +8451,15 @@ export default function CompanionPageClient() {
         } else {
           lastUserTextRef.current = trimmed;
         }
-        if (frictionlessPending.target !== "content-generator") {
-          if (frictionlessPending.target !== "visual-focus") {
-            setMessages((prev) => [
-              ...prev,
-              { role: "assistant", content: continuation.ack },
-            ]);
-          }
+        if (
+          frictionlessPending.target !== "content-generator" &&
+          frictionlessPending.target !== "visual-focus" &&
+          frictionlessPending.target !== "plan-my-day"
+        ) {
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: continuation.ack },
+          ]);
         }
         clearFrictionlessPending();
         clearPendingAcceptanceAuthority();
@@ -8371,7 +8633,11 @@ export default function CompanionPageClient() {
       setBuilderKickoffActive(false);
     }
 
-    if (appFeatureNavOffer && userAcceptedFeatureNav(trimmed)) {
+    if (
+      appFeatureNavOffer &&
+      userAcceptedFeatureNav(trimmed) &&
+      loadReminderIntakeSession()?.phase !== "collecting"
+    ) {
       const userMessage: Message = { role: "user", content: trimmed };
       setMessages((prev) => [...prev, userMessage]);
       setInput("");
@@ -8383,7 +8649,9 @@ export default function CompanionPageClient() {
     const settingsFeatureNav = buildAppFeatureNavOffer(trimmed);
     if (
       settingsFeatureNav?.target.kind === "settings" &&
-      !appFeatureNavOffer
+      !appFeatureNavOffer &&
+      !isReminderRequest(trimmed) &&
+      loadReminderIntakeSession()?.phase !== "collecting"
     ) {
       const userMessage: Message = { role: "user", content: trimmed };
       setMessages((prev) => [
@@ -9416,6 +9684,8 @@ export default function CompanionPageClient() {
       workspace: workspacePanel,
       timeBlocks: getTimeBlocks(),
       reminderDraft: loadReminderIntakeSession()?.draft ?? null,
+      artifactExecutionDraft: loadArtifactExecutionSession()?.draft ?? null,
+      messages: toChatTurns(nextMessages),
     });
     latencyProfiler.measure("frictionlessAction");
     const knowledgeTiming = measureKnowledgeDetection(trimmed);
@@ -9752,6 +10022,7 @@ export default function CompanionPageClient() {
       record: pendingAcceptanceRecord,
       pendingAction: pendingNow,
       createConsent: pendingCreateOpen,
+      outcomeThread: getOutcomeThread(),
     });
 
     if (
@@ -10451,6 +10722,23 @@ export default function CompanionPageClient() {
       inputRef.current?.focus();
       return;
     }
+    if (frictionlessAction.executeArtifactNow && frictionlessAction.artifactExecutionIntake) {
+      clearStaleWorkflowPendingsForNewIntent();
+      clearPendingAcceptanceAuthority();
+      const result = await executeArtifactGeneration(
+        frictionlessAction.artifactExecutionIntake.draft,
+      );
+      clearArtifactExecutionSession();
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: result.message },
+      ]);
+      setInput("");
+      setIsLoading(false);
+      inputRef.current?.focus();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
     if (frictionlessAction.localReply) {
       setMessages((prev) => [
         ...prev,
@@ -10488,9 +10776,18 @@ export default function CompanionPageClient() {
         saveGoogleSheetIntakeSession(frictionlessAction.googleSheetIntake);
       }
       if (frictionlessAction.reminderIntake) {
+        clearStaleWorkflowPendingsForNewIntent();
+        clearPendingAcceptanceAuthority();
         saveReminderIntakeSession(frictionlessAction.reminderIntake);
       } else if (frictionlessAction.category === "reminder") {
         clearReminderIntakeSession();
+      }
+      if (frictionlessAction.artifactExecutionIntake) {
+        clearStaleWorkflowPendingsForNewIntent();
+        clearPendingAcceptanceAuthority();
+        saveArtifactExecutionSession(frictionlessAction.artifactExecutionIntake);
+      } else if (frictionlessAction.category === "artifact_execution") {
+        clearArtifactExecutionSession();
       }
       if (frictionlessAction.toolSuggestion) {
         setToolSuggestion(frictionlessAction.toolSuggestion);
@@ -12722,6 +13019,7 @@ export default function CompanionPageClient() {
             onOpen={openWorkspaceFromSection}
             onSuggestOpen={suggestCrossWorkspaceOpen}
             onContextChange={handleWorkspaceDetailChange}
+            registerBack={registerBack}
           />
         );
       case "time-block":
@@ -12750,6 +13048,7 @@ export default function CompanionPageClient() {
           <ContentGeneratorPanel
             seed={genSeed}
             workspaceMode
+            registerBack={registerBack}
             focusField={workspaceFocusField}
             focusStamp={workspaceFocusStamp}
             sopSession={workspaceSession}
@@ -12872,7 +13171,8 @@ export default function CompanionPageClient() {
       case "saved-work":
         return (
           <SavedWorkLibrary
-            onBack={workspacePanelBack}
+            onBack={goBack}
+            registerBack={registerBack}
             onOpenInCreate={(input) => {
               const item = input.templateId
                 ? getSavedWorkById(input.templateId)
@@ -12896,9 +13196,15 @@ export default function CompanionPageClient() {
         );
       case "today":
         return (
-          <TodayPanel
+          <TodayHubPanel
             refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
             onResume={resumeHomeItem}
+            onResumeNotNow={handleTodayResumeLater}
+            onStartFresh={() => setFreshStartDialog("begin-new-day")}
+            onOpenPlanMyDay={() =>
+              openSectionBesideChatCore("plan-my-day", "today", { userInitiated: true })
+            }
+            onOpenAdaptMyDay={openAdaptMyDayCore}
           />
         );
       case "plan-my-day":
@@ -12906,6 +13212,7 @@ export default function CompanionPageClient() {
           <PlanMyDayPanel
             onBack={goBack}
             onOpenSettings={() => openHowDoISettings("planning")}
+            onOpenReminderBuilder={() => openHowDoISettings("notifications")}
             onStartFocus={() => {
               openSectionBesideChatCore("focus-timer");
             }}
@@ -12932,9 +13239,23 @@ export default function CompanionPageClient() {
             onBack={goBack}
             onClose={closeWorkspacePanel}
             registerBack={registerBack}
-            onWorkWithShari={() => {
+            onOpenLinkedSection={(section) => {
+              if (section === "brain-dump") {
+                openClearMyMindStandaloneCore();
+                return;
+              }
+              openSectionBesideChatCore(section, "visual-thinking", {
+                userInitiated: true,
+              });
+            }}
+            onWorkWithShari={(context) => {
               setInput(
-                "I'm in Visual Focus™ and I'm not sure which visual thinking tool fits. Here's what I'm trying to figure out: ",
+                shariPromptForVisualContext({
+                  fromHub: context?.fromHub,
+                  homeTypeId: context?.homeTypeId,
+                  mode: context?.mode,
+                  mapTitle: context?.mapTitle,
+                }),
               );
               inputRef.current?.focus();
             }}
@@ -12977,13 +13298,44 @@ export default function CompanionPageClient() {
             nav={buildGrowthPanelNav("evidence-bank")}
           />
         );
-      case "focus":
-        return <FocusAreaPanel onAction={handleFocusHubAction} />;
-      case "growth":
+      case "portfolio":
         return (
-          <GrowthCenterPanel
+          <PortfolioPanel
             refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
-            nav={buildGrowthPanelNav("growth")}
+            nav={buildGrowthPanelNav("portfolio")}
+          />
+        );
+      case "focus":
+        return (
+          <FocusAreaPanel
+            onAction={handleFocusHubAction}
+            registerBack={registerBack}
+            selectedFeeling={focusHubFeeling}
+            onSelectedFeelingChange={setFocusHubFeeling}
+          />
+        );
+      case "focus-audio":
+        return (
+          <FocusAudioPanel
+            emotion={displayEmotion}
+            initialCategory={focusAudioCategory ?? undefined}
+            backLabel={focusAudioBackLabel}
+            onDone={goBack}
+          />
+        );
+      case "growth-vault":
+        return (
+          <GrowthVaultHubPanel
+            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+            nav={buildGrowthPanelNav("growth-vault")}
+          />
+        );
+      case "outcome-goals":
+        return (
+          <OutcomeGoalsHubPanel
+            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+            nav={buildGrowthPanelNav("outcome-goals")}
+            registerBack={registerBack}
           />
         );
       case "confidence-vault":
@@ -13106,6 +13458,7 @@ export default function CompanionPageClient() {
             onAsk={handleProjectAsk}
             onOpenTimeBlock={handleOpenProjectTimeBlock}
             onBuildWithShari={() => openCompanionAssist("projects")}
+            registerBack={registerBack}
           />
         );
       case "templates-library":
@@ -13115,7 +13468,8 @@ export default function CompanionPageClient() {
             onGenerate={openGenerator}
             onBuildWithShari={handleTemplateBuildWithShari}
             onOpenInCreate={handleTemplateOpenInCreate}
-            onBack={workspacePanelBack}
+            onBack={goBack}
+            registerBack={registerBack}
           />
         );
       case "playbook":
@@ -13136,7 +13490,8 @@ export default function CompanionPageClient() {
       case "snippets":
         return (
           <SnippetsLibrary
-            onBack={workspacePanelBack}
+            onBack={goBack}
+            registerBack={registerBack}
             onBuildWithShari={(input) =>
               openCreationWorkspaceCore("content-generator", {
                 ...input,
@@ -13173,6 +13528,7 @@ export default function CompanionPageClient() {
             onSuggestOpen={suggestCrossWorkspaceOpen}
             contextBanner={workspaceContextBanner}
             onContextChange={handleWorkspaceDetailChange}
+            registerBack={registerBack}
           />
         );
       case "decision-compass":
@@ -13182,7 +13538,8 @@ export default function CompanionPageClient() {
             restoredSession={decisionCompassSession}
             onSessionChange={handleDecisionCompassSessionChange}
             onComplete={handleDecisionCompassComplete}
-            onClose={closeWorkspacePanel}
+            onClose={goBack}
+            registerBack={registerBack}
             projectId={projectContinueId}
             projectName={
               projectContinueId
@@ -13240,7 +13597,14 @@ export default function CompanionPageClient() {
           />
         );
       case "focus":
-        return <FocusAreaPanel onAction={handleFocusHubAction} />;
+        return (
+          <FocusAreaPanel
+            onAction={handleFocusHubAction}
+            registerBack={registerBack}
+            selectedFeeling={focusHubFeeling}
+            onSelectedFeelingChange={setFocusHubFeeling}
+          />
+        );
       case "breathe":
         return <BreathePanel onDone={closeWorkspacePanel} />;
       case "focus-audio":
@@ -13248,7 +13612,8 @@ export default function CompanionPageClient() {
           <FocusAudioPanel
             emotion={displayEmotion}
             initialCategory={focusAudioCategory ?? undefined}
-            onDone={closeWorkspacePanel}
+            backLabel={focusAudioBackLabel}
+            onDone={goBack}
           />
         );
       default:
@@ -13282,6 +13647,10 @@ export default function CompanionPageClient() {
       handleCreateSessionSync,
       handleWorkspaceDetailChange,
       handleSopFieldChange,
+      focusAudioCategory,
+      focusAudioBackLabel,
+      focusHubFeeling,
+      displayEmotion,
       handleProjectsBootstrapDone,
       handleWorkspaceProjectSaved,
     ],
@@ -13898,6 +14267,7 @@ export default function CompanionPageClient() {
           <AppSidebar
             activeNav={activeNav}
             activeSection={activeSection}
+            workspacePanel={workspacePanel}
             onNavSelect={handleNavSelect}
           />
         </CompanionSidebarPortal>
@@ -13914,6 +14284,7 @@ export default function CompanionPageClient() {
             }}
             onOpenProfile={() => setOverlay("profile")}
             showPlanMyDay
+            planMyDayActive={workspacePanel === "plan-my-day"}
             onOpenPlanMyDay={() =>
               openSectionBesideChatCore("plan-my-day", undefined, {
                 userInitiated: true,
@@ -13996,7 +14367,11 @@ export default function CompanionPageClient() {
                 </header>
               ) : homeCalm ? (
                 <SimpleHomeWelcome
-                  onOpenToday={() => openSectionBesideChat("today")}
+                  onOpenToday={() =>
+                    openSectionBesideChatCore("plan-my-day", undefined, {
+                      userInitiated: true,
+                    })
+                  }
                 />
               ) : (
               <IdentityBar
@@ -14558,6 +14933,7 @@ export default function CompanionPageClient() {
               onOpen={openWorkspaceFromSection}
               onSuggestOpen={suggestCrossWorkspaceOpen}
               onContextChange={handleWorkspaceDetailChange}
+              registerBack={registerBack}
             />
           )}
 
@@ -14569,9 +14945,10 @@ export default function CompanionPageClient() {
             <FocusAudioPanel
               emotion={displayEmotion}
               initialCategory={focusAudioCategory ?? undefined}
+              backLabel={focusAudioBackLabel}
               onDone={() => {
                 setFocusAudioCategory(null);
-                setActiveSection("home");
+                goBack();
               }}
             />
           )}
@@ -14601,7 +14978,12 @@ export default function CompanionPageClient() {
               assistLabel={getShariAssistLabel("focus")}
               onAskShari={() => openCompanionAssist("focus")}
             >
-              <FocusAreaPanel onAction={handleFocusHubAction} />
+              <FocusAreaPanel
+                onAction={handleFocusHubAction}
+                registerBack={registerBack}
+                selectedFeeling={focusHubFeeling}
+                onSelectedFeelingChange={setFocusHubFeeling}
+              />
             </WorkspaceShell>
           ) : null}
 

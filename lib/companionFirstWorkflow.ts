@@ -104,6 +104,19 @@ const EXPLICIT_FEATURE_ROUTES: {
     },
   },
   {
+    re: /\b(?:how (?:do|can) i|how to)\s+use\s+(?:the )?strateg(?:y|ies)\b/i,
+    target: {
+      section: "playbook",
+      label: "Strategy Builder",
+      briefAnswer:
+        "Strategies holds ADHD techniques and business plans you build with Shari one question at a time.",
+      offerLine:
+        "Want me to open **Strategies** beside us to build your plan?",
+      coachAfterOpen:
+        "What's the business goal behind this plan — we'll build it one piece at a time.",
+    },
+  },
+  {
     re: /\b(?:how (?:do|can) i|how to)\s+(?:create|make|build|write)\s+(?:a |an |my )?(?:strateg(?:y|ies)|marketing plan|business plan)\b/i,
     target: {
       section: "playbook",
@@ -172,6 +185,12 @@ const DEFAULT_BRIEF: Partial<Record<AppFeatureId, string>> = {
 };
 
 /** User is asking how to use/create something in the app — companion-first applies. */
+export function hasExplicitCompanionFirstRoute(text: string): boolean {
+  const t = text.trim();
+  if (!t) return false;
+  return EXPLICIT_FEATURE_ROUTES.some((route) => route.re.test(t));
+}
+
 export function isCompanionFirstQuestion(text: string): boolean {
   const t = text.trim();
   if (!t) return false;

@@ -9,14 +9,13 @@ import {
   type MyWorkHubOpenTarget,
 } from "@/lib/myWorkHub";
 import { GrowthPanelBackButton } from "@/components/companion/GrowthPanelBackButton";
-import {
-  EcosystemCloseAllButton,
-  EcosystemCollapsibleSection,
-} from "@/components/companion/EcosystemCollapsibleSection";
 import { SavedBrowsePanel } from "@/components/companion/SavedBrowsePanel";
 import { SAVED_WORK_UPDATED_EVENT } from "@/lib/savedWorkStore";
 import { VISUAL_FOCUS_UPDATED } from "@/lib/visualFocus";
 import { getProjects, getSnippets, getTemplates } from "@/lib/companionStore";
+import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
+import { EcosystemCloseAllButton } from "@/components/companion/EcosystemCollapsibleSection";
+
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 
 type MyWorkHubPanelProps = {
@@ -30,9 +29,7 @@ type MyWorkHubPanelProps = {
   refreshKey?: string | number;
 };
 
-type HubSectionId = "create" | "retrieve";
-
-type CreateDestination = {
+type ResourceDestination = {
   id: string;
   title: string;
   description: string;
@@ -109,7 +106,6 @@ export function MyWorkHubPanel({
 }: MyWorkHubPanelProps) {
   const [query, setQuery] = useState("");
   const [savedWorkTick, setSavedWorkTick] = useState(0);
-  const [openSections, setOpenSections] = useState<Set<HubSectionId>>(new Set());
   const [savedBrowseOpen, setSavedBrowseOpen] = useState(false);
 
   const hub = useMemo(
@@ -140,49 +136,42 @@ export function MyWorkHubPanel({
     };
   }, [hub]);
 
-  const createDestinations: CreateDestination[] = useMemo(
+  const createDestinations: ResourceDestination[] = useMemo(
     () => [
       {
         id: "projects",
-        title: "Projects™",
-        description: "Larger work with multiple steps.",
+        title: "Projects",
+        description: "Active work with multiple steps.",
         count: counts.projects,
         onOpen: () => onOpenSection("projects", "other"),
       },
       {
-        id: "templates",
-        title: "Templates™",
-        description: "Reusable frameworks and starting points.",
-        count: counts.templates,
-        onOpen: () => onOpenSection("templates-library", "other"),
-      },
-      {
         id: "strategies",
-        title: "Strategies™",
-        description: "Saved ADHD and business strategies.",
+        title: "Strategies",
+        description: "Reusable solutions and playbooks.",
         count: counts.strategies,
         onOpen: () => onOpenSection("playbook", "other"),
       },
       {
+        id: "templates",
+        title: "Templates",
+        description: "Starting points for common work.",
+        count: counts.templates,
+        onOpen: () => onOpenSection("templates-library", "other"),
+      },
+      {
         id: "snippets",
-        title: "Snippets™",
-        description: "Reusable phrases, hooks, CTAs, and content blocks.",
+        title: "Snippets",
+        description: "Reusable phrases, hooks, and content blocks.",
         count: counts.snippets,
         onOpen: () => onOpenSection("snippets", "other"),
       },
       {
-        id: "sops",
-        title: "SOPs™",
-        description: "Standard operating procedures and repeatable workflows.",
-        count: counts.sops,
-        onOpen: () => onOpenSection("saved-work", "other"),
-      },
-      {
-        id: "documents",
-        title: "Documents™",
-        description: "Workshops, plans, emails, and created content.",
-        count: counts.documents,
-        onOpen: () => onOpenSection("content-generator", "other"),
+        id: "saved-items",
+        title: "Saved Items",
+        description: "Drafts, ideas, notes, and saved outputs — move when ready.",
+        count: counts.documents + counts.sops,
+        onOpen: () => setSavedBrowseOpen(true),
       },
     ],
     [counts, onOpenSection],
@@ -209,17 +198,7 @@ export function MyWorkHubPanel({
     return () => registerBack?.(null);
   }, [registerBack, savedBrowseOpen]);
 
-  function toggleSection(id: HubSectionId) {
-    setOpenSections((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
-
   function closeAll() {
-    setOpenSections(new Set());
     setSavedBrowseOpen(false);
   }
 
@@ -248,7 +227,7 @@ export function MyWorkHubPanel({
     }
   }
 
-  const hasExpanded = openSections.size > 0 || savedBrowseOpen;
+  const hasExpanded = savedBrowseOpen;
 
   if (savedBrowseOpen) {
     return (
@@ -281,11 +260,13 @@ export function MyWorkHubPanel({
           <GrowthPanelBackButton onBack={onBack} label={backLabel ?? "Chat"} />
         ) : null}
 
+        <WorkspaceAreaWorksGuide areaId="my-work" />
+
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-3xl font-bold text-stone-900">Other™</h1>
             <p className="mt-1 text-stone-600">
-              Create, build, manage, and retrieve — when you need more than chat.
+              Resources, reusable assets, and workspaces.
             </p>
           </div>
           <EcosystemCloseAllButton onClick={closeAll} disabled={!hasExpanded} />
@@ -335,43 +316,16 @@ export function MyWorkHubPanel({
             )}
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
-            <EcosystemCollapsibleSection
-              title="Create & Build"
-              description="Projects, templates, strategies, snippets, SOPs, and documents."
-              emoji="🛠️"
-              open={openSections.has("create")}
-              onToggle={() => toggleSection("create")}
-              testId="other-create-build"
-            >
-              <div className="flex flex-col gap-2">
-                {createDestinations.map((dest) => (
-                  <BrowseRow
-                    key={dest.id}
-                    title={dest.title}
-                    count={dest.count}
-                    description={dest.description}
-                    onOpen={dest.onOpen}
-                  />
-                ))}
-              </div>
-            </EcosystemCollapsibleSection>
-
-            <EcosystemCollapsibleSection
-              title="Retrieve"
-              description="Saved work — browse by category when you need it later."
-              emoji="📂"
-              open={openSections.has("retrieve")}
-              onToggle={() => toggleSection("retrieve")}
-              testId="other-retrieve"
-            >
+          <div className="flex flex-col gap-2">
+            {createDestinations.map((dest) => (
               <BrowseRow
-                title="Saved™"
-                count={counts.documents + counts.projects + counts.templates}
-                description="ADHD-friendly file explorer for everything you kept."
-                onOpen={() => setSavedBrowseOpen(true)}
+                key={dest.id}
+                title={dest.title}
+                count={dest.count}
+                description={dest.description}
+                onOpen={dest.onOpen}
               />
-            </EcosystemCollapsibleSection>
+            ))}
           </div>
         )}
       </div>

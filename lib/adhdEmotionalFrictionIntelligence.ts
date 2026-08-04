@@ -3,6 +3,15 @@
  * Distinguish emotional-friction turns from task-first turns.
  */
 
+import { detectOverwhelmTodayRoute } from "./overwhelmTodayRouting";
+import { isSelfUnderstandingIntent } from "./relationshipIntelligenceBoundaries";
+import {
+  isFocusProblem,
+  isMotivationProblem,
+  isOverwhelmProblem,
+  isStrategyProblem,
+} from "./visualThinkingGuards";
+
 export type AdhdEmotionalFrictionCategory =
   | "activation"
   | "overwhelm"
@@ -73,6 +82,24 @@ export function isAdhdEmotionalFrictionTurn(text: string): boolean {
   if (!t) return false;
   if (CRISIS_DISTRESS_RE.test(t)) return false;
   if (isTaskFirstTurn(t)) return false;
+  if (isSelfUnderstandingIntent(t)) return false;
+  if (/\b(?:stuck between|torn between)\b/i.test(t)) return false;
+  if (/\b(?:help me decide|help me choose|should i|can'?t decide)\b/i.test(t)) {
+    return false;
+  }
+  if (detectOverwhelmTodayRoute(t)) return false;
+  if (isStrategyProblem(t)) return false;
+  if (
+    /\b(?:discouraged|feel(?:ing)? stuck|shut(?:ting)? down|frustrat\w*)\b/i.test(
+      t,
+    ) &&
+    EMOTIONAL_FRICTION_RE.test(t)
+  ) {
+    return true;
+  }
+  if (isFocusProblem(t)) return false;
+  if (isMotivationProblem(t)) return false;
+  if (isOverwhelmProblem(t)) return false;
   return EMOTIONAL_FRICTION_RE.test(t);
 }
 

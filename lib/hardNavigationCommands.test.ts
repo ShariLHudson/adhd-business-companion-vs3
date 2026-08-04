@@ -79,7 +79,7 @@ describe("hardNavigationCommands", () => {
       buildRelationshipLeadParagraph("open create", new Date(), {
         suppressForRouting: false,
       }),
-    ).not.toBeNull();
+    ).toBeNull();
     expect(
       buildRelationshipLeadParagraph("open create", new Date(), {
         suppressForRouting: true,

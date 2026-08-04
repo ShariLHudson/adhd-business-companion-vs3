@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { WorkspaceBackRegistrar } from "@/lib/workspaceDrillBack";
 import {
   businessContextSummary,
   createTemplate,
@@ -104,10 +105,12 @@ function TemplateConsentGate({
 
 export function TemplatesLibrary({
   onBack,
+  registerBack,
   onBuildWithShari,
   onOpenInCreate,
 }: {
   onBack?: () => void;
+  registerBack?: WorkspaceBackRegistrar;
   /** @deprecated Snippets / generate moved to Create — kept for call-site compat */
   onOpen?: (section: AppSection) => void;
   onGenerate?: (seed: { type?: string; brief?: string }) => void;
@@ -144,6 +147,34 @@ export function TemplatesLibrary({
   useEffect(() => {
     setItems(getTemplates());
   }, []);
+
+  const popDrillView = useCallback(() => {
+    if (pendingConsent) {
+      setPendingConsent(null);
+      return;
+    }
+    if (draft) {
+      setDraft(null);
+      return;
+    }
+    if (viewId) {
+      setViewId(null);
+    }
+  }, [draft, pendingConsent, viewId]);
+
+  useEffect(() => {
+    if (!registerBack) return;
+    const drilled = Boolean(pendingConsent || draft || viewId);
+    if (!drilled) {
+      registerBack(null);
+      return;
+    }
+    registerBack(() => {
+      popDrillView();
+      return true;
+    });
+    return () => registerBack(null);
+  }, [registerBack, draft, viewId, pendingConsent, popDrillView]);
 
   function closePanel() {
     onBack?.();

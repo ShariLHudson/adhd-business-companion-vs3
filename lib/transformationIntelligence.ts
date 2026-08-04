@@ -15,6 +15,7 @@ import {
 } from "./phase5CompanionIntelligenceEcosystem";
 import { isPhase7BusinessIntelligenceEcosystemActive } from "./businessIntelligenceEcosystem";
 import { getSavedWork } from "./savedWorkStore";
+import { shouldSuppressProactivePatternInsights } from "./patternAwarenessPrefs";
 
 export type TransformationDimension =
   | "visibility"
@@ -647,6 +648,7 @@ export function maybeTransformationReflection(input: {
   userText: string;
   now?: Date;
 }): string | null {
+  if (shouldSuppressProactivePatternInsights()) return null;
   if (!isPhase10TransformationIntelligenceActive(input.now)) return null;
 
   const now = input.now ?? new Date();
@@ -759,6 +761,7 @@ export function phase10TransformationIntelligenceHintForChat(input?: {
   userText?: string;
   reflection?: string | null;
 }): string | null {
+  if (shouldSuppressProactivePatternInsights()) return null;
   if (!isPhase10TransformationIntelligenceActive()) return null;
 
   const snapshot = buildTransformationIntelligenceSnapshot();

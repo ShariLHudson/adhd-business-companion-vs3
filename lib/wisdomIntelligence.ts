@@ -8,6 +8,7 @@ import { isPhase7BusinessIntelligenceEcosystemActive } from "./businessIntellige
 import { getPhase2DiscoveryState } from "./phase2ProgressiveDiscovery";
 import { daysSinceRelationshipStart, getPhase3RelationshipState } from "./phase3AdaptiveRelationship";
 import { getPhase5EcosystemState } from "./phase5CompanionIntelligenceEcosystem";
+import { shouldSuppressProactivePatternInsights } from "./patternAwarenessPrefs";
 
 export type WisdomKind =
   | "lesson_learned"
@@ -263,6 +264,7 @@ export function maybeWisdomReflection(input: {
   userText: string;
   now?: Date;
 }): string | null {
+  if (shouldSuppressProactivePatternInsights()) return null;
   if (!isPhase7BusinessIntelligenceEcosystemActive(input.now)) return null;
 
   const now = input.now ?? new Date();
@@ -450,6 +452,7 @@ export function phase9WisdomIntelligenceHintForChat(input?: {
   reflection?: string | null;
   now?: Date;
 }): string | null {
+  if (shouldSuppressProactivePatternInsights()) return null;
   const now = input?.now;
   const phase9Active = isPhase9WisdomIntelligenceActive(now);
   const phase7Active = isPhase7BusinessIntelligenceEcosystemActive(now);

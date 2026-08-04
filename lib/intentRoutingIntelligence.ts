@@ -45,7 +45,10 @@ import { visualThinkingStudioHintForChat } from "./visualThinkingStudio";
 import { visualThinkingOverreachHintForChat } from "./visualThinkingOverreach";
 import { visualRecommendationEngineHintForChat } from "./visualRecommendationEngine";
 import { isHowToLearningQuestion, howToLearningHintForChat } from "./howToLearningIntelligence";
-import { visualLearnBoundaryHintForChat } from "./visualLearnBoundary";
+import {
+  isLearnAboutVisualType,
+  visualLearnBoundaryHintForChat,
+} from "./visualLearnBoundary";
 import { visualThinkingGuardsHintForChat } from "./visualThinkingGuards";
 import { visualTypeAvailabilityHintForChat } from "./visualTypeAvailability";
 import {
@@ -53,6 +56,10 @@ import {
   type WorkspaceOffer,
   workspaceTitle,
 } from "./workspaceMode";
+import {
+  applyWorkspaceOpenSuppression,
+  isTargetWorkspaceOpen,
+} from "./workspaceContinuity";
 import { isCompanionFirstQuestion } from "./companionFirstWorkflow";
 
 const FEATURE_DISCOVERY_RE =
@@ -73,7 +80,8 @@ export type RouteMode =
   | "conversation"
   | "feature_offer"
   | "execute_inline"
-  | "clarify";
+  | "clarify"
+  | "learn";
 
 export type RoutingSupportStyle =
   | "direct"
@@ -170,7 +178,7 @@ const ORGANIZE_RE =
   /\b(?:brain is (?:spinning|full|noisy)|my brain is|too many ideas|all over the place|everything (?:is )?in my (?:head|mind)|head is (?:full|crowded)|clear my (?:head|mind)|get (?:it|these thoughts) out|dump (?:everything|my thoughts)|mental clutter)\b/i;
 
 const BUILD_RE =
-  /\b(?:help me (?:create|build|make|write|draft|design|develop|generate)|(?:create|build|design|develop|draft|write|generate|make) (?:an? )?(?:sop|marketing plan|content plan|funnel|strategy|checklist|template|email|proposal|landing page|lead magnet|sales page|sales script|social post|offer|client avatar|(?:follow-?up|nurture|sales|email) sequence))\b/i;
+  /\b(?:help me (?:create|build|make|write|draft|design|develop|generate)|(?:create|build|design|develop|draft|write|generate|make) (?:an? )?(?:sop|marketing plan|content plan|funnel|strategy|checklist|template|email|proposal|landing page|lead magnet|sales page|sales script|social post|offer|client avatar|book|(?:follow-?up|nurture|sales|email) sequence)|(?:want|need) to write (?:a |an |my )?book)\b/i;
 
 const EXECUTE_RE =
   /\b(?:write|draft|create|build|make|design|develop|generate)\s+(?:an?|the|my)?\s*(?:email|sop|marketing plan|content plan|proposal|checklist|workflow|content|landing page|lead magnet|sales page|sales script|social post|offer|client avatar|(?:\w+\s+)*funnel|(?:follow-?up|nurture|sales|email) sequence)\b/i;
@@ -208,13 +216,14 @@ function createSectionForArtifact(kind: ArtifactKind): AppSection {
 function buildCreateArtifactOffer(
   kind: ArtifactKind,
   category: IntentCategory,
+  alreadyOpen?: boolean,
 ): WorkspaceOffer {
   const execCategory = category === "build" ? "build" : "execute";
   const section = createSectionForArtifact(kind);
   return {
     section,
     buttonLabel: section === "client-avatars" ? "Open Client Avatar" : "Open Create",
-    line: buildRegistryArtifactOfferLine(kind, execCategory),
+    line: buildRegistryArtifactOfferLine(kind, execCategory, { alreadyOpen }),
   };
 }
 
@@ -239,6 +248,9 @@ function detectIntentCategory(text: string): IntentCategory {
   if (VAGUE_HELP_RE.test(t)) return "clarify";
   if (FEATURE_DISCOVERY_RE.test(t)) {
     if (/\bdecision\b/i.test(t)) return "decide";
+    if (/\b(?:write|create|build|sop|marketing plan|email)\b/i.test(t)) {
+      return "build";
+    }
     return "conversation";
   }
   if (isCompanionFirstQuestion(t)) return "conversation";
@@ -246,6 +258,10 @@ function detectIntentCategory(text: string): IntentCategory {
 
   if (isRegistryArtifactExecution(t)) {
     return /\bhelp me\b/i.test(t) ? "build" : "execute";
+  }
+
+  if (isHowToLearningQuestion(t) && /\bhow do i\b/i.test(t) && MARKETING_BUILD_RE.test(t)) {
+    return "build";
   }
 
   if (isLearnIntent(t)) return "learn";
@@ -476,6 +492,7 @@ function detectFeatureOffer(
   category: IntentCategory,
   overwhelmRoute?: OverwhelmTodayRoute | null,
   artifactKind?: ArtifactKind | null,
+  currentWorkspace?: AppSection | null,
 ): WorkspaceOffer | null {
   const visualOffer = resolveVisualStructureWorkspaceOffer(text);
   if (visualOffer) return visualOffer;
@@ -483,21 +500,33 @@ function detectFeatureOffer(
   const decisionOffer = resolveDecisionStructureWorkspaceOffer(text);
   if (decisionOffer && category === "decide") return decisionOffer;
 
-  if (category === "understand" || category === "learn" || category === "clarify") {
+  if (category === "understand" || category === "clarify") {
     return null;
+  }
+
+  if (isHowToLearningQuestion(text) && MARKETING_BUILD_RE.test(text)) {
+    return buildCreateArtifactOffer("marketing_plan", "build");
   }
 
   if (artifactKind && isRegistryArtifactExecution(text)) {
     const execCategory: "build" | "execute" =
       category === "build" ? "build" : "execute";
-    return buildCreateArtifactOffer(artifactKind, execCategory);
+    const alreadyOpen = isTargetWorkspaceOpen(
+      currentWorkspace,
+      createSectionForArtifact(artifactKind),
+    );
+    return buildCreateArtifactOffer(artifactKind, execCategory, alreadyOpen);
   }
 
   if (
     artifactKind &&
     (category === "build" || category === "execute")
   ) {
-    return buildCreateArtifactOffer(artifactKind, category);
+    const alreadyOpen = isTargetWorkspaceOpen(
+      currentWorkspace,
+      createSectionForArtifact(artifactKind),
+    );
+    return buildCreateArtifactOffer(artifactKind, category, alreadyOpen);
   }
 
   if (overwhelmRoute) {
@@ -562,9 +591,12 @@ function resolveRouteMode(
   category: IntentCategory,
   offer: WorkspaceOffer | null,
   artifactKind?: ArtifactKind | null,
+  learnRoute?: boolean,
 ): RouteMode {
   if (category === "clarify") return "clarify";
-  if (category === "understand" || category === "learn") return "conversation";
+  if (learnRoute) return "learn";
+  if (category === "learn") return "conversation";
+  if (category === "understand") return "conversation";
   if (
     artifactKind &&
     (category === "execute" || category === "build") &&
@@ -663,6 +695,7 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
     category,
     overwhelmTodayRoute,
     artifactKind,
+    input.workspace,
   );
   const overwhelmOffers = overwhelmTodayRoute
     ? buildOverwhelmTodayOffers(text, overwhelmTodayRoute)
@@ -703,10 +736,16 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
     };
   }
 
+  const learnFastPath = category === "learn" && isLearnIntent(text);
+  const learnRoute =
+    learnFastPath &&
+    isLearnAboutVisualType(text) &&
+    /\bhow (?:is|are|does|do)\b/i.test(text);
+
   const routeMode =
     artifactExecution && offer
       ? "feature_offer"
-      : resolveRouteMode(category, offer, artifactKind);
+      : resolveRouteMode(category, offer, artifactKind, learnRoute);
   const surfaceOfferUi =
     shouldSurfaceRoutingOfferUi(text, category, offer) ||
     Boolean(artifactExecution && offer);
@@ -716,7 +755,6 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
       ? buildWorkspaceContinuity(offer.section, text, goal)
       : null;
   const suppressConversationSummary = Boolean(overwhelmTodayRoute);
-  const learnFastPath = category === "learn" && isLearnIntent(text);
   const suppressRelationshipIntelligence =
     shouldSuppressRelationshipIntelligenceForUserText(text);
   const suppressDeepIntelligence =
@@ -772,13 +810,17 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
           )
         : null),
     stayHereLabel: STAY_HERE_LABEL,
-    featureLabel: offer ? featureLabelForSection(offer.section) : null,
+    featureLabel: learnRoute
+      ? "Learn"
+      : offer
+        ? featureLabelForSection(offer.section)
+        : null,
   };
 
   decision.suppressRelationshipLead =
     suppressRelationshipIntelligence ||
     shouldSuppressRelationshipLeadForRouting(decision);
-  return decision;
+  return applyWorkspaceOpenSuppression(decision, input.workspace);
 }
 
 export function intentRoutingHintForChat(

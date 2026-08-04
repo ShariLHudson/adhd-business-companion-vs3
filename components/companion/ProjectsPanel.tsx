@@ -58,6 +58,9 @@ import {
 } from "@/lib/projectConversations";
 import { listProjectAssetNotes, listProjectAssetFiles } from "@/lib/projectAssets";
 import { listProjectLinks } from "@/lib/projectLinks";
+import { OutcomeGoalMultiLinkPicker } from "@/components/companion/OutcomeGoalMultiLinkPicker";
+import { getLinkedGoalIds, outcomeGoalLabels, packGoalLinks } from "@/lib/goals/goalLinking";
+import { listOutcomeGoals } from "@/lib/goals/outcomeGoals";
 
 function initialProjectView(
   resumeProjectId?: string | null,
@@ -102,6 +105,7 @@ export function ProjectsPanel({
   onBuildWithShari,
   resumeProjectId,
   onResumeConsumed,
+  registerBack,
 }: {
   onOpen?: (section: AppSection) => void;
   onAsk?: (prompt: string) => void;
@@ -130,6 +134,7 @@ export function ProjectsPanel({
   sopSession?: WorkspaceSession | null;
   onSopFieldChange?: (stepId: string, value: string) => void;
   onProjectSaved?: (projectId: string, projectTitle: string) => void;
+  registerBack?: (fn: (() => boolean) | null) => void;
 }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [view, setView] = useState<
@@ -185,6 +190,32 @@ export function ProjectsPanel({
   useEffect(() => {
     setProjects(getProjects());
   }, []);
+
+  useEffect(() => {
+    if (!registerBack) return;
+    if (view === "list") {
+      registerBack(null);
+      return;
+    }
+    registerBack(() => {
+      if (view === "detail") {
+        setDetailId(null);
+        setView("list");
+        return true;
+      }
+      if (view === "create") {
+        setStep(0);
+        setView("create-source");
+        return true;
+      }
+      if (view === "create-source") {
+        setView("list");
+        return true;
+      }
+      return false;
+    });
+    return () => registerBack(null);
+  }, [registerBack, view]);
 
   useEffect(() => {
     if (!resumeProjectId) return;
@@ -640,6 +671,11 @@ export function ProjectsPanel({
             <span className="min-w-0 truncate text-sm font-medium text-[#1f1c19]">
               {p.name}
             </span>
+            {getLinkedGoalIds(p).length > 0 ? (
+              <span className="hidden min-w-0 truncate text-[10px] font-medium text-[#1e4f4f] sm:inline">
+                → {outcomeGoalLabels(getLinkedGoalIds(p), listOutcomeGoals()).join(", ")}
+              </span>
+            ) : null}
             <span className="shrink-0 rounded bg-[#f0f5f5] px-1.5 py-0.5 text-[10px] font-semibold text-[#4b6b6b]">
               {PROJECT_STATUS_LABEL[p.status]}
             </span>
@@ -662,6 +698,16 @@ export function ProjectsPanel({
             ) : (
               <p className="text-[#9a8f82]">No outcome written yet.</p>
             )}
+            {getLinkedGoalIds(p).length > 0 ? (
+              <p className="mt-1">
+                <span className="font-semibold text-[#1f1c19]">
+                  Link to goal:
+                </span>{" "}
+                {outcomeGoalLabels(getLinkedGoalIds(p), listOutcomeGoals()).join(
+                  ", ",
+                )}
+              </p>
+            ) : null}
             {p.nextAction?.trim() ? (
               <p className="mt-1">
                 <span className="font-semibold text-[#1f1c19]">Next:</span>{" "}
@@ -919,6 +965,14 @@ export function ProjectsPanel({
                   micTitle="Outcome — why it matters"
                 />
               </label>
+
+              <OutcomeGoalMultiLinkPicker
+                value={getLinkedGoalIds(current)}
+                onChange={(ids) =>
+                  patch(current.id, packGoalLinks(ids))
+                }
+                label="Link to goal"
+              />
 
               <div id="workspace-field-project-goals">
                 <p className="text-xs font-semibold text-[#6b635a]">Goals</p>
@@ -1352,7 +1406,7 @@ export function ProjectsPanel({
           {recentProjects.length > 0 ? (
             <CollapsibleSection
               id="recent-projects"
-              title="Recent Projects"
+              title="Continue Working On™"
               count={recentProjects.length}
               open={recentSectionOpen}
               onToggle={toggleListSection}

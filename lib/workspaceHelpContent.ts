@@ -6,6 +6,8 @@ import { getWorkspaceAreaWorkflow } from "./workspaceAreaWorkflows";
 
 /** Workspace keys used by panels — maps to How Do I help articles. */
 export type WorkspaceHelpAreaId =
+  | "today"
+  | "focus"
   | "plan-my-day"
   | "visual-focus"
   | "projects"
@@ -16,16 +18,21 @@ export type WorkspaceHelpAreaId =
   | "snippets"
   | "my-work"
   | "evidence-bank"
+  | "portfolio"
   | "wins-this-week"
   | "client-avatars"
   | "settings"
   | "growth"
+  | "growth-vault"
+  | "outcome-goals"
   | "time-block"
   | "decision-compass"
   | "confidence-vault"
   | "my-journey";
 
 const HELP_ARTICLE_ID: Partial<Record<WorkspaceHelpAreaId, string>> = {
+  today: "today-view",
+  focus: "focus-sessions",
   "plan-my-day": "plan-my-day",
   "visual-focus": "visual-focus",
   projects: "projects",
@@ -36,10 +43,13 @@ const HELP_ARTICLE_ID: Partial<Record<WorkspaceHelpAreaId, string>> = {
   snippets: "snippets",
   "my-work": "my-work",
   "evidence-bank": "evidence-bank",
+  portfolio: "portfolio",
   "wins-this-week": "wins-this-week",
   "client-avatars": "client-avatars",
   settings: "settings-personalization",
   growth: "growth-center",
+  "growth-vault": "growth-center",
+  "outcome-goals": "outcome-goals",
   "time-block": "momentum-appointments",
   "decision-compass": "decision-compass",
   "confidence-vault": "my-highlights",
@@ -55,9 +65,20 @@ const AREA_DISPLAY_NAME: Partial<Record<WorkspaceHelpAreaId, string>> = {
   "time-block": "Momentum Appointments",
   "decision-compass": "Decision Compass",
   growth: "Growth Center",
+  "growth-vault": "Growth Vault",
+  "outcome-goals": "Outcome Goals",
+  today: "Today",
+  focus: "Focus",
+  "my-work": "Other",
 };
 
 const RELATED_AREAS: Partial<Record<WorkspaceHelpAreaId, string>> = {
+  today:
+    "Opens Plan My Day and Adapt My Day — what needs attention today. Resume picks up yesterday or today's work.",
+  focus:
+    "I'm Stuck, I Need A Break, Focus Audio, and Momentum Games — regulation when overwhelmed or distracted.",
+  "my-work":
+    "Projects, Strategies, Templates, Snippets, and Saved Items — resources and reusable assets.",
   "plan-my-day":
     "Pulls from Projects and Clear My Mind. Finished work lands in My Work; wins and proof build in Wins This Week and Evidence Bank.",
   "visual-focus":
@@ -74,14 +95,14 @@ const RELATED_AREAS: Partial<Record<WorkspaceHelpAreaId, string>> = {
     "Pairs with Create — Build With Shari adapts templates in conversation before anything drafts.",
   snippets:
     "Feeds Create and marketing workflows. Pair with Client Avatars for voice and tone.",
-  "my-work":
-    "Hub with Search Everything, Continue Working (favorites, recently active, resume items), and Browse My Work (Created Content, Projects, Snippets, Strategies, Templates, Archive).",
   "evidence-bank":
-    "Separate from Wins This Week — wins capture what happened; evidence captures why it mattered. Part of 🌱 Growth alongside My Highlights and My Journey.",
+    "Proof that progress mattered — categorized impact and results. Part of Growth Vault™ alongside My Wins™, Portfolio™, and My Journey™.",
+  portfolio:
+    "Completed assets and creations — courses, books, products, funnels, templates, websites, workshops, and lead magnets.",
   "wins-this-week":
-    "Companion to Evidence Bank and My Highlights — weekly encouragement without scorekeeping. Review via Growth Inbox on the Growth hub.",
+    "Forward motion and accomplishments. Part of Growth Vault™ — pair with Evidence Bank™ when you want proof of impact.",
   growth:
-    "Hub for Wins This Week, Evidence Bank, My Highlights, and My Journey — open each from navigation cards. Growth Inbox and Growth Reports live here too.",
+    "Two areas: Growth Vault™ (My Wins™, Evidence Bank™, Portfolio™, My Journey™) and Outcome Goals™ (goals, progress, reports).",
   "client-avatars":
     "Informs Create, Templates, Snippets, and Strategies so messaging stays personal.",
   settings:
@@ -114,11 +135,11 @@ const LOCAL_PLAN_MY_DAY_HELP: Omit<
   whenToUse:
     "When competing priorities need a reality check against your energy, time, appointments, motivation, and mental bandwidth today.",
   workflow: [
-    "Add a task above the board — ideas from Clear My Mind, Projects, yesterday's work, or new commitments.",
-    "Decide where it belongs: Considering Today, Today's Focus, or In Progress.",
+    "Add a task above the board — ideas from Clear My Mind (Pull From Clear My Mind), Projects, or new commitments.",
+    "Decide where it belongs: Considering Today → Today's Focus → In Progress (Kanban).",
     "Work the board — move items as you begin and finish; tap ✓ to complete (items archive and leave the board).",
     "Defer or remove what does not belong today.",
-    "Check Today's Reality in the compact summary; update via Adapt My Day in the top bar when your capacity shifts.",
+    "Check Today's Reality; use Adapt My Day when your capacity shifts.",
     "When starting a new day, use Chat Workspace → New Day's Chat to reset this workspace.",
   ],
   tips: [
@@ -137,24 +158,24 @@ const LOCAL_GROWTH_HELP: Record<
   Omit<WorkspaceHelpContent, "areaId" | "helpsToday" | "strengthens">
 > = {
   growth: {
-    areaName: "Growth Center",
+    areaName: "Growth Vault",
     whatItIs:
-      "Your hub for progress, impact, highlights, and story — open each area from navigation cards. Growth Inbox and Growth Reports live here.",
+      "Wins, proof, portfolio, and journey — open each area from the Growth Vault™ hub. Use Outcome Goals™ → Insights for printable goal reports.",
     whenToUse:
       "When you want the big picture of how you are growing — not just today's tasks.",
     workflow: [
-      "Define Outcome Goals — where you are headed (not a task list).",
-      "Open Plan My Day™ when you are ready to choose what fits today.",
-      "Open My Wins, Evidence Bank, My Highlights, or My Journey from the hub cards.",
-      "Check Growth Inbox for moments the app noticed — save where they belong or dismiss.",
-      "Tap Growth Reports for a printable reflection — not a live dashboard.",
+      "Open Growth → Growth Vault™ from the sidebar.",
+      "Use Quick Save to capture a win, evidence, portfolio item, or journey note.",
+      "Open My Wins, Evidence Bank, Portfolio, or My Journey from the hub boxes.",
+      "For goal progress and printable reports, open Outcome Goals™ → Insights.",
+      "Check Growth Inbox in My Wins for moments the app noticed — save or dismiss.",
     ],
     tips: [
       "Reviewing progress strengthens pattern recognition and self-awareness over time.",
       "Nothing is logged without your review in Growth Inbox.",
     ],
     relatedAreas:
-      "Wins, Evidence Bank, My Highlights, and My Journey — each area has its own workspace.",
+      "Wins, Evidence Bank, Portfolio, and My Journey — each area has its own workspace and How To Use guide.",
   },
   "confidence-vault": {
     areaName: "My Highlights",

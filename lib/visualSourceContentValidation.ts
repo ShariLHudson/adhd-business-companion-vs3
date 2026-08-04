@@ -45,6 +45,8 @@ export function isPromptOrOfferContent(text: string): boolean {
 
 export function hasConvertibleStructure(content: string): boolean {
   const t = content.trim();
+  if (t.length < 12) return false;
+  if (/^[^:]+:\s*\S+(?:,\s*\S+){2,}/.test(t)) return true;
   if (t.length < 24) return false;
   if (extractFlowStepsFromContent(t).length >= 2) return true;
   if (/^(?:[-*•]|\d+[\.\)])\s/m.test(t)) return true;

@@ -6,6 +6,11 @@
 import { isActionAcceptance } from "./assistedActionBridge";
 import type { OutcomeThread } from "./companionOutcomeThread";
 import { threadAwareAcceptanceFallback } from "./companionOutcomeThread";
+import {
+  detectWorkflowOwnerFromAssistant,
+  workflowOwnerContinuationFallback,
+  assistantQuestionOwnsDecisionContext,
+} from "./workflowOwnershipAuthority";
 import type { AppSection } from "./companionUi";
 import type { PendingCreateOpenPayload } from "./createOpenAuthority";
 import {
@@ -125,8 +130,17 @@ export function isPendingAcceptanceExpired(
   return false;
 }
 
-export function ambiguousAcceptanceReply(thread?: OutcomeThread | null): string {
-  return threadAwareAcceptanceFallback(thread ?? null);
+export function ambiguousAcceptanceReply(
+  thread?: OutcomeThread | null,
+  lastAssistantText?: string,
+): string {
+  const owner = lastAssistantText
+    ? detectWorkflowOwnerFromAssistant(lastAssistantText)
+    : null;
+  if (owner && !assistantQuestionOwnsDecisionContext(lastAssistantText ?? "")) {
+    return workflowOwnerContinuationFallback(owner);
+  }
+  return threadAwareAcceptanceFallback(thread ?? null, lastAssistantText);
 }
 
 export function expiredAcceptanceReply(thread?: OutcomeThread | null): string {
@@ -233,7 +247,10 @@ export function resolvePendingAcceptance(
       if (!input.record) {
         return {
           outcome: "conversation",
-          message: ambiguousAcceptanceReply(input.outcomeThread),
+          message: ambiguousAcceptanceReply(
+            input.outcomeThread,
+            input.lastAssistantText,
+          ),
         };
       }
       if (isPendingAcceptanceExpired(input.record, input)) {
@@ -294,7 +311,10 @@ export function resolvePendingAcceptance(
     }
     return {
       outcome: "conversation",
-      message: ambiguousAcceptanceReply(input.outcomeThread),
+      message: ambiguousAcceptanceReply(
+        input.outcomeThread,
+        input.lastAssistantText,
+      ),
     };
   }
 
@@ -353,7 +373,10 @@ export function resolvePendingAcceptance(
 
   return {
     outcome: "conversation",
-    message: ambiguousAcceptanceReply(input.outcomeThread),
+    message: ambiguousAcceptanceReply(
+      input.outcomeThread,
+      input.lastAssistantText,
+    ),
   };
 }
 

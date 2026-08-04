@@ -67,4 +67,18 @@ describe("Focus V2 — feelings first, tools second", () => {
       expect(focusHubOpensSidebarTool(tool)).toBe(true);
     }
   });
+
+  it("P0.27 routes stretch break and walk exercise to dedicated activities", () => {
+    const stretch = allFocusHubTools().find((t) => t.id === "stretch-break");
+    const walk = allFocusHubTools().find((t) => t.id === "walk-reminder");
+    expect(stretch?.action.kind).toBe("activity");
+    expect(walk?.action.kind).toBe("activity");
+    if (stretch?.action.kind === "activity") {
+      expect(stretch.action.activityId).toBe("stretch-break");
+    }
+    if (walk?.action.kind === "activity") {
+      expect(walk.action.activityId).toBe("walk-reminder");
+    }
+    expect(walk?.label).toBe("Walk Exercise");
+  });
 });

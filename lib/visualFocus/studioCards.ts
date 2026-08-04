@@ -36,10 +36,11 @@ export type VisualFocusStudioCard = {
 
 export const VISUAL_FOCUS_STUDIO_HERO = {
   title: "Visual Thinking™",
-  tagline: "Think visually, not linearly.",
+  tagline:
+    "Tell us what you're trying to accomplish — we'll recommend the best visual tool.",
   microCopy:
     "Build a map, discover patterns, and receive insights, recommendations, and next steps.",
-  question: "How do you want to think today?",
+  question: "What are you trying to do?",
   footer:
     "The insight is the product — not the file. Save when something is worth keeping.",
 } as const;

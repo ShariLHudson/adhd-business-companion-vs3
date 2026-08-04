@@ -1,7 +1,8 @@
 // Workspace Awareness — what Shari can "see" beside chat and how she co-guides
 // (one field at a time, energy-scoped, using the open panel — not generic advice).
 
-import type { DayLevel } from "./companionStore";
+import { getActiveVisualFocusMap } from "./visualFocus/store";
+import { resolveHomeTypeForMap } from "./visualThinkingHome";
 import type { AppSection } from "./companionUi";
 import type { WorkspaceOffer } from "./workspaceMode";
 import { workspaceTitle } from "./workspaceMode";
@@ -885,6 +886,54 @@ export function tryWorkspaceLocalReply(
     return "[[focus:project-title]]Projects is already open. Use the **New project** button, then enter the title — I'll walk you through one field at a time.";
   }
 
+  if (ctx.section === "content-generator") {
+    if (
+      /\b(?:see|show|read|check|what(?:'s| is) (?:already )?in)\b[\s\S]*\bdraft\b/i.test(
+        t,
+      )
+    ) {
+      return null;
+    }
+    if (
+      /\b(?:help me )?(?:write|draft|edit|improve|work on|continue)\b/i.test(
+        t,
+      ) ||
+      /\bhelp me add\b/i.test(t) ||
+      /\b(?:introduction|section|paragraph|outline|hook|headline)\b/i.test(t)
+    ) {
+      return "Create is already open beside us — tell me what you're working on and we'll build it together.";
+    }
+  }
+
+  if (ctx.section === "playbook" && /\b(?:strategy|playbook|tactic)\b/i.test(t)) {
+    return "Strategies is already open — which strategy or step should we focus on?";
+  }
+
+  if (ctx.section === "plan-my-day" && /\b(?:task|plan|today|add)\b/i.test(t)) {
+    return "Plan My Day is already open — type what needs attention and press Enter to capture it.";
+  }
+
+  if (ctx.section === "brain-dump") {
+    return "Clear My Mind is already open — dump what's on your mind and we'll sort it after.";
+  }
+
+  if (ctx.section === "visual-focus") {
+    const map = getActiveVisualFocusMap();
+    if (map) {
+      const home = resolveHomeTypeForMap({
+        homeTypeId: map.homeTypeId,
+        mode: map.mode,
+        title: map.title,
+      });
+      return `${home.title} is open — what should we add or clarify next?`;
+    }
+    return "Visual Thinking is open — what are you trying to accomplish?";
+  }
+
+  if (ctx.section === "decision-compass") {
+    return "Decision Compass is already open — what's the decision you're weighing?";
+  }
+
   if (CONTINUATION_RE.test(t) || /^help(?: me)?\??$/i.test(t)) {
     return continuationReply(ctx, energy);
   }
@@ -1043,6 +1092,11 @@ export function resolveWorkspaceCoachTurn(
   sopSession?: WorkspaceSession | null,
   createWorkflow?: import("./createWorkflow").CreateWorkflowState | null,
 ): WorkspaceCoachTurn | null {
+  const coachPhrase = tryWorkspaceLocalReply(ctx, userText, energy);
+  if (coachPhrase) {
+    return { reply: coachPhrase };
+  }
+
   // Create workspace = conversational chat + draft canvas. No SOP / field wizard.
   if (isCreateWorkspaceChat(ctx)) {
     return null;
@@ -1062,11 +1116,6 @@ export function resolveWorkspaceCoachTurn(
       focusField: approvalTurn.focusField,
       sessionPatch: approvalTurn.sessionPatch,
     };
-  }
-
-  const coachPhrase = tryWorkspaceLocalReply(ctx, userText, energy);
-  if (coachPhrase) {
-    return { reply: coachPhrase };
   }
 
   // Pending suggestion selection — never legacy field fill

@@ -10,6 +10,7 @@ import {
   currentStep,
   personalizeStepLabel,
   optionLabels,
+  retreatDecisionCompass,
   setDecisionType,
   stateFromDecisionCompassPrefill,
   suggestDecisionType,
@@ -25,6 +26,7 @@ import {
   type PersistedDecisionCompassSession,
 } from "@/lib/decisionCompassSessionStore";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
+import type { WorkspaceBackRegistrar } from "@/lib/workspaceDrillBack";
 
 function MindMapBranch({ node, depth = 0 }: { node: MindMapNode; depth?: number }) {
   const colors = ["#1e4f4f", "#a85c4a", "#4a6fa5", "#6b8e23"];
@@ -61,6 +63,7 @@ export function DecisionCompassPanel({
   restoredSession = null,
   onSessionChange,
   hideInlineMap = false,
+  registerBack,
 }: {
   onClose?: () => void;
   onStop?: () => void;
@@ -75,6 +78,7 @@ export function DecisionCompassPanel({
   onSessionChange?: (snapshot: PersistedDecisionCompassSession) => void;
   /** When true, visual canvas in workspace handles the map. */
   hideInlineMap?: boolean;
+  registerBack?: WorkspaceBackRegistrar;
 }) {
   const seeded = useMemo(() => {
     if (restoredSession) return panelStateFromSnapshot(restoredSession);
@@ -110,6 +114,20 @@ export function DecisionCompassPanel({
     lastEmittedTouch.current = snapshot.lastTouchedAt;
     onSessionChange(snapshot);
   }, [state, optionA, optionB, draft, onSessionChange, restoredSession?.sessionId]);
+
+  useEffect(() => {
+    if (!registerBack) return;
+    const atWizardRoot = state.stepIndex <= 0 && !state.complete;
+    if (atWizardRoot) {
+      registerBack(null);
+      return;
+    }
+    registerBack(() => {
+      setState((current) => retreatDecisionCompass(current));
+      return true;
+    });
+    return () => registerBack(null);
+  }, [registerBack, state.stepIndex, state.complete]);
 
   const step = currentStep(state);
   const { a: labelA, b: labelB } = optionLabels(state.answers);

@@ -52,9 +52,9 @@ describe("visualFocus studioCards", () => {
     expect(joined).toContain("ready to act");
   });
 
-  it("hero shows always-visible micro-copy without accordion", () => {
-    expect(VISUAL_FOCUS_STUDIO_HERO.tagline).toBe("Think visually, not linearly.");
-    expect(VISUAL_FOCUS_STUDIO_HERO.microCopy).toMatch(/insights, recommendations, and next steps/i);
+  it("hero explains guidance-first flow", () => {
+    expect(VISUAL_FOCUS_STUDIO_HERO.tagline).toMatch(/trying to accomplish/i);
+    expect(VISUAL_FOCUS_STUDIO_HERO.question).toMatch(/What are you trying to do/i);
   });
 
   it("work with shari copy reduces decision fatigue", () => {

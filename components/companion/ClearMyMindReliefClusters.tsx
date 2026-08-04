@@ -3,14 +3,21 @@
 import { useCallback, useMemo, useState } from "react";
 import type { BrainDumpEntry } from "@/lib/companionStore";
 import { updateBrainDump } from "@/lib/companionStore";
+import { loadClusterOverrides } from "@/lib/brainDumpClusterPreferences";
 import {
   buildBrainDumpClusterGraph,
+  clusterGroupingExplanation,
   clusterOffersThoughtPreview,
   clusterReliefAcknowledgement,
   clusterThoughtExpansionFallback,
   formatClusterDotWeight,
   getClusterVisibleThoughts,
 } from "@/lib/brainDumpClusterModel";
+import {
+  convertClusterToGoal,
+  convertClusterToProject,
+  moveThoughtToCluster,
+} from "@/lib/clusterManagement";
 import { generateMentalLandscapeInsight } from "@/lib/mentalLandscapeInsight";
 import {
   INITIAL_RELIEF_CLUSTER_EXPANSION,
@@ -27,6 +34,9 @@ import {
 } from "@/lib/thoughtActions";
 import type { AppSection } from "@/lib/companionUi";
 import { ThoughtActionSheet } from "@/components/companion/ThoughtActionSheet";
+import { ClusterManagementMenu } from "@/components/companion/ClusterManagementMenu";
+import { CategorizationModePicker } from "@/components/companion/CategorizationModePicker";
+import type { ClusterOverrides } from "@/lib/brainDumpClusterPreferences";
 
 const toggleLinkClass =
   "mt-2 text-base font-semibold text-[#1e4f4f] underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e4f4f]/35";
@@ -64,7 +74,17 @@ export function ClearMyMindReliefClusters({
   onOpen?: (section: AppSection) => void;
   onEntriesChange?: () => void;
 }) {
-  const graph = useMemo(() => buildBrainDumpClusterGraph(entries), [entries]);
+  const [clusterOverrides, setClusterOverrides] = useState<ClusterOverrides>(() =>
+    loadClusterOverrides(),
+  );
+  const [showAllThoughtsClusterId, setShowAllThoughtsClusterId] = useState<
+    string | null
+  >(null);
+
+  const graph = useMemo(
+    () => buildBrainDumpClusterGraph(entries, clusterOverrides),
+    [entries, clusterOverrides],
+  );
   const entryById = useMemo(
     () => new Map(entries.map((e) => [e.id, e])),
     [entries],
@@ -105,6 +125,45 @@ export function ClearMyMindReliefClusters({
       onEntriesChange?.();
     },
     [onEntriesChange],
+  );
+
+  const handleMoveToCluster = useCallback(
+    (entryId: string, targetClusterId: string) => {
+      moveThoughtToCluster(entryId, targetClusterId);
+      onEntriesChange?.();
+    },
+    [onEntriesChange],
+  );
+
+  const handleClusterConvert = useCallback(
+    (
+      cluster: (typeof graph.clusters)[number],
+      kind: "project" | "goal",
+    ) => {
+      const result =
+        kind === "project"
+          ? convertClusterToProject(cluster, entries)
+          : convertClusterToGoal(cluster, entries);
+      if (!result) return;
+      setTrust({
+        ok: true,
+        headline:
+          kind === "project"
+            ? `Project created from ${result.count} thought(s).`
+            : `Goal created from ${result.count} thought(s).`,
+        savedWhere: kind === "project" ? "Projects" : "Growth → Outcome Goals™",
+        seeWhere:
+          kind === "project"
+            ? "Open Projects to add tasks."
+            : "Open Outcome Goals to track this outcome.",
+        route: kind === "project" ? "project" : "task",
+        action: kind === "project" ? "move-to-project" : "convert-to-goal",
+      });
+      onEntriesChange?.();
+      onOpen?.(kind === "project" ? "projects" : "outcome-goals");
+      window.setTimeout(() => setTrust(null), 3200);
+    },
+    [entries, onEntriesChange, onOpen],
   );
 
   const handleThoughtAction = useCallback(
@@ -152,6 +211,10 @@ export function ClearMyMindReliefClusters({
         {insight}
       </p>
 
+      <CategorizationModePicker
+        onChange={() => setClusterOverrides(loadClusterOverrides())}
+      />
+
       {trust ? <ThoughtActionTrust result={trust} /> : null}
 
       <ul className="mt-4 flex flex-col gap-2.5" role="list">
@@ -160,7 +223,9 @@ export function ClearMyMindReliefClusters({
           const isActive = expansion.activeClusterId === cluster.id;
           const thoughtsVisible =
             expansion.thoughtsVisibleClusterId === cluster.id;
-          const visibleThoughts = getClusterVisibleThoughts(cluster);
+          const showAll = showAllThoughtsClusterId === cluster.id;
+          const visibleThoughts = getClusterVisibleThoughts(cluster, showAll);
+          const totalThoughts = getClusterVisibleThoughts(cluster, true);
           const fallback = clusterThoughtExpansionFallback(cluster);
           const canPreview = clusterOffersThoughtPreview(cluster);
 
@@ -219,6 +284,13 @@ export function ClearMyMindReliefClusters({
                       {clusterReliefAcknowledgement(cluster.count)}
                     </p>
 
+                    <p
+                      className="mt-2 text-sm leading-relaxed text-[#5a5248]"
+                      data-testid="cluster-grouping-explanation"
+                    >
+                      {clusterGroupingExplanation(cluster)}
+                    </p>
+
                     {thoughtsVisible ? (
                       <>
                         {fallback ? (
@@ -264,6 +336,15 @@ export function ClearMyMindReliefClusters({
                                       onCategoryChange={(category) =>
                                         handleCategoryChange(entry.id, category)
                                       }
+                                      clusterMoveTargets={graph.clusters
+                                        .filter((c) => c.id !== cluster.id)
+                                        .map((c) => ({
+                                          id: c.id,
+                                          label: c.label,
+                                        }))}
+                                      onMoveToCluster={(targetId) =>
+                                        handleMoveToCluster(entry.id, targetId)
+                                      }
                                     />
                                   ) : null}
                                 </li>
@@ -271,6 +352,29 @@ export function ClearMyMindReliefClusters({
                             })}
                           </ul>
                         )}
+                        {!showAll && totalThoughts.length > visibleThoughts.length ? (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setShowAllThoughtsClusterId(cluster.id)
+                            }
+                            className={toggleLinkClass}
+                            data-testid="show-all-cluster-thoughts"
+                          >
+                            Show all {totalThoughts.length} thoughts
+                          </button>
+                        ) : null}
+                        <ClusterManagementMenu
+                          cluster={cluster}
+                          allClusters={graph.clusters}
+                          onOverridesChange={setClusterOverrides}
+                          onConvertProject={() =>
+                            handleClusterConvert(cluster, "project")
+                          }
+                          onConvertGoal={() =>
+                            handleClusterConvert(cluster, "goal")
+                          }
+                        />
                         <button
                           type="button"
                           onClick={handleHideThoughts}

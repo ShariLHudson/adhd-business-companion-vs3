@@ -1,29 +1,17 @@
 import type { HowDoIHelpArticle } from "./howDoIHelpTypes";
 import { HOW_DO_I_HELP_ARTICLES } from "./howDoIHelpArticles";
-import { howDoIBrowseSections } from "./howDoIHelpBrowseStructure";
+import {
+  howDoIBrowseSections,
+  mainAreaBrowseArticleIds,
+} from "./howDoIHelpBrowseStructure";
 
 /**
- * Main Areas — grouped in How Do I browse (Daily Use, Growth, Resources).
- * Flat list kept for search indexing and legacy callers.
+ * Main Areas — grouped in How Do I browse (Basics, Daily Use, Growth, Resources).
+ * Derived from browse structure for search indexing and legacy callers.
  */
-export const HELP_CENTER_ARTICLE_IDS = [
-  "clear-my-mind",
-  "create-overview",
-  "focus-sessions",
-  "plan-my-day",
-  "projects",
-  "evidence-bank",
-  "my-highlights",
-  "my-journey",
-  "wins-this-week",
-  "client-avatars",
-  "my-work",
-  "snippets",
-  "strategies",
-  "templates",
-] as const;
+export const HELP_CENTER_ARTICLE_IDS: readonly string[] = mainAreaBrowseArticleIds();
 
-export type HelpCenterArticleId = (typeof HELP_CENTER_ARTICLE_IDS)[number];
+export type HelpCenterArticleId = string;
 
 const byId = new Map(HOW_DO_I_HELP_ARTICLES.map((a) => [a.id, a]));
 
@@ -38,7 +26,7 @@ export function helpCenterArticles(): HowDoIHelpArticle[] {
 }
 
 export function isHelpCenterArticle(id: string): boolean {
-  return (HELP_CENTER_ARTICLE_IDS as readonly string[]).includes(id);
+  return HELP_CENTER_ARTICLE_IDS.includes(id);
 }
 
 export function mainAreaBrowseSubgroups() {

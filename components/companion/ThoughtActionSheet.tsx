@@ -24,12 +24,17 @@ export function ThoughtActionSheet({
   entry,
   onAction,
   onCategoryChange,
+  clusterMoveTargets,
+  onMoveToCluster,
 }: {
   entry: BrainDumpEntry;
   onAction: (action: ThoughtAction) => void;
   onCategoryChange?: (category: string) => void;
+  clusterMoveTargets?: { id: string; label: string }[];
+  onMoveToCluster?: (clusterId: string) => void;
 }) {
   const [moreAction, setMoreAction] = useState("");
+  const [moveTarget, setMoveTarget] = useState("");
 
   function handleMoreAction(value: string) {
     if (!value) return;
@@ -56,6 +61,32 @@ export function ThoughtActionSheet({
             onChange={onCategoryChange}
           />
         </div>
+      ) : null}
+
+      {clusterMoveTargets && clusterMoveTargets.length > 0 && onMoveToCluster ? (
+        <label className="mt-3 block text-base font-semibold text-[#1f1c19]">
+          Move to cluster
+          <select
+            value={moveTarget}
+            onChange={(e) => {
+              const v = e.target.value;
+              setMoveTarget(v);
+              if (v) {
+                onMoveToCluster(v);
+                setMoveTarget("");
+              }
+            }}
+            className={SELECT_CLASS}
+            data-testid="thought-move-cluster-select"
+          >
+            <option value="">Select cluster…</option>
+            {clusterMoveTargets.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.label}
+              </option>
+            ))}
+          </select>
+        </label>
       ) : null}
 
       <p className="mt-4 text-base font-medium text-[#6b635a]">

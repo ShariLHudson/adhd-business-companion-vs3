@@ -122,7 +122,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "Chat Workspace (💬) — New Chat or New Day's Chat when you need a fresh conversation or fresh daily start.",
       "Create: New Draft, Start From Template, Snippet, Audience Profile, Resume Draft.",
       "My Work: Search, Continue Working, Browse (Created Content, Projects, libraries, Archive).",
-      "Growth: My Wins, Evidence Bank, My Highlights, My Journey.",
+      "Growth: Growth Vault™ (My Wins, Evidence Bank, Portfolio, My Journey) and Outcome Goals™.",
       "Open How Do I → Main Areas anytime for how each one works.",
     ],
     tips: ["Chat can help you pick — you do not have to memorize the map."],
@@ -154,7 +154,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
   {
     id: "chat-companion",
     categoryId: "conversation",
-    title: "Conversations",
+    title: "Chat",
     emoji: "💬",
     whatItIs: "The front door — talk through what is happening and get guidance.",
     whenToUse: "When you are not sure which tool to open first.",
@@ -966,14 +966,15 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     emoji: "🌱",
     featured: true,
     whatItIs:
-      "Your hub for progress, impact, highlights, and story — four areas you open from navigation cards, plus Growth Inbox and Growth Reports.",
+      "Your Growth Vault™ for wins, proof, portfolio, and journey — plus Outcome Goals™ for targets, activity, and insights. Open each area from the sidebar Growth menu.",
     whenToUse:
       "When you want the big picture of how you are growing — not just today's tasks.",
     workflow: [
-      "Open Growth from the sidebar (🌱 — beside Create and My Work).",
-      "Open Wins, Evidence Bank, My Highlights, or My Journey from the hub cards.",
-      "Check Growth Inbox for moments the app noticed — save where they belong or dismiss.",
-      "Tap 📖 Growth Reports to build a printable or downloadable combined report.",
+      "Open Growth from the sidebar — choose Growth Vault™ or Outcome Goals™.",
+      "Use Quick Save on the Vault hub to capture a win, evidence, portfolio item, or journey note.",
+      "Open My Wins, Evidence Bank, Portfolio, or My Journey from the vault boxes.",
+      "For goal progress and printable reports, open Outcome Goals™ → Insights.",
+      "Check Growth Inbox in My Wins for moments the app noticed — save where they belong or dismiss.",
     ],
     tips: [
       "Why it matters: reviewing progress trains pattern recognition and self-awareness — you see momentum you would otherwise forget.",
@@ -989,13 +990,13 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "progress",
       "pillars",
     ],
-    openSection: "growth",
+    openSection: "growth-vault",
     openLabel: "Open Growth Center",
   },
   {
     id: "wins-this-week",
     categoryId: "personal-growth",
-    title: "Wins This Week",
+    title: "My Wins",
     emoji: "🏆",
     featured: true,
     whatItIs:
@@ -1005,17 +1006,17 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     workflow: [
       "Open Wins This Week from 🌱 Growth or the Growth cross-links.",
       "Review the activity summary for the current week (auto-collected from your work).",
-      "Check Growth Inbox on the Growth hub — edit, then Save as Win, or dismiss what does not count.",
-      "Attach images or files to a saved win with Attach on the win card.",
+      "Check Growth Inbox in My Wins — Save as Win, or use Save elsewhere (Evidence, Portfolio, Journey).",
+      "Browse wins in date groups (Today, This Week, etc.) — one group and one win open at a time.",
+      "Attach images or files from the More menu or on an expanded win card.",
       "Tap Save to Evidence when you want the deeper impact story for a win.",
-      "Use Archive filters (week, month, quarter, year) and search to browse past wins.",
-      "Tap 🖨 Print in the header to print your wins view.",
-      "Glance at Previous weeks for archived activity summaries.",
+      "Use search to find past wins.",
+      "Previous weeks holds archived activity summaries (collapsed by default).",
     ],
     tips: [
       "Why wins matter: noticing forward motion builds reflection and confidence — your brain learns to see momentum, not only gaps.",
       "Small steps count — including showing up, starting, or finishing one hard thing.",
-      "Wins are facts (what happened). Evidence is meaning (why it mattered). My Highlights is recognition (praise and accomplishments).",
+      "Wins are facts (what happened). Evidence is meaning (why it mattered). Portfolio is what you built.",
     ],
     keywords: [
       "wins",
@@ -1029,7 +1030,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "print wins",
     ],
     openSection: "wins-this-week",
-    openLabel: "Open Wins This Week",
+    openLabel: "Open My Wins",
   },
   {
     id: "evidence-bank",
@@ -1055,7 +1056,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "Why evidence matters: capturing impact strengthens pattern recognition and decision-making — you build a library of proof for pricing, pitching, and hard choices.",
       "Core question: What changed because of what I did?",
       "Good evidence names the fact, the impact, and who benefited — e.g. \"Client signed after I simplified the proposal — they said clarity was the deciding factor.\"",
-      "Separate from wins (what happened) and My Highlights (praise and accomplishments about you).",
+      "Separate from wins (what happened) and Portfolio (things you created).",
     ],
     keywords: [
       "evidence",
@@ -1071,7 +1072,44 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "attach",
     ],
     openSection: "evidence-bank",
-    openLabel: "Open Evidence Bank",
+    openLabel: "Open Evidence Bank™",
+  },
+  {
+    id: "portfolio",
+    categoryId: "personal-growth",
+    title: "Portfolio™",
+    emoji: "📦",
+    whatItIs:
+      "Your shelf of completed assets and creations — courses, books, products, funnels, templates, websites, workshops, and lead magnets.",
+    whenToUse:
+      "When you finish something tangible you want to remember, showcase, or link to an outcome goal.",
+    workflow: [
+      "Open Portfolio™ from Growth Vault™ in 🌱 Growth.",
+      "Tap Add to Portfolio — title, asset type, description, completion date, and optional link.",
+      "Attach files or link to live assets.",
+      "Link to Outcome Goals™ when the asset supports a measurable outcome.",
+      "Browse and edit entries as your body of work grows.",
+    ],
+    tips: [
+      "Portfolio holds what you built. Evidence Bank holds why it mattered. My Wins™ holds forward motion.",
+      "Use asset types (Course, Book, Funnel, etc.) so you can scan your work at a glance.",
+    ],
+    keywords: [
+      "portfolio",
+      "course",
+      "book",
+      "product",
+      "funnel",
+      "template",
+      "website",
+      "workshop",
+      "lead magnet",
+      "presentation",
+      "completed",
+      "creation",
+    ],
+    openSection: "portfolio",
+    openLabel: "Open Portfolio™",
   },
   {
     id: "my-highlights",
@@ -1118,10 +1156,10 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
   {
     id: "my-journey",
     categoryId: "personal-growth",
-    title: "My Journey",
+    title: "My Journey™",
     emoji: "🌿",
     whatItIs:
-      "Your personal and professional story — experiences, lessons, milestones, and wisdom. Not a resume.",
+      "Your personal and professional story — decisions, lessons, milestones, and wisdom. Decision Log and Lessons Learned live here.",
     whenToUse:
       "When something shaped you, you learned a lesson, or you want to preserve meaning over time.",
     workflow: [
@@ -1158,41 +1196,36 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
   {
     id: "growth-reports",
     categoryId: "personal-growth",
-    title: "Reports",
+    title: "Goal Insights & Reports",
     emoji: "📊",
     whatItIs:
-      "Printable and downloadable reports that combine wins, evidence, highlights, journey, reflections, photos, and files for a date range you choose.",
+      "Printable and downloadable goal reports with motivation summaries — in Outcome Goals™ → Insights.",
     whenToUse:
-      "Weekly reviews, monthly check-ins, annual accomplishments, or sharing progress with a coach, partner, or future you.",
+      "Weekly reviews, monthly check-ins, or when you want a printable picture of goal progress.",
     workflow: [
-      "Open 🌱 Growth and tap 📖 Growth Reports.",
-      "Pick report type: Weekly, Monthly, Quarterly, Annual, or Custom Date Range.",
-      "For custom, set From and To dates.",
-      "Choose what to include — wins, evidence, highlights, journey, photos, files, testimonials, certifications, reflections.",
-      "Pick report style: Summary or Detailed (Storybook and Visual styles include full narrative now; richer styling coming soon).",
-      "Tap Generate Growth Report — opens in a new tab for Print or Save as PDF.",
-      "Or tap Download HTML to save the report file and print to PDF anytime.",
+      "Open Growth → Outcome Goals™ from the sidebar.",
+      "Tap the Insights tab.",
+      "Review motivation summaries and per-goal dashboards.",
+      "Use Print, Download HTML, or Export CSV for the reports you need.",
     ],
     tips: [
-      "Why reviewing progress matters: seeing weeks or months together reveals patterns your day-to-day brain misses.",
-      "Weekly defaults are light (wins + evidence + highlights + journey). Annual includes testimonials, certifications, and reflections.",
-      "PDF export per-entry is coming soon — Growth Reports are the full combined export today.",
+      "Insights focuses on your Outcome Goals™ — wins and evidence live in Growth Vault™.",
+      "For vault-wide reflection, export evidence entries individually or review each vault section.",
     ],
     keywords: [
       "growth reports",
       "growth report",
+      "goal insights",
+      "outcome goals insights",
       "print report",
       "pdf",
       "weekly report",
       "monthly report",
-      "annual report",
-      "custom date",
-      "storybook",
-      "visual report",
       "export",
+      "insights",
     ],
-    openSection: "growth",
-    openLabel: "Open Growth Reports",
+    openSection: "outcome-goals",
+    openLabel: "Open Outcome Goals Insights",
   },
   {
     id: "celebrating-progress",
@@ -1212,7 +1245,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     ],
     keywords: ["celebrate", "progress", "win", "acknowledge"],
     openSection: "wins-this-week",
-    openLabel: "Open Wins This Week",
+    openLabel: "Open My Wins",
   },
   {
     id: "confidence-building",
@@ -1244,14 +1277,14 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "Open 🌱 Growth for the snapshot across all four pillars.",
       "Review Wins This Week history and Evidence Bank trends.",
       "Browse My Journey chapters for lessons and milestones.",
-      "Use 📖 Growth Reports for monthly or annual reviews.",
+      "Use Outcome Goals™ → Insights for monthly or annual goal reviews.",
       "Adjust Plan My Day based on what actually happened.",
     ],
     tips: [
       "Trends matter more than any single day — reviewing progress is a thinking skill.",
     ],
     keywords: ["growth", "track", "progress", "review", "growth reports", "cognitive growth"],
-    openSection: "growth",
+    openSection: "growth-vault",
     openLabel: "Open Growth Center",
   },
 
@@ -1579,13 +1612,13 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "Record wins when something goes well — even small.",
       "Save evidence when you can prove impact.",
       "Add highlights when you want to remember your value.",
-      "Review monthly with Growth Reports.",
+      "Review monthly with Outcome Goals™ → Insights.",
     ],
     tips: [
       "Reflection trains your brain to notice progress — that is the cognitive growth loop.",
     ],
     keywords: ["cognitive growth", "reflection", "confidence", "growth mindset"],
-    openSection: "growth",
+    openSection: "growth-vault",
     openLabel: "Open Growth",
   },
   {
@@ -1617,11 +1650,11 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "Open a Growth area — Wins, Evidence, My Highlights, or My Journey.",
       "Use Attach File or Upload Image in the header or on an entry.",
       "Preview attachments before printing or reporting.",
-      "Growth Reports can include your uploads in combined exports.",
+      "Outcome Goals™ → Insights can include your goal dashboards in printable exports.",
     ],
     tips: ["A photo of a thank-you email counts as evidence."],
     keywords: ["upload", "attach", "file", "image", "photo", "pdf"],
-    openSection: "growth",
+    openSection: "growth-vault",
     openLabel: "Open Growth",
   },
   {
@@ -1769,5 +1802,241 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     keywords: ["view", "layout", "kanban", "split", "visual"],
     openSection: "plan-my-day",
     openLabel: "Open Plan My Day",
+  },
+
+  // —— P0.34 Help Center browse topics ——
+  {
+    id: "today-view",
+    categoryId: "conversation",
+    title: "Today",
+    emoji: "☀️",
+    whatItIs:
+      "Your home base — Chat plus what matters right now, without opening every tool at once.",
+    whenToUse:
+      "When you land in the app and want one calm place to talk, plan, or pick your next move.",
+    workflow: [
+      "Open Chat from the sidebar — Today is your default companion view.",
+      "Say what is on your mind or ask what to focus on.",
+      "Accept tool offers when they fit — or stay in conversation.",
+      "Return here anytime; your thread and context stay with you.",
+    ],
+    tips: [
+      "Today is conversation-first — tools open only when you confirm.",
+      "Use Plan My Day or Focus when you are ready to execute, not before.",
+    ],
+    keywords: ["today", "home", "chat", "start", "daily", "companion"],
+    openSection: "today",
+    openLabel: "Open Today",
+  },
+  {
+    id: "daily-workflows",
+    categoryId: "planning",
+    title: "Daily Workflows",
+    emoji: "🔄",
+    whatItIs:
+      "Repeatable rhythms — morning check-in, deep work, admin blocks, and end-of-day wrap-up.",
+    whenToUse:
+      "When you want structure without a rigid schedule, or you keep forgetting the same daily steps.",
+    workflow: [
+      "Start in Chat — name your day (\"I need a calm morning routine\").",
+      "Open Plan My Day to block time or list priorities.",
+      "Use Focus for one protected block; Clear My Mind to unload noise first.",
+      "End with a quick win log in Growth → My Wins when something moved forward.",
+    ],
+    tips: [
+      "Workflows are templates for your brain — adjust any day without guilt.",
+      "Pair conversation with one tool at a time to avoid overwhelm.",
+    ],
+    keywords: [
+      "daily workflow",
+      "routine",
+      "morning",
+      "evening",
+      "rhythm",
+      "habit",
+      "day",
+    ],
+    askPrompt: "Help me build a simple daily workflow.",
+  },
+  {
+    id: "outcome-goals",
+    categoryId: "personal-growth",
+    title: "Outcome Goals™",
+    emoji: "🎯",
+    whatItIs:
+      "Measurable outcomes with progress you can see — not endless task lists.",
+    whenToUse:
+      "When you care about a result (revenue, health, launch, habit) and want honest tracking.",
+    workflow: [
+      "Open 🌱 Growth → Outcome Goals™.",
+      "Create a goal with a clear outcome and how you will measure it.",
+      "Record progress as you go — multiple metrics supported per goal.",
+      "Review in Outcome Goals™ → Insights when you want the big picture on goals.",
+    ],
+    tips: [
+      "One meaningful outcome beats ten vague to-dos.",
+      "Progress updates are manual — you stay in control of what counts.",
+    ],
+    keywords: [
+      "outcome goals",
+      "goals",
+      "metrics",
+      "progress",
+      "tracking",
+      "target",
+    ],
+    openSection: "growth-vault",
+    openLabel: "Open Growth Center",
+  },
+  {
+    id: "decision-log",
+    categoryId: "decisions",
+    title: "Decision Log",
+    emoji: "⚖️",
+    whatItIs:
+      "A record of choices you made, why you made them, and what you learned.",
+    whenToUse:
+      "After a hard call, pricing choice, hire/no-hire, or any decision you might second-guess later.",
+    workflow: [
+      "Open 🌱 Growth → Decision Log.",
+      "Add the decision, options you considered, and your reasoning.",
+      "Note the outcome later — even \"still waiting\" counts.",
+      "Review when similar choices come up again.",
+    ],
+    tips: [
+      "Future-you will not remember the context — write it while it is fresh.",
+      "Decisions pair well with Evidence Bank when the choice paid off.",
+    ],
+    keywords: ["decision log", "decisions", "choices", "reasoning", "log"],
+    openSection: "growth-vault",
+    openLabel: "Open Growth Center",
+  },
+  {
+    id: "lessons-learned",
+    categoryId: "personal-growth",
+    title: "Lessons Learned",
+    emoji: "🌱",
+    whatItIs:
+      "Short captures of what you figured out — insights worth keeping, not full journal entries.",
+    whenToUse:
+      "When something clicked, failed, or surprised you and you do not want to lose the lesson.",
+    workflow: [
+      "Open 🌱 Growth → Lessons Learned.",
+      "Save from Quick Save in Growth Center or add directly.",
+      "Tag what area it applies to (business, health, ADHD, relationships).",
+      "Skim before similar projects or seasons.",
+    ],
+    tips: [
+      "Lessons are lighter than Journey entries — quick and searchable.",
+      "One sentence is enough if it is true.",
+    ],
+    keywords: ["lessons learned", "lesson", "insight", "learned", "wisdom"],
+    openSection: "growth-vault",
+    openLabel: "Open Growth Center",
+  },
+  {
+    id: "learning-resources",
+    categoryId: "conversation",
+    title: "Learning Resources",
+    emoji: "📚",
+    whatItIs:
+      "Guided learning in Chat — concepts, strategies, and how features fit your ADHD brain.",
+    whenToUse:
+      "When you want to understand before doing, or explore a topic without opening a tool yet.",
+    workflow: [
+      "Ask in Chat: \"Teach me about…\" or \"What is…?\"",
+      "Browse Strategies and ADHD Strategies from Resources or Playbook.",
+      "Open How Do I for step-by-step feature workflows.",
+      "Save useful insights to Lessons Learned or Journey when ready.",
+    ],
+    tips: [
+      "Learn mode stays conversational — no auto-routing to tools.",
+      "Pair reading with one small action so knowledge sticks.",
+    ],
+    keywords: [
+      "learn",
+      "learning",
+      "resources",
+      "strategies",
+      "adhd",
+      "education",
+    ],
+    askPrompt: "What should I learn first as a new user?",
+  },
+  {
+    id: "productivity-help",
+    categoryId: "focus-momentum",
+    title: "Productivity",
+    emoji: "⚡",
+    whatItIs:
+      "How this app supports getting things done with an ADHD-friendly pace — not hustle culture.",
+    whenToUse:
+      "When you want momentum without burnout, or productivity systems keep failing you.",
+    workflow: [
+      "Unload with Clear My Mind, then pick one priority in Plan My Day.",
+      "Protect focus time with Focus sessions.",
+      "Use time blocking and kanban views when lists are not enough.",
+      "Log wins and evidence so progress stays visible.",
+    ],
+    tips: [
+      "Productivity here means forward motion you can notice — not perfect days.",
+      "Executive-function support beats willpower.",
+    ],
+    keywords: ["productivity", "productive", "momentum", "get things done"],
+    askPrompt: "Help me be productive without overwhelming myself.",
+  },
+  {
+    id: "integrations",
+    categoryId: "workspace",
+    title: "Integrations",
+    emoji: "🔗",
+    whatItIs:
+      "Connecting external tools and services where supported — calendar, workspace, and exports.",
+    whenToUse:
+      "When you want work to flow between this app and tools you already use.",
+    workflow: [
+      "Open Settings and review connected services.",
+      "Use Google Workspace areas when linking docs or calendar.",
+      "Export from Outcome Goals™ → Insights or saved work when you need files elsewhere.",
+      "Ask in Chat if you are unsure what connects today.",
+    ],
+    tips: [
+      "Integrations expand over time — check Settings for what is available now.",
+      "You can always copy/export manually if a direct link is not ready.",
+    ],
+    keywords: ["integrations", "connect", "google", "calendar", "export", "sync"],
+    openSection: "settings",
+    openLabel: "Open Settings",
+  },
+  {
+    id: "troubleshooting",
+    categoryId: "personalization",
+    title: "Troubleshooting",
+    emoji: "🔧",
+    whatItIs:
+      "Quick fixes when something feels broken, missing, or confusing.",
+    whenToUse:
+      "Notifications not firing, layout looks wrong, data seems lost, or Chat is not responding.",
+    workflow: [
+      "Refresh the page — many UI states reset safely.",
+      "Check Settings → Notifications for permissions and sounds.",
+      "Confirm you are signed in under Account & Settings.",
+      "Search How Do I for the feature name.",
+      "Ask Chat: \"Something is not working — …\" with what you expected.",
+    ],
+    tips: [
+      "Local data (reminders, drafts) lives in this browser — switching devices may look empty.",
+      "Screenshot the issue before refreshing if you need to remember details.",
+    ],
+    keywords: [
+      "troubleshooting",
+      "broken",
+      "not working",
+      "bug",
+      "fix",
+      "help",
+      "stuck",
+    ],
+    askPrompt: "Something is not working — can you help me troubleshoot?",
   },
 ];

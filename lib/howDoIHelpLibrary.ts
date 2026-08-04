@@ -49,6 +49,8 @@ export {
 export {
   howDoIBrowseSections,
   browseLocationForArticle,
+  formatBrowseLocationLabel,
+  browseLocationLabelForArticle,
   articlesForNewUserStart,
   articlesForBrowseSubgroup,
   isHelpCenterBrowseArticle,

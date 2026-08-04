@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { WorkspaceBackRegistrar } from "@/lib/workspaceDrillBack";
+import {
+  executeSavedItemMove,
+  SAVED_ITEM_MOVE_OPTIONS,
+  type SavedItemMoveDestination,
+} from "@/lib/savedItemMoves";
 import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
 import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
 import { ConfirmDialog } from "@/components/companion/ConfirmDialog";
@@ -33,9 +39,11 @@ const STATUS_OPTIONS: { value: SavedWorkStatus | "archived"; label: string }[] =
 function SavedWorkItemMenu({
   item,
   onAction,
+  onMove,
 }: {
   item: SavedWorkItem;
   onAction: (action: SavedWorkAction, item: SavedWorkItem) => void;
+  onMove: (destination: SavedItemMoveDestination, item: SavedWorkItem) => void;
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -92,6 +100,23 @@ function SavedWorkItemMenu({
           >
             Duplicate
           </button>
+          <p className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-wide text-[#9a8f82]">
+            Move to
+          </p>
+          {SAVED_ITEM_MOVE_OPTIONS.filter((o) => o.id !== "delete").map((opt) => (
+            <button
+              key={opt.id}
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                onMove(opt.id, item);
+              }}
+              className={MENU_DROPDOWN_ITEM}
+            >
+              {opt.label}
+            </button>
+          ))}
           {archived ? (
             <button
               type="button"
@@ -127,10 +152,12 @@ function SavedWorkItemMenu({
 
 export function SavedWorkLibrary({
   onBack,
+  registerBack,
   onOpenInCreate,
   embedded = false,
 }: {
   onBack?: () => void;
+  registerBack?: WorkspaceBackRegistrar;
   onOpenInCreate?: (input: CreationWorkspaceInput) => void;
   /** When true, renders inside My Work Hub without standalone chrome. */
   embedded?: boolean;
@@ -144,6 +171,7 @@ export function SavedWorkLibrary({
   const [renaming, setRenaming] = useState<SavedWorkItem | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<SavedWorkItem | null>(null);
+  const [moveStatus, setMoveStatus] = useState<string | null>(null);
 
   function refresh() {
     setItems(getSavedWork());
@@ -155,6 +183,34 @@ export function SavedWorkLibrary({
     window.addEventListener(SAVED_WORK_UPDATED_EVENT, onUpdate);
     return () => window.removeEventListener(SAVED_WORK_UPDATED_EVENT, onUpdate);
   }, []);
+
+  const popDrillView = useCallback(() => {
+    if (deleteTarget) {
+      setDeleteTarget(null);
+      return;
+    }
+    if (renaming) {
+      setRenaming(null);
+      return;
+    }
+    if (viewId) {
+      setViewId(null);
+    }
+  }, [deleteTarget, renaming, viewId]);
+
+  useEffect(() => {
+    if (!registerBack || embedded) return;
+    const drilled = Boolean(deleteTarget || renaming || viewId);
+    if (!drilled) {
+      registerBack(null);
+      return;
+    }
+    registerBack(() => {
+      popDrillView();
+      return true;
+    });
+    return () => registerBack(null);
+  }, [registerBack, embedded, deleteTarget, renaming, viewId, popDrillView]);
 
   const baseList =
     status === NO_CATEGORY
@@ -209,6 +265,21 @@ export function SavedWorkLibrary({
     setRenaming(null);
     setRenameValue("");
     refresh();
+  }
+
+  function handleMove(destination: SavedItemMoveDestination, item: SavedWorkItem) {
+    if (destination === "delete") {
+      setDeleteTarget(item);
+      return;
+    }
+    const result = executeSavedItemMove(item.id, destination);
+    if (result.ok) {
+      setMoveStatus(result.message);
+      if (viewId === item.id) setViewId(null);
+      refresh();
+    } else {
+      setMoveStatus(result.message);
+    }
   }
 
   function confirmDelete() {
@@ -290,7 +361,7 @@ export function SavedWorkLibrary({
       {!embedded ? (
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-2xl font-semibold text-[#1f1c19]">📂 Saved Work</p>
+            <p className="text-2xl font-semibold text-[#1f1c19]">📂 Saved Items</p>
             <p className="mt-1 text-base text-[#6b635a]">
               Your created documents — proposals, SOPs, plans, and more. Archive to
               hide from active views; recover anytime from Archived.
@@ -334,7 +405,11 @@ export function SavedWorkLibrary({
             >
               ← All saved work
             </button>
-            <SavedWorkItemMenu item={viewing} onAction={handleItemAction} />
+            <SavedWorkItemMenu
+              item={viewing}
+              onAction={handleItemAction}
+              onMove={handleMove}
+            />
           </div>
           <p className="mt-2 text-xs font-bold uppercase tracking-wide text-[#6b635a]">
             {viewing.artifactType} · {viewing.status}
@@ -411,7 +486,11 @@ export function SavedWorkLibrary({
                     </p>
                   </button>
                   <div className="flex items-start px-2 py-3">
-                    <SavedWorkItemMenu item={w} onAction={handleItemAction} />
+                    <SavedWorkItemMenu
+                      item={w}
+                      onAction={handleItemAction}
+                      onMove={handleMove}
+                    />
                   </div>
                 </div>
               </li>

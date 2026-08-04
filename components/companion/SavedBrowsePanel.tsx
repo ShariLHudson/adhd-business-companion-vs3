@@ -85,12 +85,7 @@ export function SavedBrowsePanel({
   const visualCategories = useMemo(() => buildVisualThinkingByCategory(), []);
 
   function toggleCategory(id: SavedCategoryId) {
-    setOpenCategories((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    setOpenCategories((prev) => (prev.has(id) ? new Set() : new Set([id])));
   }
 
   function openCategory(id: SavedCategoryId) {
@@ -122,7 +117,7 @@ export function SavedBrowsePanel({
   return (
     <div data-testid="saved-browse-panel">
       <GrowthPanelBackButton onBack={onBack} label="Other" />
-      <h2 className="mt-4 text-2xl font-bold text-stone-900">Saved™</h2>
+      <h2 className="mt-4 text-2xl font-bold text-stone-900">Saved Items</h2>
       <p className="mt-1 text-sm text-stone-600">
         Find something from the past — simple browsing, not a file manager.
       </p>

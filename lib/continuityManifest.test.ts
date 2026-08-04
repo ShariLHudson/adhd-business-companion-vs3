@@ -14,6 +14,7 @@ import {
   saveWorkspaceSession,
 } from "./workspaceSessionStore";
 import { createWorkspaceSession } from "./workspaceSop";
+import { clearCreateSession } from "./createSessionStore";
 import {
   recoveryMessageAfterPanelHide,
 } from "./continuityRecovery";
@@ -43,10 +44,15 @@ function stubStorage() {
   return localStorage;
 }
 
+function recentIso(hoursAgo = 2): string {
+  return new Date(Date.now() - hoursAgo * 60 * 60 * 1000).toISOString();
+}
+
 describe("continuityManifest", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     stubStorage();
+    clearCreateSession();
   });
 
   it("aggregates create, project, workspace SOP, and saved work", () => {
@@ -79,7 +85,7 @@ describe("continuityManifest", () => {
           draftContent: "Hello",
         },
         workspaceDetail: null,
-        updatedAt: "2026-06-10T12:00:00.000Z",
+        updatedAt: recentIso(2),
       }),
     );
 
@@ -106,7 +112,7 @@ describe("continuityManifest", () => {
             "This is a meaningful draft with enough characters to count as real work.",
         },
         workspaceDetail: null,
-        updatedAt: "2026-06-12T12:00:00.000Z",
+        updatedAt: recentIso(1),
       }),
     );
 
@@ -135,7 +141,7 @@ describe("continuityManifest", () => {
           nextAction: "Step",
           color: "#1e4f4f",
           createdAt: "2026-06-01T12:00:00.000Z",
-          updatedAt: "2026-06-12T12:00:00.000Z",
+          updatedAt: recentIso(3),
         },
       ]),
     );
@@ -158,7 +164,7 @@ describe("continuityManifest", () => {
     saveWorkspaceSession(session);
     const raw = localStorage.getItem("companion-workspace-session-v1");
     const snap = JSON.parse(raw!);
-    snap.lastTouchedAt = "2026-06-02T12:00:00.000Z";
+    snap.lastTouchedAt = recentIso(4);
     localStorage.setItem("companion-workspace-session-v1", JSON.stringify(snap));
 
     const latest = findLatestContinuityItem(HOME_RESUME_CONTINUITY_TYPES);

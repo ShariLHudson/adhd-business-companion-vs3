@@ -4,6 +4,7 @@ import {
   buildDecisionMindMap,
   computeDecisionResult,
   emptyDecisionCompassState,
+  retreatDecisionCompass,
   setDecisionType,
   stateFromDecisionCompassPrefill,
   suggestDecisionType,
@@ -78,5 +79,18 @@ describe("decisionCompass", () => {
       "Reason: Save cash",
       "Concern: Falling behind",
     ]);
+  });
+
+  it("retreats one wizard step for global Back", () => {
+    let state = advanceDecisionCompass(emptyDecisionCompassState(), {
+      decision: "Pick a path",
+    });
+    expect(state.stepIndex).toBe(1);
+    state = retreatDecisionCompass(state);
+    expect(state.stepIndex).toBe(0);
+    state = { ...state, complete: true, stepIndex: 5 };
+    state = retreatDecisionCompass(state);
+    expect(state.complete).toBe(false);
+    expect(state.stepIndex).toBe(5);
   });
 });

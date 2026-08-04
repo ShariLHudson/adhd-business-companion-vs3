@@ -37,6 +37,8 @@ export function EcosystemCollapsibleSection({
   accentClass = "border-[#e4ddd2]",
   headerClassName,
   emojiClassName,
+  containerClassName,
+  contentClassName,
 }: {
   id?: string;
   title: string;
@@ -50,12 +52,14 @@ export function EcosystemCollapsibleSection({
   accentClass?: string;
   headerClassName?: string;
   emojiClassName?: string;
+  containerClassName?: string;
+  contentClassName?: string;
 }) {
   return (
     <div
       id={id}
       data-testid={testId}
-      className={`overflow-hidden rounded-xl border bg-white shadow-sm ${accentClass}`}
+      className={`overflow-hidden rounded-xl border bg-white shadow-sm ${accentClass} ${containerClassName ?? ""}`}
     >
       <button
         type="button"
@@ -101,7 +105,9 @@ export function EcosystemCollapsibleSection({
         ) : null}
       </button>
       {open ? (
-        <div className="border-t border-[#efe8de] bg-[#faf7f2]/40 px-3 py-3">
+        <div
+          className={`border-t border-[#efe8de] bg-[#faf7f2]/40 px-3 py-3 ${contentClassName ?? ""}`}
+        >
           {children}
         </div>
       ) : null}

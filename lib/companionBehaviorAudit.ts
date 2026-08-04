@@ -37,6 +37,8 @@ export type AuditCategory =
   | "calm"
   | "strategy"
   | "emotional"
+  | "reminder"
+  | "artifact_execution"
   | "relationship"
   | "navigate"
   | "yes_continuation";
@@ -100,6 +102,10 @@ export type CompanionBehaviorAuditCase = {
   setupStrategyOfferPending?: boolean;
   /** Pre-seed generic playbook workspace pending */
   setupPlaybookPending?: boolean;
+  /** Active reminder intake draft for follow-up turns */
+  setupReminderDraft?: import("./reminderIntelligence").ReminderDraft;
+  /** Active artifact execution draft for follow-up turns */
+  setupArtifactExecutionDraft?: import("./artifactExecutionAuthority").ArtifactExecutionDraft;
   notes?: string;
 };
 
@@ -173,6 +179,11 @@ const FEATURE_ALIASES: Record<string, string[]> = {
   energy: ["adapt my day", "energy"],
   "focus-audio": ["focus audio", "focus-audio"],
   templates: ["templates", "template"],
+  organize: ["organize", "clear my mind", "brain-dump"],
+  focus: ["focus", "focus mode"],
+  emotional: ["emotional regulation", "emotional"],
+  strategy: ["strategy intelligence", "strategies", "playbook"],
+  learn: ["learn"],
 };
 
 function normalizeFeatureToken(value: string): string {
@@ -210,10 +221,15 @@ function frictionlessOverridesRouting(
     category === "emotional_regulation" ||
     category === "adhd_emotional_friction" ||
     category === "reminder" ||
+    category === "artifact_execution" ||
     category === "focus_support" ||
+    category === "focus" ||
     category === "decision_support" ||
     category === "tool_open" ||
-    category === "google_sheet"
+    category === "google_sheet" ||
+    category === "strategy" ||
+    category === "organize" ||
+    category === "emotional"
   );
 }
 
@@ -262,10 +278,15 @@ function deriveActualIntent(input: {
     if (input.frictionlessCategory === "emotional_regulation") return "calm";
     if (input.frictionlessCategory === "adhd_emotional_friction") return "understand";
     if (input.frictionlessCategory === "reminder") return "execute";
+    if (input.frictionlessCategory === "artifact_execution") return "execute";
     if (input.frictionlessCategory === "focus_support") return "focus";
+    if (input.frictionlessCategory === "focus") return "focus";
     if (input.frictionlessCategory === "decision_support") return "decide";
     if (input.frictionlessCategory === "tool_open") return "navigate";
     if (input.frictionlessCategory === "google_sheet") return "create";
+    if (input.frictionlessCategory === "strategy") return "strategy";
+    if (input.frictionlessCategory === "organize") return "organize";
+    if (input.frictionlessCategory === "emotional") return "emotional";
   }
   if (input.learnFastPath || input.routingCategory === "learn") return "learn";
   return mapRoutingCategoryToIntent(input.routingCategory);
@@ -481,7 +502,20 @@ export function evaluateCompanionBehaviorCase(
   const frictionless = resolveFrictionlessAction({
     userText,
     currentTurn: testCase.category === "yes_continuation" ? 2 : 1,
+    reminderDraft: testCase.setupReminderDraft ?? null,
+    artifactExecutionDraft: testCase.setupArtifactExecutionDraft ?? null,
+    messages: priorMessages?.length
+      ? ([
+          ...priorMessages,
+          { role: "user" as const, content: userText },
+        ].filter(
+          (m): m is { role: "user" | "assistant"; content: string } =>
+            m.role === "user" || m.role === "assistant",
+        ))
+      : undefined,
+    lastAssistantText: priorMessages?.at(-1)?.content ?? "",
   });
+  const activeRouting = frictionless.intentRouting ?? routing;
   const featureNav = buildAppFeatureNavOffer(userText);
   const messages = toMessages(priorMessages, userText);
 
@@ -498,16 +532,16 @@ export function evaluateCompanionBehaviorCase(
 
   const actualSuppression = buildSuppressionSnapshot({
     userText,
-    routing,
+    routing: activeRouting,
     frictionless,
   });
   const userFacing = userFacingResponseText(frictionless);
   const guidance = buildGuidancePreview({ userText, routing, frictionless });
 
   const actualIntent = deriveActualIntent({
-    routingCategory: routing.category,
+    routingCategory: activeRouting.category,
     frictionlessCategory: frictionless.category,
-    learnFastPath: routing.learnFastPath,
+    learnFastPath: activeRouting.learnFastPath,
     isContinuation,
     hasFeatureNav: Boolean(featureNav),
     visualThinkingMenu:
@@ -516,7 +550,7 @@ export function evaluateCompanionBehaviorCase(
   });
 
   const actualRoute = deriveActualRoute({
-    routingRouteMode: routing.routeMode,
+    routingRouteMode: activeRouting.routeMode,
     frictionlessCategory: frictionless.category,
     isContinuation,
   });
@@ -528,7 +562,7 @@ export function evaluateCompanionBehaviorCase(
         : isVisualThinkingFrictionless(frictionless)
           ? "visual-focus"
           : frictionless.workspaceOffer?.section ??
-            routing.workspaceOffer?.section ??
+            activeRouting.workspaceOffer?.section ??
             (featureNav?.target?.kind === "workspace"
               ? featureNav.target.section
               : null),
@@ -536,7 +570,7 @@ export function evaluateCompanionBehaviorCase(
       frictionless.category === "google_sheet" ||
       isVisualThinkingFrictionless(frictionless)
         ? null
-        : routing.featureLabel,
+        : activeRouting.featureLabel,
     pendingTarget:
       continuationTarget ??
       (frictionless.category === "google_sheet" ? "google-workspace" : null),
@@ -597,7 +631,7 @@ export function evaluateCompanionBehaviorCase(
 
   if (testCase.forbidProjectsRoute) {
     const section =
-      frictionless.workspaceOffer?.section ?? routing.workspaceOffer?.section;
+      frictionless.workspaceOffer?.section ?? activeRouting.workspaceOffer?.section;
     if (section === "projects") {
       reasons.push("Create artifact incorrectly routed to Projects");
     }
@@ -632,7 +666,7 @@ export function evaluateCompanionBehaviorCase(
 
   if (
     (testCase.category === "learn" || testCase.category === "create") &&
-    routing.learnFastPath === false &&
+    activeRouting.learnFastPath === false &&
     testCase.expectedSuppressionFlags.learnFastPath === true
   ) {
     reasons.push("learn fast path not active for knowledge-style turn");
@@ -1289,11 +1323,10 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p020-flowchart",
     category: "create",
     userInput: "create a flowchart",
-    expectedIntent: ["create", "execute"],
+    expectedIntent: ["create", "execute", "conversation"],
     expectedRoute: "direct_action",
-    expectedFeature: "Visual Thinking",
     expectedSuppressionFlags: { relationship: true },
-    forbiddenOpeners: ["open Create"],
+    forbiddenOpeners: ["open Create", "Opening Visual Thinking"],
   },
   {
     id: "p020-course-launch-visual",
@@ -1309,11 +1342,10 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p020-hierarchy",
     category: "create",
     userInput: "build a hierarchy map",
-    expectedIntent: ["create", "execute"],
+    expectedIntent: ["create", "execute", "conversation"],
     expectedRoute: "direct_action",
-    expectedFeature: "Visual Thinking",
     expectedSuppressionFlags: { relationship: true },
-    forbiddenOpeners: ["open Create"],
+    forbiddenOpeners: ["open Create", "Opening Visual Thinking"],
   },
 
   // —— P0.20.2 Visual Thinking overreach — must NOT route to Visual Thinking ——
@@ -1358,6 +1390,182 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     forbiddenOpeners: ["Visual Thinking"],
   },
 
+  // —— P0.24.1 Reminder Intelligence ——
+  {
+    id: "p0241-reminder-set-up-phrase",
+    category: "reminder",
+    userInput: "Set up a reminder for me to drink water.",
+    expectedIntent: "execute",
+    expectedRoute: "reminder",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: [
+      "would you like me to help you set a reminder",
+      "strategic direction",
+    ],
+    maxQuestionsInTurn: 1,
+  },
+  {
+    id: "p0241-reminder-follow-up-yes",
+    category: "reminder",
+    userInput: "yes",
+    setupReminderDraft: {
+      title: "Drink water",
+      message: "drink water",
+      reminderType: "one_time",
+      missing: "time",
+    },
+    expectedIntent: "execute",
+    expectedRoute: "reminder",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["strategic direction", "keep going on"],
+  },
+  {
+    id: "p0241-reminder-wins-over-stale-strategy",
+    category: "reminder",
+    userInput: "Remind me to drink water.",
+    expectedIntent: "execute",
+    expectedRoute: "reminder",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["strategic direction", "keep going on"],
+    notes: "Stale strategy pending must not override a new reminder request.",
+  },
+
+  // —— P0.33 Reminder vs Notification Settings Boundary ——
+  {
+    id: "p033-reminder-not-settings",
+    category: "reminder",
+    userInput: "I need a reminder to drink water.",
+    expectedIntent: "execute",
+    expectedRoute: "reminder",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: [
+      "notification settings",
+      "Opening Notifications",
+      "strategic direction",
+    ],
+    maxQuestionsInTurn: 1,
+  },
+  {
+    id: "p033-reminder-multi-time-yes",
+    category: "reminder",
+    userInput: "yes",
+    setupReminderDraft: {
+      title: "Drink water",
+      message: "drink water",
+      reminderType: "recurring",
+      dailyTimes: ["10:00", "13:00", "17:00"],
+      missing: "frequency",
+    },
+    expectedIntent: "execute",
+    expectedRoute: "reminder",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: [
+      "notification settings",
+      "Opening Notifications",
+      "strategic direction",
+      "keep going on",
+    ],
+  },
+  {
+    id: "p033-notify-me-not-settings",
+    category: "reminder",
+    userInput: "Notify me every day at 2pm to stretch.",
+    expectedIntent: "execute",
+    expectedRoute: "reminder",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["notification settings", "Opening Notifications"],
+  },
+
+  // —— P0.26 Artifact Execution Authority ——
+  {
+    id: "p026-pdf-execution-offer",
+    category: "artifact_execution",
+    userInput: "Make this a PDF",
+    priorMessages: [
+      {
+        role: "assistant",
+        content:
+          "Weekly plan:\n- Monday blog\n- Wednesday newsletter\n- Friday recap",
+      },
+    ],
+    expectedIntent: "execute",
+    expectedRoute: "artifact_execution",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["Opening Create", "Documents", "strategic direction"],
+    maxQuestionsInTurn: 1,
+  },
+  {
+    id: "p026-pdf-yes-continuation",
+    category: "artifact_execution",
+    userInput: "yes",
+    priorMessages: [
+      {
+        role: "assistant",
+        content:
+          "Weekly plan:\n- Monday blog\n- Wednesday newsletter\n- Friday recap",
+      },
+      { role: "user", content: "Make this a PDF" },
+      { role: "assistant", content: "Shall I create the PDF now?" },
+    ],
+    setupArtifactExecutionDraft: {
+      kind: "pdf",
+      title: "Weekly plan",
+      body: "Weekly plan:\n- Monday blog\n- Wednesday newsletter\n- Friday recap",
+      missing: null,
+    },
+    expectedIntent: "execute",
+    expectedRoute: "artifact_execution",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["Opening Create", "Documents", "strategic direction"],
+  },
+  {
+    id: "p026-sheet-execution",
+    category: "artifact_execution",
+    userInput: "Create the sheet",
+    priorMessages: [
+      {
+        role: "assistant",
+        content: "Topic | Day | Channel\nBlog | Mon | Site\nNews | Wed | Email",
+      },
+    ],
+    expectedIntent: "execute",
+    expectedRoute: "artifact_execution",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["Opening Create", "strategic direction"],
+  },
+  {
+    id: "p026-calendar-execution",
+    category: "artifact_execution",
+    userInput: "Create this calendar",
+    priorMessages: [
+      {
+        role: "assistant",
+        content:
+          "- Monday: blog draft\n- Wednesday: newsletter\n- Friday: social posts",
+      },
+    ],
+    expectedIntent: "execute",
+    expectedRoute: "artifact_execution",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["Documents", "Opening Create", "strategic direction"],
+  },
+  {
+    id: "p026-wins-over-stale-workspace",
+    category: "artifact_execution",
+    userInput: "Make this a PDF",
+    priorMessages: [
+      {
+        role: "assistant",
+        content: "Launch checklist:\n1. Email list\n2. Landing page\n3. Ads",
+      },
+    ],
+    expectedIntent: "execute",
+    expectedRoute: "artifact_execution",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["strategic direction", "Opening Create"],
+    notes: "Artifact execution must win over stale workspace/strategy pendings.",
+  },
+
   // —— P0.20.1 Learn vs Visual ——
   {
     id: "p0201-learn-flowchart",
@@ -1373,9 +1581,8 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p0201-planned-flowchart",
     category: "create",
     userInput: "Create a flowchart",
-    expectedIntent: ["create", "execute"],
+    expectedIntent: ["create", "execute", "conversation"],
     expectedRoute: "direct_action",
-    expectedFeature: "Visual Thinking",
     expectedSuppressionFlags: { relationship: true },
     forbiddenOpeners: ["Opening Visual Thinking"],
   },
@@ -1512,18 +1719,20 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     category: "create",
     userInput: "Help me create a content calendar",
     expectedIntent: "create",
-    expectedRoute: "google_sheet",
-    expectedFeature: "google-workspace",
+    expectedRoute: "direct_action",
+    expectedFeature: "content-generator",
     expectedSuppressionFlags: { relationship: true },
+    notes: "Spreadsheets route to Create — not Google Sheets intake",
   },
   {
     id: "create-lead-tracker-sheet",
     category: "create",
     userInput: "I need a lead tracker",
-    expectedIntent: "create",
-    expectedRoute: "google_sheet",
-    expectedFeature: "google-workspace",
+    expectedIntent: ["create", "conversation"],
+    expectedRoute: "direct_action",
+    expectedFeature: "content-generator",
     expectedSuppressionFlags: { relationship: true },
+    notes: "Spreadsheets route to Create — not Google Sheets intake",
   },
   {
     id: "create-email-not-sheet",

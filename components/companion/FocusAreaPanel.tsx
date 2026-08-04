@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import {
   FOCUS_FEELING_ENTRIES,
   focusFeelingById,
@@ -11,6 +12,7 @@ import {
 } from "@/lib/focusHub";
 import { initialSectionOpen } from "@/lib/expandableUi";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
+import { BackButton } from "./BackButton";
 
 function FeelingButton({
   emoji,
@@ -154,14 +156,39 @@ function ToolGroupSection({
 
 export function FocusAreaPanel({
   onAction,
+  registerBack,
+  onGoBack,
+  selectedFeeling: selectedFeelingProp,
+  onSelectedFeelingChange,
 }: {
   onAction: (action: FocusHubAction) => void;
+  registerBack?: (fn: (() => boolean) | null) => void;
+  onGoBack?: () => void;
+  selectedFeeling?: FocusFeelingId | null;
+  onSelectedFeelingChange?: (id: FocusFeelingId | null) => void;
 }) {
-  const [selectedFeeling, setSelectedFeeling] = useState<FocusFeelingId | null>(
-    null,
-  );
+  const [localFeeling, setLocalFeeling] = useState<FocusFeelingId | null>(null);
+  const selectedFeeling = selectedFeelingProp ?? localFeeling;
+
+  function setSelectedFeeling(id: FocusFeelingId | null) {
+    if (onSelectedFeelingChange) onSelectedFeelingChange(id);
+    else setLocalFeeling(id);
+  }
 
   const category = selectedFeeling ? focusFeelingById(selectedFeeling) : null;
+
+  useEffect(() => {
+    if (!registerBack) return;
+    if (!selectedFeeling) {
+      registerBack(null);
+      return;
+    }
+    registerBack(() => {
+      setSelectedFeeling(null);
+      return true;
+    });
+    return () => registerBack(null);
+  }, [registerBack, selectedFeeling]);
 
   function handleFeelingSelect(id: FocusFeelingId) {
     setSelectedFeeling(id);
@@ -169,6 +196,7 @@ export function FocusAreaPanel({
 
   function handleBack() {
     setSelectedFeeling(null);
+    onGoBack?.();
   }
 
   if (category) {
@@ -184,13 +212,12 @@ export function FocusAreaPanel({
         data-focus-view="category"
         data-focus-category={category.id}
       >
-        <button
-          type="button"
+        <BackButton
           onClick={handleBack}
-          className="mb-3 self-start text-sm font-semibold text-[#1e4f4f]"
-        >
-          ‹ Focus
-        </button>
+          label="Focus"
+          size="compact"
+          className="mb-3 self-start"
+        />
         <p className="text-2xl font-semibold text-[#1f1c19]">
           {category.emoji} {category.label}
         </p>
@@ -226,7 +253,8 @@ export function FocusAreaPanel({
       data-testid="focus-area-panel"
       data-focus-view="feelings"
     >
-      <p className="text-2xl font-semibold text-[#1f1c19]">Focus</p>
+      <WorkspaceAreaWorksGuide areaId="focus" />
+      <p className="mt-4 text-2xl font-semibold text-[#1f1c19]">Focus™</p>
       <p className="mt-1 text-base text-[#6b635a]">
         How are you feeling right now?
       </p>

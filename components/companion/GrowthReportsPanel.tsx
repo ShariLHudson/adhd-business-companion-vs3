@@ -1,5 +1,7 @@
 "use client";
 
+/** @deprecated P0.56 — Not mounted. Use Outcome Goals™ → Insights for goal reports. */
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   buildGrowthReportContent,
@@ -26,6 +28,58 @@ type GrowthReportsPanelProps = {
 };
 
 export function GrowthReportsPanel({ open, onClose }: GrowthReportsPanelProps) {
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4"
+      role="presentation"
+      onClick={onClose}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="growth-reports-title"
+        className="flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-3xl border border-[#e7d9c8] bg-[#faf7f2] shadow-2xl sm:rounded-3xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-3 border-b border-[#e7d9c8] bg-white px-5 py-4">
+          <div>
+            <h2 id="growth-reports-title" className="text-xl font-bold text-[#2f261f]">
+              📖 Growth Reports
+            </h2>
+            <p className="mt-1 text-sm text-[#6f6259]">
+              Build a printable report from your wins, evidence, portfolio, and journey.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full border border-[#e7d9c8] bg-[#faf7f2] px-3 py-1.5 text-sm font-semibold text-[#6f6259] hover:bg-[#f3ebe0]"
+            aria-label="Close Growth Reports"
+          >
+            ✕
+          </button>
+        </div>
+        <GrowthReportsForm onClose={onClose} />
+      </div>
+    </div>
+  );
+}
+
+/** Inline report builder for Outcome Goals™ → Reports tab */
+export function GrowthReportsInline() {
+  return (
+    <div
+      className="rounded-2xl border border-[#e7d9c8] bg-white"
+      data-testid="growth-reports-inline"
+    >
+      <GrowthReportsForm />
+    </div>
+  );
+}
+
+function GrowthReportsForm({ onClose }: { onClose?: () => void }) {
   const [reportType, setReportType] = useState<GrowthReportType>("weekly");
   const [reportStyle, setReportStyle] = useState<GrowthReportStyle>("summary");
   const [customFrom, setCustomFrom] = useState("");
@@ -36,13 +90,13 @@ export function GrowthReportsPanel({ open, onClose }: GrowthReportsPanelProps) {
   const [status, setStatus] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!open) return;
+    if (!onClose) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  }, [onClose]);
 
   const handleTypeChange = useCallback((type: GrowthReportType) => {
     setReportType(type);
@@ -91,41 +145,9 @@ export function GrowthReportsPanel({ open, onClose }: GrowthReportsPanelProps) {
     setStatus("HTML report downloaded — open it and print to PDF anytime.");
   }
 
-  if (!open) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-[100] flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4"
-      role="presentation"
-      onClick={onClose}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="growth-reports-title"
-        className="flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-3xl border border-[#e7d9c8] bg-[#faf7f2] shadow-2xl sm:rounded-3xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-start justify-between gap-3 border-b border-[#e7d9c8] bg-white px-5 py-4">
-          <div>
-            <h2 id="growth-reports-title" className="text-xl font-bold text-[#2f261f]">
-              📖 Growth Reports
-            </h2>
-            <p className="mt-1 text-sm text-[#6f6259]">
-              Build a printable report from your wins, evidence, highlights, and journey.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-full border border-[#e7d9c8] bg-[#faf7f2] px-3 py-1.5 text-sm font-semibold text-[#6f6259] hover:bg-[#f3ebe0]"
-            aria-label="Close Growth Reports"
-          >
-            ✕
-          </button>
-        </div>
-
-        <div className="flex-1 space-y-5 overflow-y-auto px-5 py-5">
+    <>
+      <div className="flex-1 space-y-5 overflow-y-auto px-5 py-5">
           <div>
             <label htmlFor="report-type" className={LABEL_CLASS}>
               Report Type
@@ -254,16 +276,17 @@ export function GrowthReportsPanel({ open, onClose }: GrowthReportsPanelProps) {
           >
             Download HTML
           </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-full border border-[#e7d9c8] px-4 py-2.5 text-sm font-semibold text-[#6f6259] hover:bg-[#faf7f2]"
-          >
-            Cancel
-          </button>
+          {onClose ? (
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-full border border-[#e7d9c8] px-4 py-2.5 text-sm font-semibold text-[#6f6259] hover:bg-[#faf7f2]"
+            >
+              Cancel
+            </button>
+          ) : null}
         </div>
-      </div>
-    </div>
+    </>
   );
 }
 

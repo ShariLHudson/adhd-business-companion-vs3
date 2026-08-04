@@ -12,6 +12,7 @@ import {
 } from "@/lib/clearMyMindCopy";
 import type { AppSection } from "@/lib/companionUi";
 import type { WorkspacePanelDetail } from "@/lib/workspaceAwareness";
+import type { WorkspaceBackRegistrar } from "@/lib/workspaceDrillBack";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 
@@ -20,6 +21,7 @@ export function BrainDumpPanel({
   onSuggestOpen,
   onContextChange,
   contextBanner,
+  registerBack,
   /** Full-width layout when opened standalone from top navigation. */
   standalone = false,
 }: {
@@ -27,6 +29,7 @@ export function BrainDumpPanel({
   onSuggestOpen?: (section: AppSection) => void;
   contextBanner?: string | null;
   onContextChange?: (detail: WorkspacePanelDetail) => void;
+  registerBack?: WorkspaceBackRegistrar;
   standalone?: boolean;
 }) {
   const [captureSessionId] = useState(newCaptureSessionId);
@@ -50,6 +53,19 @@ export function BrainDumpPanel({
   const handleLandscapeActiveChange = useCallback((active: boolean) => {
     setLandscapeActive(active);
   }, []);
+
+  useEffect(() => {
+    if (!registerBack) return;
+    if (!landscapeActive) {
+      registerBack(null);
+      return;
+    }
+    registerBack(() => {
+      setLandscapeActive(false);
+      return true;
+    });
+    return () => registerBack(null);
+  }, [registerBack, landscapeActive]);
 
   const fullWidth = standalone || landscapeActive;
 

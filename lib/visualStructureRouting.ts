@@ -53,8 +53,9 @@ export function visualFocusModeForKind(
 export function isVisualStructureExecution(text: string): boolean {
   if (shouldRouteBusinessStrategyToCreate(text)) return false;
   if (shouldSuppressVisualThinkingForLearn(text)) return false;
-  if (resolveUnavailableVisualTypeReply(text)) return false;
   if (shouldBlockVisualThinking(text)) return false;
+  const view = detectExplicitVisualView(text);
+  if (view && !isViewIdAvailable(view.id)) return false;
   return (
     isExplicitVisualStructureRequest(text) ||
     isVisualConversionRequest(text) ||
@@ -103,7 +104,8 @@ export function resolveVisualStructureRoute(
   }
 
   const view = detectExplicitVisualView(t);
-  if (view && isExplicitVisualStructureRequest(t) && isViewIdAvailable(view.id)) {
+  if (view && isExplicitVisualStructureRequest(t)) {
+    if (!isViewIdAvailable(view.id)) return null;
     return {
       section: "visual-focus",
       visualFocusMode: view.mode,

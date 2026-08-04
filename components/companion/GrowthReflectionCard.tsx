@@ -1,5 +1,7 @@
 "use client";
 
+/** @deprecated P0.56 — Not mounted. Weekly reflection not wired to a hub. */
+
 import { useEffect, useState } from "react";
 import {
   getReflectionQuestionForWeek,

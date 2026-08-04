@@ -1,5 +1,7 @@
 /** Visual Focus — cognitive workspace (not a task display mode). */
 
+import type { VisualThinkingHomeTypeId } from "../visualThinkingHome";
+
 export type VisualFocusSaveDestinationId =
   | "visual-thinking"
   | "projects"
@@ -137,6 +139,8 @@ export type VisualFocusMap = {
   id: string;
   title: string;
   mode: VisualFocusMode;
+  /** P0.43.1 — which home box opened this map (for per-type help). */
+  homeTypeId?: VisualThinkingHomeTypeId;
   root: VisualFocusNode;
   purposeAnchor?: VisualFocusPurposeAnchor;
   businessCanvas?: BusinessCanvasData;

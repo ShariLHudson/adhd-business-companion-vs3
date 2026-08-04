@@ -9,7 +9,8 @@ import {
   downloadEvidenceEntry,
   EMPTY_EVIDENCE_DRAFT,
   EVIDENCE_BANK_UPDATED_EVENT,
-  EVIDENCE_CATEGORIES,
+  addCustomEvidenceCategory,
+  getEvidenceCategories,
   getEvidenceDashboardStats,
   getEvidenceEntries,
   printEvidenceEntry,
@@ -28,6 +29,8 @@ import {
 } from "@/components/companion/GrowthSectionHeader";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
+import { OutcomeGoalMultiLinkPicker } from "@/components/companion/OutcomeGoalMultiLinkPicker";
+import { getLinkedGoalIds, packGoalLinks } from "@/lib/goals/goalLinking";
 import {
   isInGrowthArchivePeriod,
   type GrowthArchivePeriod,
@@ -37,6 +40,74 @@ import type { GrowthPanelNav } from "@/lib/growthNavigation";
 const INPUT_CLASS =
   "mt-1 w-full rounded-xl border border-[#e4ddd2] bg-white px-3 py-2.5 text-sm text-[#2d2926] placeholder:text-[#9a8f82] focus:border-[#c9a66b] focus:outline-none focus:ring-2 focus:ring-[#c9a66b]/25";
 const LABEL_CLASS = "text-xs font-bold uppercase tracking-wide text-[#9a8f82]";
+
+function EvidenceCategorySelect({
+  value,
+  onChange,
+  id,
+  className,
+}: {
+  value: string;
+  onChange: (category: EvidenceCategory) => void;
+  id?: string;
+  className?: string;
+}) {
+  const [categories, setCategories] = useState(() => getEvidenceCategories());
+  const [customName, setCustomName] = useState("");
+  const isCustom = value === "Custom" || (!categories.includes(value) && value.length > 0);
+
+  function refreshCategories() {
+    setCategories(getEvidenceCategories());
+  }
+
+  return (
+    <div className="space-y-2">
+      <select
+        id={id}
+        value={isCustom && value !== "Custom" ? "Custom" : value}
+        onChange={(e) => {
+          const next = e.target.value;
+          if (next === "Custom") {
+            onChange("Custom");
+          } else {
+            onChange(next);
+          }
+        }}
+        className={className}
+      >
+        {categories.map((cat) => (
+          <option key={cat} value={cat}>
+            {cat}
+          </option>
+        ))}
+      </select>
+      {value === "Custom" || isCustom ? (
+        <div className="flex flex-wrap gap-2">
+          <input
+            value={customName || (value !== "Custom" ? value : "")}
+            onChange={(e) => setCustomName(e.target.value)}
+            placeholder="Your category name"
+            className={className}
+          />
+          <button
+            type="button"
+            onClick={() => {
+              const name = (customName || value).trim();
+              if (!name || name === "Custom") return;
+              const saved = addCustomEvidenceCategory(name);
+              refreshCategories();
+              onChange(saved);
+              setCustomName("");
+            }}
+            className="rounded-full border border-[#e7d9c8] px-3 py-1.5 text-xs font-semibold text-[#2f261f]"
+          >
+            Use category
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 function formatEvidenceDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, {
@@ -149,22 +220,13 @@ function EvidenceCard({
             <div className="space-y-3">
               <div>
                 <label className={LABEL_CLASS}>Category</label>
-                <select
+                <EvidenceCategorySelect
                   value={editDraft.category}
-                  onChange={(e) =>
-                    onEditDraftChange({
-                      ...editDraft,
-                      category: e.target.value as EvidenceCategory,
-                    })
+                  onChange={(category) =>
+                    onEditDraftChange({ ...editDraft, category })
                   }
                   className={INPUT_CLASS}
-                >
-                  {EVIDENCE_CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
               {(
                 [
@@ -193,6 +255,12 @@ function EvidenceCard({
                 attachments={editDraft.attachments}
                 onAttachmentsChange={(next) =>
                   onEditDraftChange({ ...editDraft, attachments: next })
+                }
+              />
+              <OutcomeGoalMultiLinkPicker
+                value={getLinkedGoalIds(editDraft)}
+                onChange={(ids) =>
+                  onEditDraftChange({ ...editDraft, ...packGoalLinks(ids) })
                 }
               />
               <div className="flex gap-2">
@@ -354,6 +422,7 @@ export function EvidenceBankPanel({
     createEvidenceEntry({
       ...draft,
       whatHappened: draft.whatHappened.trim(),
+      ...packGoalLinks(getLinkedGoalIds(draft)),
     });
     setDraft(EMPTY_EVIDENCE_DRAFT);
     setShowForm(false);
@@ -381,6 +450,7 @@ export function EvidenceBankPanel({
       whatThisProves: entry.whatThisProves,
       attachments: [...entry.attachments],
       sourceWinId: entry.sourceWinId,
+      ...packGoalLinks(getLinkedGoalIds(entry)),
     });
   }
 
@@ -389,6 +459,7 @@ export function EvidenceBankPanel({
     updateEvidenceEntry(editingId, {
       ...editDraft,
       whatHappened: editDraft.whatHappened.trim(),
+      ...packGoalLinks(getLinkedGoalIds(editDraft)),
     });
     setEditingId(null);
     reload();
@@ -415,6 +486,7 @@ export function EvidenceBankPanel({
         onSearchChange={setSearch}
         searchPlaceholder="Search evidence…"
         onCloseAll={closeAll}
+        toolsInMore
         onQuickAttach={(atts) => {
           setDraft((d) => ({
             ...d,
@@ -477,20 +549,12 @@ export function EvidenceBankPanel({
                 <label className={LABEL_CLASS} htmlFor="evidence-category">
                   Category
                 </label>
-                <select
+                <EvidenceCategorySelect
                   id="evidence-category"
                   value={draft.category}
-                  onChange={(e) =>
-                    updateDraft("category", e.target.value as EvidenceCategory)
-                  }
+                  onChange={(category) => updateDraft("category", category)}
                   className={INPUT_CLASS}
-                >
-                  {EVIDENCE_CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div>
@@ -588,6 +652,13 @@ export function EvidenceBankPanel({
               <GrowthAttachmentsField
                 attachments={draft.attachments}
                 onAttachmentsChange={(next) => updateDraft("attachments", next)}
+              />
+
+              <OutcomeGoalMultiLinkPicker
+                value={getLinkedGoalIds(draft)}
+                onChange={(ids) =>
+                  setDraft((d) => ({ ...d, ...packGoalLinks(ids) }))
+                }
               />
 
               <button

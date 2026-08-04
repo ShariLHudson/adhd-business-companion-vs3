@@ -6,6 +6,7 @@ import {
   isPlanMyDayDismissedForSession,
 } from "./todayPanelDismiss";
 import { findLatestHomeResumeItem } from "./homeResumeItem";
+import { clearCreateSession } from "./createSessionStore";
 
 function stubStorage() {
   const sessionMem = new Map<string, string>();
@@ -27,10 +28,15 @@ function stubStorage() {
   vi.stubGlobal("window", { localStorage, sessionStorage });
 }
 
+function recentIso(hoursAgo = 2): string {
+  return new Date(Date.now() - hoursAgo * 60 * 60 * 1000).toISOString();
+}
+
 describe("todayPanelDismiss", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     stubStorage();
+    clearCreateSession();
   });
 
   it("hides plan my day for the session without deleting resume data", () => {
@@ -56,7 +62,7 @@ describe("todayPanelDismiss", () => {
             "This is a meaningful draft with enough characters to count as real work.",
         },
         workspaceDetail: null,
-        updatedAt: "2026-06-12T12:00:00.000Z",
+        updatedAt: recentIso(1),
       }),
     );
 

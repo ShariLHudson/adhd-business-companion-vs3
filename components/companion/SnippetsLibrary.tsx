@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { WorkspaceBackRegistrar } from "@/lib/workspaceDrillBack";
 import {
   businessContextSummary,
   createSnippet,
@@ -61,9 +62,11 @@ const EMPTY: Draft = {
 export function SnippetsLibrary({
   onBuildWithShari,
   onBack,
+  registerBack,
 }: {
   onBuildWithShari?: (input: CreationWorkspaceInput) => void;
   onBack?: () => void;
+  registerBack?: WorkspaceBackRegistrar;
 }) {
   const [items, setItems] = useState<Snippet[]>([]);
   const [filter, setFilter] = useState<SnippetKind | typeof NO_CATEGORY>(
@@ -89,6 +92,30 @@ export function SnippetsLibrary({
   useEffect(() => {
     setItems(getSnippets());
   }, []);
+
+  const popDrillView = useCallback(() => {
+    if (draft) {
+      setDraft(null);
+      return;
+    }
+    if (viewId) {
+      setViewId(null);
+    }
+  }, [draft, viewId]);
+
+  useEffect(() => {
+    if (!registerBack) return;
+    const drilled = Boolean(draft || viewId);
+    if (!drilled) {
+      registerBack(null);
+      return;
+    }
+    registerBack(() => {
+      popDrillView();
+      return true;
+    });
+    return () => registerBack(null);
+  }, [registerBack, draft, viewId, popDrillView]);
 
   async function suggest() {
     if (suggesting) return;

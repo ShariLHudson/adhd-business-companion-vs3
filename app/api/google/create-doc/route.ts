@@ -13,6 +13,15 @@ import {
 import { contentToSheetCsv } from "@/lib/googleSheetContent";
 import { googleUrlForFile } from "@/lib/googleDriveServer";
 import type { GoogleFileKind } from "@/lib/googleWorkspace";
+import {
+  GOOGLE_EXPORT_MESSAGES,
+  deleteGoogleDriveFile,
+  spreadsheetStructureErrorMessage,
+  validateDocumentExportContent,
+  validateSpreadsheetCsv,
+  verifyGoogleDocFileContent,
+  verifyGoogleSheetFileContent,
+} from "@/lib/googleExportVerification";
 
 /** Create a Google Doc/Sheet/Form with content and return its URL + file id. */
 export async function POST(request: NextRequest) {
@@ -28,10 +37,25 @@ export async function POST(request: NextRequest) {
   const kind: GoogleFileKind =
     rawKind === "sheet" ? "sheet" : rawKind === "form" ? "form" : "doc";
   const forceExport = Boolean(body.forceExport);
+  const alreadyCsv = Boolean(body.alreadyCsv);
 
-  if (!content.trim()) {
+  if (kind === "sheet") {
+    const csv = alreadyCsv ? content.trim() : contentToSheetCsv(content);
+    const structure = validateSpreadsheetCsv(csv);
+    if (!structure.ok) {
+      return NextResponse.json(
+        { error: spreadsheetStructureErrorMessage(structure.reason) },
+        { status: 400 },
+      );
+    }
+  } else if (kind === "doc") {
+    const docCheck = validateDocumentExportContent(content);
+    if (!docCheck.ok) {
+      return NextResponse.json({ error: docCheck.message }, { status: 400 });
+    }
+  } else if (!content.trim()) {
     return NextResponse.json(
-      { error: "No draft content to export." },
+      { error: GOOGLE_EXPORT_MESSAGES.emptyDocument },
       { status: 400 },
     );
   }
@@ -67,7 +91,7 @@ export async function POST(request: NextRequest) {
       fileId = result.fileId;
       url = result.url;
     } else if (kind === "sheet") {
-      const csv = contentToSheetCsv(content);
+      const csv = alreadyCsv ? content.trim() : contentToSheetCsv(content);
       const mimeType = "application/vnd.google-apps.spreadsheet";
       const boundary = `spark${Date.now()}`;
       const metadata = { name: title.slice(0, 120), mimeType };
@@ -95,13 +119,26 @@ export async function POST(request: NextRequest) {
         const detail = await r.text();
         console.error("Drive sheet create error:", detail);
         return NextResponse.json(
-          { error: "Couldn't create the sheet." },
+          { error: GOOGLE_EXPORT_MESSAGES.verifyFailed },
           { status: r.status === 401 ? 401 : 502 },
         );
       }
       const j = await r.json();
       fileId = j.id as string;
       url = googleUrlForFile("sheet", fileId);
+
+      const sheetOk = await verifyGoogleSheetFileContent(
+        tokens.access_token,
+        fileId,
+      );
+      if (!sheetOk) {
+        console.error("Google Sheet verification failed:", fileId);
+        await deleteGoogleDriveFile(tokens.access_token, fileId);
+        return NextResponse.json(
+          { error: GOOGLE_EXPORT_MESSAGES.verifyFailed },
+          { status: 502 },
+        );
+      }
     } else {
       const created = await createGoogleDocWithContent(
         tokens.access_token,
@@ -115,13 +152,25 @@ export async function POST(request: NextRequest) {
         );
       }
       fileId = created.fileId;
-      // Best-effort headings/bullets when Google Docs API is enabled; content
-      // is already in the file from the Drive upload above.
       await applyContentToGoogleDoc(tokens.access_token, fileId, content);
       url = googleUrlForFile("doc", fileId);
+
+      const docOk = await verifyGoogleDocFileContent(
+        tokens.access_token,
+        fileId,
+        1,
+      );
+      if (!docOk) {
+        console.error("Google Doc verification failed:", fileId);
+        await deleteGoogleDriveFile(tokens.access_token, fileId);
+        return NextResponse.json(
+          { error: GOOGLE_EXPORT_MESSAGES.verifyFailed },
+          { status: 502 },
+        );
+      }
     }
 
-    const res = NextResponse.json({ url, id: fileId, kind });
+    const res = NextResponse.json({ url, id: fileId, kind, verified: true });
     if (tokens.access_token !== stored.access_token) {
       res.cookies.set(G_COOKIE, JSON.stringify(tokens), {
         httpOnly: true,
@@ -133,6 +182,9 @@ export async function POST(request: NextRequest) {
     return res;
   } catch (e) {
     console.error("create-doc error", e);
-    return NextResponse.json({ error: "Something went wrong." }, { status: 500 });
+    return NextResponse.json(
+      { error: GOOGLE_EXPORT_MESSAGES.verifyFailed },
+      { status: 500 },
+    );
   }
 }

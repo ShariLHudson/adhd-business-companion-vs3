@@ -4,6 +4,8 @@
 
 import type { OutcomeGoal } from "./outcomeGoals";
 import { goalProgressPercent } from "./outcomeGoals";
+import { planItemSupportsGoal } from "./goalLinking";
+import type { PlanDayItem } from "../planMyDay/types";
 
 const ACTIVITY_KEYWORDS: Record<string, RegExp> = {
   "follow-up emails": /\b(follow.?up|email|reply|reach out)\b/i,
@@ -30,6 +32,20 @@ function activityMatchesTitle(activity: string, title: string): boolean {
   const words = activity.toLowerCase().split(/\s+/).filter((w) => w.length > 3);
   const t = title.toLowerCase();
   return words.some((w) => t.includes(w));
+}
+
+export function planDayItemAlignsWithGoal(
+  item: PlanDayItem,
+  goal: OutcomeGoal,
+): boolean {
+  return planItemSupportsGoal(item, goal);
+}
+
+export function goalsSupportedByPlanDayItem(
+  item: PlanDayItem,
+  goals: OutcomeGoal[],
+): OutcomeGoal[] {
+  return goals.filter((g) => planItemSupportsGoal(item, g));
 }
 
 export function planItemAlignsWithGoal(
