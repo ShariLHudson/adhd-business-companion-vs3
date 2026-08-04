@@ -7,10 +7,8 @@ import {
   EXPLORE_MEMBER_BUCKET_LABELS,
   getExploreEstateCategoryGroups,
   getExploreEstateDestinationById,
-  getExploreFeaturedDestinations,
   getExploreMemberBucketGroups,
   searchExploreEstateDestinations,
-  type ExploreMemberBucketId,
 } from "@/lib/estateMap/exploreEstateDestinations";
 import type {
   EstateExploreCategory,
@@ -65,7 +63,7 @@ function DestinationCard({
       data-image-ready={showImage ? "true" : "false"}
       aria-label={`${destination.name}. ${destination.description}${
         isHere ? ". You are here." : ""
-      }${!showImage ? ". Image being prepared." : ""}${
+      }${!showImage ? ". Coming Soon." : ""}${
         !destination.isAvailable ? ". Not available yet." : ""
       }`}
     >
@@ -86,7 +84,7 @@ function DestinationCard({
             className="emfs-dest-card__placeholder"
             data-testid={`explore-estate-image-pending-${destination.id}`}
           >
-            Image being prepared
+            Coming Soon
           </span>
         )}
         <span className="emfs-dest-card__shade" aria-hidden />
@@ -99,7 +97,7 @@ function DestinationCard({
         <span className="emfs-dest-card__desc">{destination.description}</span>
         {!showImage ? (
           <span className="emfs-dest-card__status">
-            {destination.unavailableMessage ?? "Image being prepared"}
+            {destination.unavailableMessage ?? "Coming Soon"}
           </span>
         ) : null}
         {!destination.isAvailable ? (
@@ -151,7 +149,6 @@ export function EstateMapFullScreen({
   const [openCategories, setOpenCategories] = useState<
     Record<string, boolean>
   >({});
-  const [openBuckets, setOpenBuckets] = useState<Record<string, boolean>>({});
   const [viewMode, setViewMode] = useState<WanderEstateViewMode>("gallery");
   const [viewerState, setViewerState] =
     useState<WanderEstateViewerState | null>(null);
@@ -208,11 +205,6 @@ export function EstateMapFullScreen({
     [filtered],
   );
 
-  const featuredIds = useMemo(() => {
-    const featured = getExploreFeaturedDestinations(destinations, 3);
-    return new Set(featured.map((d) => d.id));
-  }, [destinations]);
-
   const showFullDirectory = browseAllPlaces || query.trim().length > 0;
 
   useEffect(() => {
@@ -238,17 +230,6 @@ export function EstateMapFullScreen({
       return next;
     });
   }, [open, groups]);
-
-  useEffect(() => {
-    if (!open || memberBuckets.length === 0) return;
-    setOpenBuckets((prev) => {
-      const next = { ...prev };
-      for (const group of memberBuckets) {
-        if (next[group.id] === undefined) next[group.id] = true;
-      }
-      return next;
-    });
-  }, [open, memberBuckets]);
 
   useEffect(() => {
     if (!open || viewMode === "image_viewer") return;
@@ -312,10 +293,6 @@ export function EstateMapFullScreen({
     setOpenCategories((prev) => ({ ...prev, [id]: !prev[id] }));
   }
 
-  function toggleBucket(id: ExploreMemberBucketId) {
-    setOpenBuckets((prev) => ({ ...prev, [id]: !prev[id] }));
-  }
-
   if (!open && !visible) return null;
 
   return (
@@ -348,7 +325,7 @@ export function EstateMapFullScreen({
             <p data-testid="wander-estate-gallery-subtitle">
               {showFullDirectory
                 ? "Every place with a photograph — open an image to look more closely"
-                : "A few places to begin — open an image, or browse all"}
+                : "Calm & Restore, Explore & Discover, Work & Build — open an image, or browse all places A–Z"}
             </p>
             {/* Keep Explore Estate phrase for directory regressions / search copy */}
             <p className="emfs-sr-only">Explore Estate visual directory</p>
@@ -401,44 +378,30 @@ export function EstateMapFullScreen({
           {!showFullDirectory ? (
             <>
               {memberBuckets.map((group) => {
-                const expanded = openBuckets[group.id] !== false;
-                const cards = group.destinations.filter((d) =>
-                  featuredIds.has(d.id),
-                );
-                if (cards.length === 0) return null;
+                if (group.destinations.length === 0) return null;
                 return (
                   <section
                     key={group.id}
                     className="emfs-category"
                     data-testid={`explore-estate-bucket-${group.id}`}
                   >
-                    <button
-                      type="button"
-                      className="emfs-category__toggle"
-                      aria-expanded={expanded}
-                      onClick={() => toggleBucket(group.id)}
-                    >
-                      <span>
-                        {EXPLORE_MEMBER_BUCKET_LABELS[group.id] ?? group.label}
-                      </span>
-                      <span aria-hidden>{expanded ? "▾" : "▸"}</span>
-                    </button>
-                    {expanded ? (
-                      <div className="emfs-dest-grid" role="list">
-                        {cards.map((destination) => (
-                          <div key={destination.id} role="listitem">
-                            <DestinationCard
-                              destination={destination}
-                              isHere={
-                                destination.id === currentLocationId ||
-                                destination.destinationId === currentLocationId
-                              }
-                              onSelect={handleSelect}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    ) : null}
+                    <h2 className="emfs-category__heading">
+                      {EXPLORE_MEMBER_BUCKET_LABELS[group.id] ?? group.label}
+                    </h2>
+                    <div className="emfs-dest-grid" role="list">
+                      {group.destinations.map((destination) => (
+                        <div key={destination.id} role="listitem">
+                          <DestinationCard
+                            destination={destination}
+                            isHere={
+                              destination.id === currentLocationId ||
+                              destination.destinationId === currentLocationId
+                            }
+                            onSelect={handleSelect}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </section>
                 );
               })}

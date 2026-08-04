@@ -11448,9 +11448,11 @@ export default function CompanionPageClient() {
 
     /** Breathe is a dedicated overlay experience, not a direct-navigation room. */
     if (placeId === "breathe") {
+      openBreatheOverlayCore();
+      // openBreatheOverlayCore() dismisses Explore Estate internally (clearing this
+      // flag as a side effect) — set it true AFTER so Back to Wander survives arrival.
       markExploreEstateReturnPending();
       setExploreEstateReturnAvailable(true);
-      openBreatheOverlayCore();
       return;
     }
 
@@ -11461,11 +11463,27 @@ export default function CompanionPageClient() {
     });
     leaveClearMyMindIfNavigatingAway();
 
-    markExploreEstateReturnPending();
-    setExploreEstateReturnAvailable(true);
-
     if (dest?.destinationType === "overlay" && placeId === "my-business-estate") {
       openProfileDestinationCore("my-business-estate");
+      // openProfileDestinationCore() dismisses Explore Estate internally (clearing
+      // this flag) — set it true AFTER so Back to Wander survives arrival.
+      markExploreEstateReturnPending();
+      setExploreEstateReturnAvailable(true);
+      return;
+    }
+
+    if (dest?.destinationType === "overlay" && placeId === "people-i-help") {
+      openProfileDestinationCore("people-i-help");
+      markExploreEstateReturnPending();
+      setExploreEstateReturnAvailable(true);
+      return;
+    }
+
+    /** Strategy Chamber opens through its own standalone panel, not a direct room. */
+    if (placeId === "strategy-library") {
+      openStrategyLibraryCore();
+      markExploreEstateReturnPending();
+      setExploreEstateReturnAvailable(true);
       return;
     }
 
@@ -11511,6 +11529,10 @@ export default function CompanionPageClient() {
         skipAssistantMessage: true,
       },
     );
+    // runDirectEstateRoomNavigation() dismisses Explore Estate internally (clearing
+    // this flag) — set it true AFTER so Back to Wander survives arrival in the room.
+    markExploreEstateReturnPending();
+    setExploreEstateReturnAvailable(true);
   }
 
   function toggleJustBeHereSound() {
@@ -12788,6 +12810,14 @@ export default function CompanionPageClient() {
       <StrategyLibraryEstatePanel
         onBack={goBack}
         registerBack={extra?.registerBack}
+        onBackToWander={
+          exploreEstateReturnAvailable
+            ? () => {
+                setExploreEstateReturnAvailable(false);
+                openExploreSparkVisualExplorer();
+              }
+            : undefined
+        }
         onOpen={openWorkspaceFromSection}
         onAsk={handlePlaybookAsk}
         onContextChange={handleWorkspaceDetailChange}
@@ -28462,6 +28492,14 @@ export default function CompanionPageClient() {
         }}
         onOpenExperienceControls={() => setExperienceControlsOpen(true)}
         onReturnToProfileOrigin={returnToProfileOrigin}
+        onBackToWander={
+          exploreEstateReturnAvailable
+            ? () => {
+                setExploreEstateReturnAvailable(false);
+                openExploreSparkVisualExplorer();
+              }
+            : undefined
+        }
       />
 
       {guidedFieldHelpChatOpen

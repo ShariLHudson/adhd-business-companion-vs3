@@ -12,6 +12,7 @@ import {
   EXPLORE_ESTATE_REQUIRED_VIDEOS,
   getExploreEstateCategoryGroups,
   getExploreEstateDestinations,
+  getExploreMemberBucketGroups,
   resetExploreEstateDestinationsCache,
   searchExploreEstateDestinations,
 } from "@/lib/estateMap/exploreEstateDestinations";
@@ -180,13 +181,69 @@ describe("Explore Estate visual destinations", () => {
     expect(destinations.some((d) => d.name === "My Personal Library")).toBe(
       false,
     );
-    // The borrowed Reading Nook Under Stairway plate stays out too.
-    expect(destinations.some((d) => d.id === "stairway-reading-nook")).toBe(
-      false,
+  });
+
+  it("keeps Writing Room excluded (no direct-navigation registration yet) and includes Stairway Reading Nook (dedicated plate, no longer a duplicate)", () => {
+    const destinations = getExploreEstateDestinations();
+    // Writing Room has a dedicated image but is not registered in the
+    // direct-navigation system yet — "Talk here with Spark" would silently do
+    // nothing. Stays excluded until it's wired up as a real navigable room.
+    expect(destinations.some((d) => d.id === "writing-room")).toBe(false);
+
+    const nook = destinations.find((d) => d.id === "stairway-reading-nook");
+    expect(nook?.name).toBe("Stairway Reading Nook");
+    expect(nook?.imagePath).toBe(
+      "/backgrounds/reading-nook-under-stairway-background.png",
     );
+    expect(nook?.imageReady).toBe(true);
+
+    // Main Staircase shares the same plate as Stairway Reading Nook and stays excluded.
+    expect(destinations.some((d) => d.id === "main-staircase")).toBe(false);
+  });
+
+  it("adds Founder Office (updated image), Client Avatar Building, and Strategy Chamber", () => {
+    const destinations = getExploreEstateDestinations();
+
+    const founderOffice = destinations.find((d) => d.id === "founder-office");
+    expect(founderOffice?.name).toBe("Founder Office");
+    expect(founderOffice?.imagePath).toBe(
+      "/backgrounds/business-builder-background.png",
+    );
+    expect(founderOffice?.destinationId).toBe("my-business-estate");
+
+    const clientAvatar = destinations.find(
+      (d) => d.id === "client-avatar-building",
+    );
+    expect(clientAvatar?.name).toBe("Client Avatar Building");
+    expect(clientAvatar?.imagePath).toBe(
+      "/backgrounds/client-avatar-building-background.png",
+    );
+    expect(clientAvatar?.destinationType).toBe("overlay");
+    expect(clientAvatar?.destinationId).toBe("people-i-help");
+
+    const strategyRoom = destinations.find(
+      (d) => d.id === "strategy-conference-room",
+    );
+    expect(strategyRoom?.name).toBe("Strategy Chamber");
+    expect(strategyRoom?.imagePath).toBe(
+      "/backgrounds/strategy-conference-room.png",
+    );
+    expect(strategyRoom?.destinationId).toBe("strategy-library");
+  });
+
+  it("groups Wander destinations into the three renamed member buckets", () => {
+    const buckets = getExploreMemberBucketGroups();
+    const labels = buckets.map((b) => b.label);
+    expect(labels).toEqual(
+      expect.arrayContaining(["Calm & Restore", "Explore & Discover", "Work & Build"]),
+    );
+    const workBucket = buckets.find((b) => b.id === "work-reflect");
     expect(
-      destinations.some((d) => d.name === "Reading Nook Under Stairway"),
-    ).toBe(false);
+      workBucket?.destinations.some((d) => d.id === "client-avatar-building"),
+    ).toBe(true);
+    expect(
+      workBucket?.destinations.some((d) => d.id === "strategy-conference-room"),
+    ).toBe(true);
   });
 
   it("includes every required Explore Estate room name exactly once", () => {
@@ -365,8 +422,8 @@ describe("Explore Estate visual destinations", () => {
   it("reports calm fallback for destinations without a ready image", () => {
     const pending = getExploreEstateDestinations().filter((d) => !d.imageReady);
     for (const dest of pending) {
-      expect(dest.unavailableMessage ?? "Image being prepared").toMatch(
-        /image being prepared/i,
+      expect(dest.unavailableMessage ?? "Coming Soon").toMatch(
+        /coming soon/i,
       );
     }
   });
@@ -464,7 +521,7 @@ describe("Explore Estate visual destinations", () => {
     expect(names).toContain("Hall of Achievements");
     expect(names).toContain("Visual Thinking Studio");
     expect(names).not.toContain("Personal Library");
-    expect(names).not.toContain("Reading Nook Under Stairway");
+    expect(names).toContain("Stairway Reading Nook");
     expect(html).toContain("Wander the Estate");
     expect(html).not.toContain("Tree Swing");
     expect(html).not.toContain("Personal Deck");

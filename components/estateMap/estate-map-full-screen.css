@@ -393,6 +393,20 @@
   outline-offset: 2px;
 }
 
+/* Static group heading — bucket groups show immediately, no reveal toggle */
+.emfs-category__heading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(120, 96, 72, 0.18);
+  padding: 0.55rem 0.15rem;
+  margin: 0 0 0.75rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  font-size: clamp(1.1rem, 2.4vw, 1.35rem);
+  color: #3d3428;
+}
+
 .emfs-dest-grid {
   display: grid;
   grid-template-columns: 1fr;

@@ -650,12 +650,12 @@ export function EstateRoomExperienceMenu({
                         type="button"
                         role="menuitem"
                         className="estate-room-experience-menu__item estate-room-experience-menu__item--wander"
-                        aria-label="Return to Explore Estate"
+                        aria-label="Back to Wander"
                         data-testid="estate-return-to-explore-estate"
                         onClick={() => closeAndRun(onReturnToExploreEstate)}
                       >
                         <span className="estate-room-experience-menu__item-label">
-                          Return to Explore Estate
+                          Back to Wander
                         </span>
                       </button>
                     ) : null}

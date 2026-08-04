@@ -29,6 +29,8 @@ export type ProfileDestinationHostProps = {
   ) => void;
   onOpenExperienceControls?: () => void;
   onReturnToProfileOrigin?: (origin: NavigationOriginContext) => void;
+  /** Present only when this destination was opened from Wander the Estate. */
+  onBackToWander?: () => void;
 };
 
 /**
@@ -45,6 +47,7 @@ export function ProfileDestinationHost({
   onOpenSettings,
   onOpenExperienceControls,
   onReturnToProfileOrigin,
+  onBackToWander,
 }: ProfileDestinationHostProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -117,6 +120,18 @@ export function ProfileDestinationHost({
       aria-label={profileDestinationTitle(canonical)}
     >
       <main className="estate-room-main profile-destination-host__main">
+        {onBackToWander ? (
+          <div className="profile-return-bar" data-testid="profile-destination-back-to-wander">
+            <button
+              type="button"
+              className="profile-return-bar__button"
+              onClick={onBackToWander}
+            >
+              <span aria-hidden="true">←</span>
+              <span>Back to Wander</span>
+            </button>
+          </div>
+        ) : null}
         {onReturnToProfileOrigin ? (
           <ProfileReturnBar
             currentDestination={canonical}

@@ -11,6 +11,8 @@ type StrategiesPanelProps = ComponentProps<typeof StrategiesPanel>;
 type Props = {
   onBack: () => void;
   registerBack?: (fn: (() => boolean) | null) => void;
+  /** Present only when this destination was opened from Wander the Estate. */
+  onBackToWander?: () => void;
 } & Omit<StrategiesPanelProps, "presentation" | "registerBack">;
 
 /**
@@ -21,6 +23,7 @@ type Props = {
 export function StrategyLibraryEstatePanel({
   onBack,
   registerBack,
+  onBackToWander,
   ...panelProps
 }: Props) {
   useDismissibleWindow({
@@ -46,6 +49,18 @@ export function StrategyLibraryEstatePanel({
           <span aria-hidden="true">←</span>
           <span>{PLAN_MY_DAY_MORNING_COPY.previousScreen}</span>
         </button>
+
+        {onBackToWander ? (
+          <button
+            type="button"
+            className="plan-day-morning-note__previous"
+            onClick={onBackToWander}
+            data-testid="strategy-library-back-to-wander"
+          >
+            <span aria-hidden="true">←</span>
+            <span>Back to Wander</span>
+          </button>
+        ) : null}
 
         <StrategiesPanel
           {...panelProps}

@@ -47,7 +47,8 @@ const EXPLORE_CATALOG_EXCLUDED_IDS = new Set([
   // description, image, and category overrides below are intentionally retained
   // so it comes back intact.
   "personal-library",
-  "stairway-reading-nook",
+  // Main Staircase shares the same plate as Stairway Reading Nook (now a kept
+  // Wander card) — keep Main Staircase excluded so the two never both show.
   "main-staircase",
   "window-seat",
   "momentum-builder",
@@ -69,7 +70,12 @@ const EXPLORE_CATALOG_EXCLUDED_IDS = new Set([
   // Same plate as Possibility House / Treehouse staircase
   "house-possibility-legacy-room",
   "house-possibility-window-nook",
-  // Writing Room reuses Music Room plate — keep Music Room in Indoor Spaces
+  // Writing Room has its own dedicated plate (writing-room-background.png) but
+  // is NOT registered in the direct-navigation system (not in
+  // canonicalEstatePlaces.ts, estateRoomRegistry.ts, or the alias registry) —
+  // "Talk here with Spark" silently does nothing. Keep excluded until Writing
+  // Room is registered as a real navigable room; the image and category
+  // overrides below stay in place so it can be restored by deleting this line.
   "writing-room",
 ]);
 
@@ -381,9 +387,7 @@ function buildFromManifestPlace(
     destinationType: "room",
     destinationId,
     isAvailable: true,
-    unavailableMessage: imageReady
-      ? undefined
-      : "Image being prepared",
+    unavailableMessage: imageReady ? undefined : "Coming Soon",
     focalPosition: focalFor(place),
     imageReady,
     purpose: place.category,
@@ -415,7 +419,9 @@ function buildSupplementalDestinations(): EstateExploreDestination[] {
         "business estate",
       ],
       category: "work",
-      imagePath: "/backgrounds/founder-office-background.png",
+      // Matches the actual My Business Estate room background (ProfileDestinationHost)
+      // so the Wander preview shows the same room the member lands in.
+      imagePath: "/backgrounds/business-builder-background.png",
       description: "Your business headquarters inside Spark Estate.",
       destinationType: "overlay",
       destinationId: "my-business-estate",
@@ -423,6 +429,46 @@ function buildSupplementalDestinations(): EstateExploreDestination[] {
       focalPosition: "center",
       imageReady: true,
       purpose: "Profile",
+    }),
+    supplementalDestination({
+      id: "client-avatar-building",
+      name: "Client Avatar Building",
+      aliases: [
+        "client avatar",
+        "client avatar builder",
+        "client avatar building",
+        "people i help",
+        "ideal client",
+      ],
+      category: "work",
+      imagePath: "/backgrounds/client-avatar-building-background.png",
+      description: "Shape a clear picture of the people you help.",
+      destinationType: "overlay",
+      destinationId: "people-i-help",
+      isAvailable: true,
+      focalPosition: "center",
+      imageReady: true,
+      purpose: "Profile",
+    }),
+    supplementalDestination({
+      id: "strategy-conference-room",
+      name: "Strategy Chamber",
+      aliases: [
+        "strategy conference room",
+        "strategy chamber",
+        "strategy library",
+        "get advice",
+      ],
+      category: "advisory",
+      // Matches STRATEGY_LIBRARY_ROOM_BG in lib/strategyLibrary/estateCopy.ts
+      imagePath: "/backgrounds/strategy-conference-room.png",
+      description: "A calm place to think through decisions and choose a direction.",
+      destinationType: "room",
+      destinationId: "strategy-library",
+      isAvailable: true,
+      focalPosition: "center",
+      imageReady: true,
+      purpose: "Advisory",
     }),
     supplementalDestination({
       id: "project-room",
@@ -589,7 +635,11 @@ export function getExploreEstateCategoryGroups(
   );
 }
 
-/** Member-facing Explore buckets — fewer first decisions than 47 place names. */
+/**
+ * Member-facing Explore buckets — 3 groups instead of one long place list.
+ * Wander shows every room in each bucket immediately; Browse All Places stays
+ * as the A-Z-by-category backup for anyone who wants the full flat list.
+ */
 export type ExploreMemberBucketId =
   | "calm-restore"
   | "explore-discover"
@@ -597,9 +647,9 @@ export type ExploreMemberBucketId =
 
 export const EXPLORE_MEMBER_BUCKET_LABELS: Record<ExploreMemberBucketId, string> =
   {
-    "calm-restore": "Calm and Restore",
-    "explore-discover": "Explore and Discover",
-    "work-reflect": "Work and Reflect",
+    "calm-restore": "Calm & Restore",
+    "explore-discover": "Explore & Discover",
+    "work-reflect": "Work & Build",
   };
 
 const MEMBER_BUCKET_ORDER: ExploreMemberBucketId[] = [
@@ -656,7 +706,11 @@ export function getExploreMemberBucketGroups(
   }));
 }
 
-/** Small featured set for first paint — Browse All Places reveals the rest. */
+/**
+ * @deprecated No longer used by EstateMapFullScreen — Wander shows every room
+ * in each member bucket immediately, not a truncated featured set. Kept for
+ * any external callers; safe to remove once none remain.
+ */
 export function getExploreFeaturedDestinations(
   destinations: EstateExploreDestination[] = getExploreEstateDestinations(),
   perBucket = 3,
@@ -714,8 +768,12 @@ export const EXPLORE_ESTATE_REQUIRED_NAMES = [
   // this entry alongside the excluded id to bring the Wander destination back.
   "Study Hall",
   "Reading Nook Window",
+  "Stairway Reading Nook",
   "Tea Room",
   "Music Room",
+  // "Writing Room" is intentionally NOT required here — it is excluded from
+  // Wander until it is registered as a real navigable room (see
+  // EXPLORE_CATALOG_EXCLUDED_IDS). Restore alongside the excluded id.
   "Celebration Hall",
   "Art Studio",
   "Project Room",
@@ -742,6 +800,9 @@ export const EXPLORE_ESTATE_REQUIRED_NAMES = [
   "Estate Back Deck",
   "Breathe",
   "Back Fireside Deck Rain",
+  "Founder Office",
+  "Client Avatar Building",
+  "Strategy Chamber",
 ] as const;
 
 /** Background / poster paths that Explore Estate must resolve for listed rooms. */
@@ -759,6 +820,12 @@ export const EXPLORE_ESTATE_REQUIRED_BACKGROUNDS: Readonly<
   "estate-gardens": "/backgrounds/estate-garden-background.png",
   gardens: "/backgrounds/celebrations-garden-background.png",
   "music-room": "/backgrounds/music-room-background.png",
+  "stairway-reading-nook":
+    "/backgrounds/reading-nook-under-stairway-background.png",
+  "founder-office": "/backgrounds/business-builder-background.png",
+  "client-avatar-building":
+    "/backgrounds/client-avatar-building-background.png",
+  "strategy-conference-room": "/backgrounds/strategy-conference-room.png",
   "woodland-path": "/backgrounds/woodland-pathway.png",
   "discovery-room": "/backgrounds/writing-room-2-background.png",
   "horizon-point": "/backgrounds/horizon-point-background.png",

@@ -26,7 +26,12 @@ import { estateNavigateCommandForPlace } from "@/lib/estateIntelligence/estateCo
  * command is built. These are expected to NOT resolve via
  * `estateNavigateCommandForPlace()` — that is by design, not a bug.
  */
-const HANDLED_BEFORE_DIRECT_NAVIGATION = new Set(["breathe", "my-business-estate"]);
+const HANDLED_BEFORE_DIRECT_NAVIGATION = new Set([
+  "breathe",
+  "my-business-estate",
+  "people-i-help",
+  "strategy-library",
+]);
 
 describe("Wander the Estate — every card navigates", () => {
   it("resolves every Explore Estate destination to a place id", () => {
