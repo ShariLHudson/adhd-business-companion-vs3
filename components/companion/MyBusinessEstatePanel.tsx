@@ -24,7 +24,7 @@ import {
   consumePendingEstateHowToGuide,
   subscribeEstateHowToGuideOpen,
 } from "@/lib/estateRoomGuides";
-import { setUnsavedWorkGuard } from "@/lib/unsavedWorkGuard";
+import { registerUnsavedWorkGuard } from "@/lib/unsavedWorkGuard";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 import "@/app/companion/my-business-estate.css";
 import "@/app/companion/estate-how-to-guide.css";
@@ -120,17 +120,17 @@ export function MyBusinessEstatePanel({ onClose, onOpenPeopleIHelp }: Props) {
     });
   }, []);
 
+  // Registered only while dirty; the returned unregister runs when the section
+  // goes clean and on unmount. Other screens' guards are never displaced.
   useEffect(() => {
-    if (!sectionDirty) {
-      setUnsavedWorkGuard(null);
-      return;
-    }
-    setUnsavedWorkGuard(() =>
-      window.confirm(
-        "You have unsaved changes. Discard them and leave My Business Estate?",
-      ),
-    );
-    return () => setUnsavedWorkGuard(null);
+    if (!sectionDirty) return;
+    return registerUnsavedWorkGuard({
+      id: "my-business-estate",
+      confirmLeave: () =>
+        window.confirm(
+          "You have unsaved changes. Discard them and leave My Business Estate?",
+        ),
+    });
   }, [sectionDirty]);
 
   const { requestClose } = useDismissibleWindow({
