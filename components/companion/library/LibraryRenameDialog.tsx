@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { useDismissibleWindow } from "@/lib/windowDismiss/useDismissibleWindow";
+import { useOverlayExclusivity } from "@/lib/windowDismiss/useOverlayExclusivity";
 
 type Props = {
   open: boolean;
@@ -24,6 +26,21 @@ export function LibraryRenameDialog({
   const [name, setName] = useState(initialName);
   const inputRef = useRef<HTMLInputElement>(null);
   const titleId = useId();
+  const instanceId = useId();
+  const overlayId = `library-rename:${instanceId}`;
+
+  // Whoever had focus right before this dialog opened — usually the
+  // "Rename" menu item, which unmounts with its popover before this dialog
+  // ever renders, so there is no live trigger element to hold a ref to.
+  const openerRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (open) {
+      openerRef.current =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null;
+    }
+  }, [open]);
 
   useEffect(() => {
     if (open) {
@@ -32,14 +49,26 @@ export function LibraryRenameDialog({
     }
   }, [open, initialName]);
 
-  useEffect(() => {
-    if (!open) return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onCancel();
-    }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, onCancel]);
+  // Escape, outside-click, and dismissal policy are shared behavior. Busy
+  // (a save in flight) blocks dismissal — the Save/Cancel buttons are
+  // already disabled while busy; Escape/backdrop now match that instead of
+  // bypassing it.
+  const { onBackdropClick } = useDismissibleWindow({
+    open,
+    onClose: onCancel,
+    isDirty: Boolean(busy),
+    confirmDiscard: () => !busy,
+    overlayId,
+    overlayKind: "dialog",
+    // The name input auto-focuses on open, so it is focused for most of this
+    // dialog's open lifetime — Escape must still cancel from there, matching
+    // the pre-existing unconditional behavior.
+    escapeAppliesInFocusedField: true,
+  });
+
+  // Claim exclusive focus on open (asks any open popover/modal to close
+  // through policy) and return focus to the opener on close.
+  useOverlayExclusivity({ overlayId, open, triggerRef: openerRef });
 
   if (!open) return null;
 
@@ -48,9 +77,7 @@ export function LibraryRenameDialog({
       className="spark-library-dialog-backdrop"
       role="presentation"
       data-testid="library-rename-dialog"
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onCancel();
-      }}
+      onClick={onBackdropClick}
     >
       <div
         className="spark-library-dialog"

@@ -295,7 +295,8 @@
 .spark-library-dialog-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 60;
+  /* Shared dialog layer — see :root in app/globals.css. */
+  z-index: var(--spark-layer-dialog, 60);
   display: flex;
   align-items: center;
   justify-content: center;

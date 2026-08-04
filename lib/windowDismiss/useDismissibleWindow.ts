@@ -66,6 +66,21 @@ export type UseDismissibleWindowOptions = {
    * Pointer presses matching it count as inside.
    */
   outsideClickIgnore?: string;
+  /**
+   * When true, Escape still closes this window even while focus is inside an
+   * input, textarea, select, or contenteditable — the default text-field
+   * exclusion (106 accessibility) exists so this window's Escape does not
+   * steal Escape from an unrelated field being typed into elsewhere in the
+   * Estate. It does not apply to a field that belongs to this window itself:
+   * a simple form dialog that auto-focuses its own input on open (e.g. a
+   * rename field) has that field focused for most of its open lifetime, so
+   * the default exclusion would silently swallow Escape during its single
+   * most common interaction. Opt in only when this window's own primary
+   * control is the thing likely to be focused, and Escape-from-there was the
+   * pre-existing behavior being preserved. Default false — every other
+   * consumer is unaffected.
+   */
+  escapeAppliesInFocusedField?: boolean;
 };
 
 /**
@@ -85,6 +100,7 @@ export function useDismissibleWindow({
   overlayId,
   overlayKind,
   outsideClickIgnore,
+  escapeAppliesInFocusedField = false,
 }: UseDismissibleWindowOptions) {
   const reactId = useId();
   const windowIdRef = useRef(`${createDismissibleWindowId()}-${reactId}`);
@@ -153,10 +169,11 @@ export function useDismissibleWindow({
       if (target instanceof HTMLElement) {
         const tag = target.tagName;
         if (
-          tag === "INPUT" ||
-          tag === "TEXTAREA" ||
-          tag === "SELECT" ||
-          target.isContentEditable
+          !escapeAppliesInFocusedField &&
+          (tag === "INPUT" ||
+            tag === "TEXTAREA" ||
+            tag === "SELECT" ||
+            target.isContentEditable)
         ) {
           return;
         }
@@ -181,7 +198,7 @@ export function useDismissibleWindow({
 
     window.addEventListener("keydown", onKeyDown, true);
     return () => window.removeEventListener("keydown", onKeyDown, true);
-  }, [open, enabled, closeOnEscape, requestClose]);
+  }, [open, enabled, closeOnEscape, requestClose, escapeAppliesInFocusedField]);
 
   useEffect(() => {
     if (!open || !enabled || !closeOnOutsideClick || !outsideClickRef) return;

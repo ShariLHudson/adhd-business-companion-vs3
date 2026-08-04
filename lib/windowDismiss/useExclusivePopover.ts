@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, type RefObject } from "react";
+import type { RefObject } from "react";
 import { useDismissibleWindow } from "@/lib/windowDismiss/useDismissibleWindow";
-import { openExclusiveOverlay } from "@/lib/windowDismiss/overlayRegistry";
+import { useOverlayExclusivity } from "@/lib/windowDismiss/useOverlayExclusivity";
 
 export type UseExclusivePopoverOptions = {
   /** Stable, unique id. Per-instance for menus rendered in a list. */
@@ -51,23 +51,9 @@ export function useExclusivePopover({
     overlayKind: "popover",
   });
 
-  /**
-   * Claim exclusivity after registration. useDismissibleWindow is called
-   * first, so this popover is already in the registry and cannot close itself.
-   */
-  useEffect(() => {
-    if (!open) return;
-    openExclusiveOverlay(overlayId);
-  }, [open, overlayId]);
-
-  // Return focus to the opener — only on a real open → closed transition.
-  const wasOpenRef = useRef(false);
-  useEffect(() => {
-    if (wasOpenRef.current && !open) {
-      triggerRef.current?.focus();
-    }
-    wasOpenRef.current = open;
-  }, [open, triggerRef]);
+  // Claim exclusivity on open and restore focus on close — shared with
+  // dialog-shaped adopters that don't use rootRef/outsideClickRef.
+  useOverlayExclusivity({ overlayId, open, triggerRef });
 
   return { requestClose };
 }

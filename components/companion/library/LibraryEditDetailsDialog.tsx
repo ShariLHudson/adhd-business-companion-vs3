@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { useDismissibleWindow } from "@/lib/windowDismiss/useDismissibleWindow";
+import { useOverlayExclusivity } from "@/lib/windowDismiss/useOverlayExclusivity";
 
 export type LibraryDetailsDraft = {
   title: string;
@@ -32,6 +34,21 @@ export function LibraryEditDetailsDialog({
   const [draft, setDraft] = useState(initial);
   const titleRef = useRef<HTMLInputElement>(null);
   const titleId = useId();
+  const instanceId = useId();
+  const overlayId = `library-edit-details:${instanceId}`;
+
+  // Whoever had focus right before this dialog opened — usually the
+  // "Edit details" menu item, which unmounts with its popover before this
+  // dialog ever renders, so there is no live trigger element to hold a ref to.
+  const openerRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (open) {
+      openerRef.current =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null;
+    }
+  }, [open]);
 
   useEffect(() => {
     if (open) {
@@ -40,14 +57,26 @@ export function LibraryEditDetailsDialog({
     }
   }, [open, initial]);
 
-  useEffect(() => {
-    if (!open) return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onCancel();
-    }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, onCancel]);
+  // Escape, outside-click, and dismissal policy are shared behavior. Busy
+  // (a save in flight) blocks dismissal — the Save/Cancel buttons are
+  // already disabled while busy; Escape/backdrop now match that instead of
+  // bypassing it.
+  const { onBackdropClick } = useDismissibleWindow({
+    open,
+    onClose: onCancel,
+    isDirty: Boolean(busy),
+    confirmDiscard: () => !busy,
+    overlayId,
+    overlayKind: "dialog",
+    // The title input auto-focuses on open, so it is focused for most of
+    // this dialog's open lifetime — Escape must still cancel from there,
+    // matching the pre-existing unconditional behavior.
+    escapeAppliesInFocusedField: true,
+  });
+
+  // Claim exclusive focus on open (asks any open popover/modal to close
+  // through policy) and return focus to the opener on close.
+  useOverlayExclusivity({ overlayId, open, triggerRef: openerRef });
 
   if (!open) return null;
 
@@ -56,9 +85,7 @@ export function LibraryEditDetailsDialog({
       className="spark-library-dialog-backdrop"
       role="presentation"
       data-testid="library-details-dialog"
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) onCancel();
-      }}
+      onClick={onBackdropClick}
     >
       <div
         className="spark-library-dialog"

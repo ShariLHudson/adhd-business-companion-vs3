@@ -34,3 +34,8 @@ export {
   type OverlayRegistration,
   type OverlaySnapshot,
 } from "./overlayRegistry";
+
+export {
+  useOverlayExclusivity,
+  type UseOverlayExclusivityOptions,
+} from "./useOverlayExclusivity";
