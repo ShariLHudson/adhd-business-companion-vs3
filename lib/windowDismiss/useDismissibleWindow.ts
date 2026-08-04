@@ -15,6 +15,10 @@ import {
   type RequestWindowDismissOptions,
 } from "@/lib/windowDismiss/dismissPolicy";
 import { isScrollbarPointerTarget } from "@/lib/planMyDay/morningRoomOutsideDismiss";
+import {
+  registerOverlay,
+  type OverlayKind,
+} from "@/lib/windowDismiss/overlayRegistry";
 
 export type UseDismissibleWindowOptions = {
   open: boolean;
@@ -44,6 +48,17 @@ export type UseDismissibleWindowOptions = {
    * the topmost dismissible layer. Requires `outsideClickRef`.
    */
   closeOnOutsideClick?: boolean;
+  /**
+   * Opt in to the Estate overlay registry under a stable id — lets the Estate
+   * tell this surface apart from a primary workspace, and lets an unsaved-work
+   * guard registered under the same id protect it.
+   *
+   * Requires `overlayKind`. Registering alone closes nothing; exclusivity is
+   * claimed explicitly via `openExclusiveOverlay`.
+   */
+  overlayId?: string;
+  /** What this surface is. Required alongside `overlayId`. */
+  overlayKind?: OverlayKind;
 };
 
 /**
@@ -60,6 +75,8 @@ export function useDismissibleWindow({
   closeOnEscape = true,
   outsideClickRef,
   closeOnOutsideClick = true,
+  overlayId,
+  overlayKind,
 }: UseDismissibleWindowOptions) {
   const reactId = useId();
   const windowIdRef = useRef(`${createDismissibleWindowId()}-${reactId}`);
@@ -94,6 +111,19 @@ export function useDismissibleWindow({
       },
     });
   }, [open, enabled]);
+
+  /**
+   * Overlay registry membership. Same reasoning as the stack push: keyed on
+   * identity only, never on `requestClose`, so render churn cannot reorder it.
+   */
+  useEffect(() => {
+    if (!open || !enabled || !overlayId || !overlayKind) return;
+    return registerOverlay({
+      id: overlayId,
+      kind: overlayKind,
+      requestDismiss: () => requestCloseRef.current(),
+    });
+  }, [open, enabled, overlayId, overlayKind]);
 
   useEffect(() => {
     if (!open || !enabled || !closeOnEscape) return;

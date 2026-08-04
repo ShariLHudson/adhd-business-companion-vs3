@@ -143,6 +143,16 @@ export function unsavedWorkGuardCount(): number {
 }
 
 /**
+ * True when the guard registered under this exact id is currently dirty.
+ * Lets a caller ask about one specific window instead of the whole Estate —
+ * used by the overlay registry so exclusivity never closes a dirty overlay.
+ */
+export function isUnsavedWorkGuardDirty(id: string): boolean {
+  const guard = guards.find((g) => g.id === id);
+  return guard ? isGuardDirty(guard) : false;
+}
+
+/**
  * Returns true when navigation / dismiss may proceed.
  * Asks the topmost dirty guard; clean or absent guards never block.
  */

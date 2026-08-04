@@ -23,6 +23,9 @@ import { useDismissibleWindow } from "@/lib/windowDismiss";
 import { EstateGuideRoomPage } from "./EstateGuideSpread";
 import "./estate-guide-flipbook.css";
 
+/** Stable overlay-registry id — also the key for any unsaved-work guard. */
+export const ESTATE_GUIDE_OVERLAY_ID = "spark-estate-guide";
+
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -152,6 +155,11 @@ export function EstateGuideFlipbook({
     open,
     onClose,
     closeOnEscape: true,
+    // First adopter of the overlay registry. Read-only guide content with no
+    // draft state, so it is always safe for another temporary overlay to
+    // replace it — and it must never displace a workspace or a dialog.
+    overlayId: ESTATE_GUIDE_OVERLAY_ID,
+    overlayKind: "modal",
   });
 
   useEffect(() => {

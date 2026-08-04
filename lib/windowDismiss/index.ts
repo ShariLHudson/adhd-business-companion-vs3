@@ -19,3 +19,18 @@ export {
   useDismissibleWindow,
   type UseDismissibleWindowOptions,
 } from "./useDismissibleWindow";
+
+export {
+  isOverlayDirty,
+  isTemporaryOverlayKind,
+  isTopmostOverlay,
+  listOpenOverlays,
+  openExclusiveOverlay,
+  overlayCount,
+  registerOverlay,
+  topmostOverlay,
+  type ExclusiveOpenResult,
+  type OverlayKind,
+  type OverlayRegistration,
+  type OverlaySnapshot,
+} from "./overlayRegistry";
