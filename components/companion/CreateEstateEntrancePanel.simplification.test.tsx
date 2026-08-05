@@ -51,8 +51,9 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
       "[data-testid='create-estate-nl-input']",
     );
     expect(input).toBeTruthy();
+    // Start Freely empty-state UX follow-up — conversational placeholder.
     expect(input?.placeholder).toBe(
-      "Describe it or search ideas — e.g. email, workshop, client onboarding...",
+      "Tell me what you're thinking about, even if it's not fully formed yet...",
     );
 
     const choices = container.querySelectorAll(
@@ -168,5 +169,29 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
     expect(
       container.querySelector("[data-testid='create-browse-parent-cards']"),
     ).toBeTruthy();
+  });
+
+  it("Start Freely with an empty text area focuses the input and offers encouragement, not a silent no-op", () => {
+    renderPanel();
+    const input = container.querySelector<HTMLTextAreaElement>(
+      "[data-testid='create-estate-nl-input']",
+    )!;
+    const button = container.querySelector<HTMLButtonElement>(
+      "[data-testid='create-estate-start-creating']",
+    )!;
+
+    expect(document.activeElement).not.toBe(input);
+
+    act(() => {
+      button.click();
+    });
+
+    expect(document.activeElement).toBe(input);
+    expect(
+      container.querySelector("[data-testid='create-estate-begin-feedback']")
+        ?.textContent,
+    ).toContain(
+      "Start wherever you are. Tell me what you're working on — even if it's just a rough idea.",
+    );
   });
 });

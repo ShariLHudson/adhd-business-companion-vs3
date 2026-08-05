@@ -145,8 +145,13 @@ export const CREATE_ESTATE_UNDO_CREATE_LABEL = "Undo create";
 export const CREATE_ESTATE_WHAT_WOULD_YOU_LIKE_HEADING =
   "What would you like to create?";
 
+/**
+ * Phase 0 follow-up (Start Freely empty-state UX) — conversational, not a
+ * search-box tone. Was "Describe it or search ideas — e.g. email, workshop,
+ * client onboarding...".
+ */
 export const CREATE_ESTATE_DESCRIBE_PLACEHOLDER =
-  "Describe it or search ideas — e.g. email, workshop, client onboarding...";
+  "Tell me what you're thinking about, even if it's not fully formed yet...";
 
 /**
  * Phase 0 (Create Entrance Copy and Path Relabel) — primary action for the

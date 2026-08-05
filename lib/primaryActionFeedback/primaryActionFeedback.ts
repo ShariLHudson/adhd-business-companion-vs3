@@ -31,8 +31,15 @@ export type PrimaryActionFeedback = {
 export const CREATE_BEGIN_AMBIGUOUS_MESSAGE =
   "I'm not quite sure what you'd like to create yet. Are you thinking of a workshop, event, document, project, or something else?";
 
+/**
+ * Phase 0 follow-up (Start Freely empty-state UX) — shown when "I know
+ * where I want to begin" is clicked with an empty text area; paired with
+ * moving focus into the input so the next action is obvious, not silent.
+ * Was "Tell me what you'd like to create first — a workshop, event,
+ * document, project, or something else — then tap Begin."
+ */
 export const CREATE_BEGIN_EMPTY_MESSAGE =
-  "Tell me what you'd like to create first — a workshop, event, document, project, or something else — then tap Begin.";
+  "Start wherever you are. Tell me what you're working on — even if it's just a rough idea.";
 
 export const CREATE_BEGIN_PROGRESS_MESSAGE = "Opening your workspace…";
 

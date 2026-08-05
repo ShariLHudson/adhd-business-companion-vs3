@@ -160,6 +160,7 @@ export function CreateEstateEntrancePanel({
   const [browseMoreOpen, setBrowseMoreOpen] = useState(false);
   const confirmRegionRef = useRef<HTMLDivElement | null>(null);
   const browseMoreRef = useRef<HTMLDetailsElement | null>(null);
+  const promptInputRef = useRef<HTMLTextAreaElement | null>(null);
 
   const exitDestination = resolveCreateExitDestination(exitOriginHint);
   const suggestionContext = useMemo(
@@ -450,6 +451,11 @@ export function CreateEstateEntrancePanel({
       setBeginFeedback(outcome.message);
       setBeginFeedbackKind("clarify");
       setBeginBusy(false);
+      // Empty Start Freely click — make the next action obvious instead of
+      // leaving the member wondering what happened (live-testing gap).
+      if (outcome.reason === "empty") {
+        promptInputRef.current?.focus();
+      }
       return;
     }
 
@@ -569,6 +575,7 @@ export function CreateEstateEntrancePanel({
             {CREATE_ESTATE_WHAT_WOULD_YOU_LIKE_HEADING}
           </h2>
           <textarea
+            ref={promptInputRef}
             value={prompt}
             onChange={(e) => {
               setPrompt(e.target.value);
