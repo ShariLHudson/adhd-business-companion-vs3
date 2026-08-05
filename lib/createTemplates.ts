@@ -83,11 +83,67 @@ const EMAIL_SECTIONS: CreateTemplateSection[] = [
   section("signoff", "Sign-Off"),
 ];
 
+/**
+ * SOP Build Journey Phase 1 (2026-08-05) — the SOP Build Definition.
+ *
+ * Replaces the previous four generic headings (Purpose, Scope, Steps, Notes &
+ * Tips) with the sections the approved SOP Knowledge Finger requires, each
+ * carrying the question an operations expert would actually ask. The four
+ * added sections — Intended User, Before You Begin, Completion Check,
+ * Troubleshooting — are precisely what determine whether someone else can
+ * follow the process without the creator present.
+ *
+ * On "Title": the Knowledge Finger lists Title as required section 1. It is
+ * deliberately NOT a conversational section here — the creation record already
+ * owns the title (resolveHumanReadableTitle), and assembleWorkFromWorkflow
+ * prepends it to the assembled body. Asking "What belongs in Title?" would
+ * duplicate that machinery and open the conversation with a form field
+ * instead of the outcome question the specification requires.
+ *
+ * Section ids `purpose` and `steps` are preserved deliberately — IDEAS_BY_SECTION
+ * (lib/currentFocus/submitCurrentFocusResponse.ts) is keyed on them.
+ *
+ * @see docs/create-experience/SOP_BUILD_JOURNEY_SPECIFICATION.md
+ * @see docs/create-experience/SOP_BUILD_JOURNEY_APPROVAL_RECORD.md
+ */
 const SOP_SECTIONS: CreateTemplateSection[] = [
-  section("purpose", "Purpose"),
-  section("scope", "Scope"),
-  section("steps", "Steps"),
-  section("notes", "Notes & Tips"),
+  {
+    id: "purpose",
+    label: "Purpose",
+    prompt:
+      "What should someone be able to accomplish after following this SOP?",
+    why: "Starting with the result keeps every step pointed at something real.",
+  },
+  {
+    id: "intended-user",
+    label: "Intended User",
+    prompt: "Who will be using these instructions?",
+    why: "How much to explain depends entirely on who is reading it.",
+  },
+  {
+    id: "before-you-begin",
+    label: "Before You Begin",
+    prompt: "What should they already have or know before they start?",
+    why: "Missing access or setup is where most people get stuck first.",
+  },
+  {
+    id: "steps",
+    label: "Step-by-Step Instructions",
+    prompt: "What happens first?",
+    why: "We'll build the steps in order, one at a time.",
+  },
+  {
+    id: "completion-check",
+    label: "Completion Check",
+    prompt: "How will they know they did it right?",
+    why: "Without a way to check, someone can finish and still be unsure.",
+  },
+  {
+    id: "troubleshooting",
+    label: "Troubleshooting",
+    prompt: "What usually goes wrong, and what should they do about it?",
+    why: "This is what keeps them from needing to interrupt you.",
+  },
 ];
 
 /**

@@ -84,7 +84,7 @@ export const V1_PRIORITY_REGISTRY_ITEMS: readonly CreationRegistryItem[] = [
     recommendedChamberMemberIds: [],
     recommendedMapTypes: [],
     recommendedBoardRoles: [],
-    builderType: "structured-form",
+    builderType: "guided-conversation",
     route: "create/estate/sop",
     lifecycleStatus: "needs-audit",
     priority: "release-essential",
@@ -95,11 +95,21 @@ export const V1_PRIORITY_REGISTRY_ITEMS: readonly CreationRegistryItem[] = [
       "Legacy Browse parent id: standard-operating-procedure.",
       "Phantom UWE work-type id 'sop' resolves via resolveWorkTypeIdFromMemberLabel " +
         "but is never registered — this build runs through the generic Create Estate " +
-        "/ Current Focus flow with the SOP_SECTIONS template, not a UWE package.",
+        "/ Current Focus flow with the SOP_SECTIONS template, not a UWE package. " +
+        "This is deliberate and must stay that way (SOP_BUILD_JOURNEY approval record).",
+      "SOP_SECTIONS carries authored prompts; Current Focus prefers them over " +
+        "label-derived questions. The Build Definition is the section list plus " +
+        "its prompts — there is no SOP engine.",
     ],
     auditNotes: [
       "2026-08-05 Phase 1: added as a Version 1 priority build; not yet " +
         "founder/browser certified against this registry's readiness gate.",
+      "2026-08-05 SOP Build Journey Phase 1: builderType corrected from " +
+        "'structured-form' to 'guided-conversation'. The former contradicted the " +
+        "Experience Constitution ('Guided Builds should never feel like completing " +
+        "forms') and the approved specification. Sections expanded 4 -> 6 " +
+        "conversational (Title comes from the record and is prepended by " +
+        "assembleWorkFromWorkflow). Still hidden: needs-audit, all flags false.",
     ],
     legacyParentTypeId: "standard-operating-procedure",
     legacyCatalogLabels: ["SOP"],

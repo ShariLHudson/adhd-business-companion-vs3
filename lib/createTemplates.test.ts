@@ -124,16 +124,13 @@ describe("createTemplates", () => {
       expect(preset.sections.map((s) => s.label)).toContain("Introduction");
     });
 
-    it("existing SOP, Proposal, and Training Guide templates are unchanged", () => {
-      const sop = defaultTemplateFor("SOP");
-      expect(sop.id).toBe("sop-default");
-      expect(sop.sections.map((s) => s.label)).toEqual([
-        "Purpose",
-        "Scope",
-        "Steps",
-        "Notes & Tips",
-      ]);
-
+    it("Proposal and Training Guide templates are unchanged", () => {
+      // SOP was deliberately removed from this guard on 2026-08-05. The guard
+      // exists to prove the Checklist/Document additions did not disturb their
+      // neighbours — not to freeze SOP forever. SOP was subsequently rewritten
+      // under the approved SOP Build Journey Specification (Phase 1), and its
+      // shape is now owned by lib/createEstate/sopBuildJourneyPhase1.test.ts.
+      // Proposal and Training Guide must still be untouched.
       const proposal = defaultTemplateFor("Proposal");
       expect(proposal.id).toBe("proposal-default");
       expect(proposal.sections.map((s) => s.label)).toEqual([

@@ -11,6 +11,10 @@ export type WorkspaceV2SectionView = {
   label: string;
   content: string;
   skipped: boolean;
+  /** Authored question from the Build Definition, when the template supplies one. */
+  prompt?: string;
+  /** Why this section matters, when the template supplies it. */
+  why?: string;
 };
 
 export function workspaceV2Sections(
@@ -24,5 +28,9 @@ export function workspaceV2Sections(
     label: s.label,
     content: content[s.id] ?? "",
     skipped: skipped.has(s.id),
+    // Phase 1 — carry authoring through so Current Focus can prefer the
+    // Build Definition's own question over a label-derived one.
+    prompt: s.prompt,
+    why: s.why,
   }));
 }

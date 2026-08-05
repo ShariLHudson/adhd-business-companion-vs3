@@ -179,8 +179,11 @@ function focusFromRuntimeRecord(
     focusId: `section:${next.id}`,
     creationId: record.id,
     title: next.label,
-    purpose: `Let's shape ${next.label.toLowerCase()} for your ${typeLabel}.`,
-    prompt: `What belongs in ${next.label}? A rough phrase is plenty.`,
+    // Phase 1 — a Build Definition may author its own question and reason.
+    // Falling back keeps every existing template's behavior unchanged.
+    purpose:
+      next.why ?? `Let's shape ${next.label.toLowerCase()} for your ${typeLabel}.`,
+    prompt: next.prompt ?? `What belongs in ${next.label}? A rough phrase is plenty.`,
     responseType: "multiline",
     knownContext,
     availableGuidance: [
@@ -231,12 +234,16 @@ function focusFromActiveSection(
     focusId: `section:${section.id}`,
     creationId,
     title: section.label,
-    purpose: `Working on ${section.label} for your ${typeLabel}.`,
+    purpose: section.why ?? `Working on ${section.label} for your ${typeLabel}.`,
+    // Skipped and in-progress copy stays label-based on purpose — those are
+    // states, not questions. The authored question applies to an empty
+    // section, including when the member jumps here out of order (077).
     prompt: section.skipped
       ? `${section.label} is marked N/A for now. Reopen it anytime, or move to another section.`
       : section.content.trim()
         ? `Continue shaping ${section.label}. Edit below or share what to change.`
-        : `What belongs in ${section.label}? A rough phrase is plenty.`,
+        : (section.prompt ??
+          `What belongs in ${section.label}? A rough phrase is plenty.`),
     responseType: "multiline",
     knownContext,
     availableGuidance: [

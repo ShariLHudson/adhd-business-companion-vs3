@@ -5,7 +5,28 @@
 
 import { effectiveCreateTypeLabel } from "./createTypePickers";
 
-export type CreateTemplateSection = { id: string; label: string };
+/**
+ * A section of a Build Definition.
+ *
+ * SOP Build Journey Phase 1 (2026-08-05) — `prompt` and `why` are additive and
+ * optional. Without them, Current Focus derives a question from the label
+ * ("What belongs in Purpose?"), which reads like a form field. With them, a
+ * Build Type supplies the question an expert would actually ask.
+ *
+ * This is the whole mechanism for turning a form into a conversation, and it
+ * belongs to every Build Type — not just SOP. Templates that omit these keep
+ * today's derived behavior unchanged.
+ *
+ * @see docs/create-experience/SOP_BUILD_JOURNEY_SPECIFICATION.md
+ */
+export type CreateTemplateSection = {
+  id: string;
+  label: string;
+  /** Authored question for this section. Falls back to a label-derived prompt. */
+  prompt?: string;
+  /** Why this section matters, in Shari's voice. Shown as the Focus purpose. */
+  why?: string;
+};
 
 export type DiscoverySubphase = "questions" | "sections";
 
