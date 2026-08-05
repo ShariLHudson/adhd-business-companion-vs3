@@ -18,6 +18,9 @@ import {
   type ResumeWorkSignal,
 } from "./resumeWorkEligibility";
 import { loadWorkspaceSessionMeta } from "./workspaceSessionStore";
+import { getRuntimeCreationRecord } from "./currentFocus";
+import { getVisualFocusMapById } from "./visualFocus/store";
+import { meaningfulNodeCount } from "./visualFocus/mapReadiness";
 
 function charCount(...parts: (string | null | undefined)[]): number {
   return parts.map((part) => part?.trim() ?? "").join("").length;
@@ -44,8 +47,21 @@ export function mapContinuityTypeToResumeKind(
       return "workspace-sop";
     case "client-avatar":
       return "create";
-    default:
+    // ResumeWorkKind has no dedicated member for these two — this field is
+    // descriptive metadata only (never branched on for eligibility scoring;
+    // the member-facing option kind is decided separately by
+    // companionLedContinue.ts's own continuityKind(), which already handles
+    // both correctly). "create" matches prior silent-default behavior.
+    case "active-creation":
+    case "visual-focus-map":
       return "create";
+    case "saved-work":
+      return "create";
+    default: {
+      // Compile-time guard — see the matching guard in buildSignalForItem.
+      const _exhaustive: never = type;
+      return _exhaustive;
+    }
   }
 }
 
@@ -187,8 +203,50 @@ function buildSignalForItem(item: ContinuityManifestItem): ResumeWorkSignal {
         viewedOnly: answeredQuestionCount === 0,
       };
     }
-    default:
+    // 2026-08-05 fix — active-creation and visual-focus-map were added to
+    // HOME_RESUME_CONTINUITY_TYPES (continuityManifest.ts) in two separate
+    // commits five weeks apart, but neither touched this switch, so both
+    // silently fell to `default: viewedOnly: true` and could never become
+    // eligible for Continue Where I Left Off regardless of real work done.
+    // Standard 071 requires the opposite ("may never become unreachable").
+    case "active-creation": {
+      const workspaceId = item.id.replace(/^active-creation:/, "");
+      const record = getRuntimeCreationRecord(workspaceId);
+      const answeredQuestionCount = record
+        ? countAnsweredFields(record.sectionContent)
+        : 0;
+      const hasDraft = Boolean(record?.draftContent?.trim());
+      return {
+        ...base,
+        answeredQuestionCount,
+        contentCharCount: charCount(record?.draftContent),
+        modifiedDocument: hasDraft,
+        viewedOnly: answeredQuestionCount === 0 && !hasDraft,
+      };
+    }
+    case "visual-focus-map": {
+      const map = item.visualFocusMapId
+        ? getVisualFocusMapById(item.visualFocusMapId)
+        : null;
+      const nodeCount = map ? meaningfulNodeCount(map) : 0;
+      return {
+        ...base,
+        answeredQuestionCount: nodeCount,
+        viewedOnly: nodeCount === 0,
+      };
+    }
+    // Deliberately excluded from HOME_RESUME_CONTINUITY_TYPES — saved-work
+    // is finished output owned by My Work, not unfinished work to resume.
+    // Kept here only so the switch is exhaustive over ContinuityItemType.
+    case "saved-work":
       return { ...base, viewedOnly: true };
+    default: {
+      // Compile-time guard: if ContinuityItemType ever grows, this fails to
+      // typecheck until a case is added above — the exact silent-drift
+      // pattern that caused this bug in the first place.
+      const _exhaustive: never = item.type;
+      return _exhaustive;
+    }
   }
 }
 
