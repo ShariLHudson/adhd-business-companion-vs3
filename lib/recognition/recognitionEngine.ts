@@ -14,6 +14,7 @@ import type {
   RecognitionContext,
   RecognitionEvent,
   RecognitionMoment,
+  RecognitionPlannedEffect,
 } from "./types";
 
 function titleForEvent(event: RecognitionEvent): string {
@@ -38,9 +39,32 @@ function titleForEvent(event: RecognitionEvent): string {
   }
 }
 
+/** Full mode's visual per event type — Settings promises "confetti, candles, or banners". */
+function plannedEffectForEvent(
+  event: RecognitionEvent,
+): RecognitionPlannedEffect {
+  switch (event.type) {
+    case "birthday":
+      return "birthday_cake";
+    case "anniversary":
+    case "membership_anniversary":
+      return "confetti";
+    case "business_milestone":
+    case "project_milestone":
+      return "fireworks";
+    case "vacation_countdown":
+      return "balloons";
+    case "conversation_milestone":
+    case "custom_event":
+    default:
+      return "celebration_banner";
+  }
+}
+
 /**
  * Returns the single highest-priority recognition moment for today, or null.
- * Visual effects are foundation-only — plannedEffect is stored but not rendered.
+ * Full mode plans a visual effect (rendered by CelebrationEffects); Simple
+ * mode is message-only (plannedEffect stays null); Off returns no moment.
  */
 export function evaluateRecognitionMoment(
   ctx: RecognitionContext = {},
@@ -69,8 +93,8 @@ export function evaluateRecognitionMoment(
     title: titleForEvent(pick),
     message,
     shariState: pick.shariState,
-    // Effects reserved for future full mode — not rendered in foundation phase.
-    plannedEffect: null,
+    plannedEffect:
+      celebrationMode === "full" ? plannedEffectForEvent(pick) : null,
     celebrationMode,
   };
 }

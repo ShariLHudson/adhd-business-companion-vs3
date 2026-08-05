@@ -453,6 +453,7 @@ import {
 import type { EcosystemSearchResult } from "@/lib/howDoIHelpLibrary";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
 import { RecognitionMomentCard } from "@/components/companion/RecognitionMomentCard";
+import { CelebrationEffects } from "@/components/companion/CelebrationEffects";
 import { ActivationOfferCard } from "@/components/companion/ActivationOfferCard";
 import { RelationshipRememberCard } from "@/components/companion/RelationshipRememberCard";
 import { OpportunityOfferCard } from "@/components/companion/OpportunityOfferCard";
@@ -26321,10 +26322,14 @@ export default function CompanionPageClient() {
               )}
 
               {homeCalm ? null : isIdle && recognitionMoment && !hasInlineIntelligenceOffer && !suppressInterventionCards ? (
-                <RecognitionMomentCard
-                  moment={recognitionMoment}
-                  onDismiss={() => setRecognitionMoment(null)}
-                />
+                <>
+                  <RecognitionMomentCard
+                    moment={recognitionMoment}
+                    onDismiss={() => setRecognitionMoment(null)}
+                  />
+                  {/* Full celebrations only — Simple keeps plannedEffect null (message-only). */}
+                  <CelebrationEffects effect={recognitionMoment.plannedEffect} />
+                </>
               ) : null}
 
               {!welcomeScene ? (

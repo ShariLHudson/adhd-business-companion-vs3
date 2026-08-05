@@ -120,14 +120,69 @@ describe("evaluateRecognitionMoment", () => {
     expect(moment?.shariState).toBe("birthday");
   });
 
-  it("does not render visual effects in foundation phase", () => {
+  it("Full mode plans a real visual effect — Settings Fix 6", () => {
     const moment = evaluateRecognitionMoment({
       celebrationMode: "full",
       now: new Date("2026-06-12T12:00:00"),
       birthday: { month: 6, day: 12 },
       userName: "Alex",
     });
-    expect(moment?.plannedEffect).toBeNull();
+    expect(moment?.plannedEffect).toBe("birthday_cake");
+  });
+
+  it("Full and Simple produce visibly different results for the same event — the fixed bug", () => {
+    const base = {
+      now: new Date("2026-06-12T12:00:00"),
+      birthday: { month: 6, day: 12 },
+      userName: "Alex",
+    };
+    const full = evaluateRecognitionMoment({ ...base, celebrationMode: "full" });
+    const simple = evaluateRecognitionMoment({
+      ...base,
+      celebrationMode: "simple",
+    });
+    expect(full?.plannedEffect).not.toBeNull();
+    expect(simple?.plannedEffect).toBeNull();
+    // The message itself is identical on purpose — only the visual differs.
+    expect(full?.message).toBe(simple?.message);
+    expect(full?.title).toBe(simple?.title);
+  });
+
+  it("Off produces no moment at all — no celebration, visual or otherwise", () => {
+    const moment = evaluateRecognitionMoment({
+      celebrationMode: "off",
+      now: new Date("2026-06-12T12:00:00"),
+      birthday: { month: 6, day: 12 },
+      userName: "Alex",
+    });
+    expect(moment).toBeNull();
+  });
+
+  it("plans a distinct effect per event type in Full mode", () => {
+    const now = new Date("2026-06-12T12:00:00");
+    const membership = evaluateRecognitionMoment({
+      celebrationMode: "full",
+      now,
+      memberSinceIso: "2025-06-12T10:00:00.000Z",
+      userName: "Alex",
+    });
+    expect(membership?.type).toBe("membership_anniversary");
+    expect(membership?.plannedEffect).toBe("confetti");
+
+    localStorage.setItem(
+      "companion-recognition-v1",
+      JSON.stringify({
+        conversationStarts: 25,
+        lastConversationStartAt: now.toISOString(),
+      }),
+    );
+    const conversation = evaluateRecognitionMoment({
+      celebrationMode: "full",
+      now,
+      userName: "Alex",
+    });
+    expect(conversation?.type).toBe("conversation_milestone");
+    expect(conversation?.plannedEffect).toBe("celebration_banner");
   });
 
   it("prioritizes birthday over membership anniversary", () => {
