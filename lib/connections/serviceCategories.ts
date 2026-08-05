@@ -12,10 +12,12 @@ import {
 } from "./settingsConnectionCatalog";
 import { isCanvaConnected } from "./canvaConnection";
 import { isOutlookCalendarConnected } from "./outlookCalendarConnection";
-import type {
-  CalendarProviderPreference,
-  DocumentsProviderPreference,
-  StorageProviderPreference,
+import {
+  DEFAULT_DIGITAL_WORKSPACE_PREFERENCES,
+  type CalendarProviderPreference,
+  type DigitalWorkspacePreferences,
+  type DocumentsProviderPreference,
+  type StorageProviderPreference,
 } from "./digitalWorkspacePreferences";
 
 export type ServiceCategoryId =
@@ -143,9 +145,16 @@ export const SERVICE_CATEGORIES: readonly ServiceCategoryDef[] = [
 
 export type ServiceItemState = ServiceItemDef & {
   status: SettingsConnectionStatus;
+  /** Honest, kind-aware badge text — "Connected ✓" only for a verified,
+   * authenticated connection. Built-in / local choices read "Selected" or
+   * "Prepared" so members never mistake a preference for a real integration. */
   statusLabel: string;
-  /** Member-facing Connected ✓ when ready */
+  /** True only for a verified, authenticated connection (Google OAuth, Canva). */
   showConnectedCheck: boolean;
+  /** True when this destination is currently active/usable — includes the
+   * member's built-in/local choice, not just authenticated connections.
+   * Drives the "N ready" category count. */
+  ready: boolean;
   connectHref: string | null;
   accountEmail?: string | null;
 };
@@ -163,7 +172,27 @@ export type ServiceCategoriesSnapshot = {
   outlookConnected?: boolean;
   canvaConnected?: boolean;
   googleAuthHref?: string;
+  /**
+   * Current Digital Workspace preference. "built-in" and "preference-only"
+   * items are local choices, not authenticated connections — they only read
+   * as the member's active choice when they actually match it. Defaults to
+   * the product's out-of-the-box preference (Spark Estate Documents/Storage).
+   */
+  preferences?: Pick<DigitalWorkspacePreferences, "documents" | "storage">;
 };
+
+/** True when a "built-in"/"preference-only" item is the member's current pick. */
+function isSelectedLocalPreference(
+  item: ServiceItemDef,
+  snap: ServiceCategoriesSnapshot,
+): boolean {
+  if (!item.preferenceKey || item.preferenceValue == null) return false;
+  const preferences = snap.preferences ?? DEFAULT_DIGITAL_WORKSPACE_PREFERENCES;
+  if (item.preferenceKey !== "documents" && item.preferenceKey !== "storage") {
+    return false;
+  }
+  return preferences[item.preferenceKey] === item.preferenceValue;
+}
 
 export function resolveServiceItemStatus(
   item: ServiceItemDef,
@@ -171,14 +200,16 @@ export function resolveServiceItemStatus(
 ): SettingsConnectionStatus {
   switch (item.kind) {
     case "built-in":
-      return "connected";
     case "preference-only":
-      // Available without OAuth — treated as ready once selected as preference.
-      return "connected";
+      // Not an authenticated connection — "connected" here only means "this
+      // is the member's current local choice," gated on the real preference.
+      return isSelectedLocalPreference(item, snap) ? "connected" : "disconnected";
     case "google-oauth":
       if (!snap.google.configured) return "needs_attention";
       return snap.google.connected ? "connected" : "disconnected";
     case "outlook-local":
+      // No Microsoft Graph OAuth exists yet — "connected" here means "the
+      // member started local prep," never a verified account connection.
       return (snap.outlookConnected ?? isOutlookCalendarConnected())
         ? "connected"
         : "disconnected";
@@ -191,6 +222,11 @@ export function resolveServiceItemStatus(
   }
 }
 
+/** Kinds backed by a real, verified authentication handshake. */
+function isAuthenticatedKind(kind: ServiceItemKind): boolean {
+  return kind === "google-oauth" || kind === "canva-local";
+}
+
 export function buildServiceCategories(
   snap: ServiceCategoriesSnapshot,
 ): ServiceCategoryState[] {
@@ -200,14 +236,31 @@ export function buildServiceCategories(
     const items: ServiceItemState[] = category.items.map((item) => {
       const status = resolveServiceItemStatus(item, snap);
       const normalized = normalizeConnectionStatus(status);
-      const showConnectedCheck = normalized === "connected";
+      const active = normalized === "connected";
+      const authenticated = isAuthenticatedKind(item.kind);
+      const showConnectedCheck = authenticated && active;
+
+      let statusLabel: string;
+      if (active) {
+        statusLabel = authenticated
+          ? "Connected ✓"
+          : item.kind === "outlook-local"
+            ? "Prepared ✓"
+            : "Selected ✓";
+      } else if (normalized === "needs_attention") {
+        statusLabel = "Needs attention";
+      } else {
+        statusLabel = authenticated || item.kind === "outlook-local"
+          ? connectionStatusLabel(status)
+          : "Select";
+      }
+
       return {
         ...item,
         status,
-        statusLabel: showConnectedCheck
-          ? "Connected ✓"
-          : connectionStatusLabel(status),
+        statusLabel,
         showConnectedCheck,
+        ready: active,
         connectHref:
           item.kind === "google-oauth" && status !== "needs_attention"
             ? googleHref
@@ -222,7 +275,7 @@ export function buildServiceCategories(
       id: category.id,
       label: category.label,
       items,
-      connectedCount: items.filter((i) => i.showConnectedCheck).length,
+      connectedCount: items.filter((i) => i.ready).length,
     };
   });
 }

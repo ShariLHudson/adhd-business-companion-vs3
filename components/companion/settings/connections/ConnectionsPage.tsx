@@ -8,6 +8,7 @@ import {
   connectOutlookCalendarLocal,
   disconnectCanvaLocal,
   disconnectOutlookCalendarLocal,
+  readDigitalWorkspacePreferences,
   updateCanvaDestinationUrl,
   verifyCanvaConnection,
   writeDigitalWorkspacePreferences,
@@ -81,6 +82,7 @@ export function ConnectionsPage({
     outlookConnected,
     canvaConnected,
     googleAuthHref,
+    preferences: readDigitalWorkspacePreferences(),
   });
 
   const activeCategory =
@@ -163,15 +165,17 @@ export function ConnectionsPage({
     }
 
     if (item.kind === "outlook-local") {
-      if (!item.showConnectedCheck) {
+      // No Microsoft Graph OAuth exists yet — this only prepares a local
+      // choice, so the flash never claims a real "Connected" account.
+      if (!item.ready) {
         connectOutlookCalendarLocal();
         refreshOutlook();
         writeDigitalWorkspacePreferences({ calendar: "outlook" });
-        flashMsg("Outlook Calendar connected.");
+        flashMsg("Outlook Calendar prepared.");
       } else {
         setManagingId("outlook-calendar");
         writeDigitalWorkspacePreferences({ calendar: "outlook" });
-        flashMsg("Outlook Calendar — Connected ✓");
+        flashMsg("Outlook Calendar — Prepared ✓");
       }
       return;
     }
@@ -190,13 +194,15 @@ export function ConnectionsPage({
       item.preferenceKey &&
       item.preferenceValue
     ) {
+      // Built-in / preference-only items are local choices, not
+      // authenticated connections — never claim "Connected".
       writeDigitalWorkspacePreferences({
         [item.preferenceKey]: item.preferenceValue as
           | DocumentsProviderPreference
           | StorageProviderPreference
           | CalendarProviderPreference,
       });
-      flashMsg(`${item.label} — Connected ✓`);
+      flashMsg(`${item.label} — Selected ✓`);
     }
   }
 
@@ -265,18 +271,20 @@ export function ConnectionsPage({
                     onClick={() => selectService(item.id)}
                     data-testid={`connections-service-${item.id}`}
                     data-connection-status={
-                      item.showConnectedCheck ? "connected" : "disconnected"
+                      item.showConnectedCheck
+                        ? "connected"
+                        : item.ready
+                          ? "selected"
+                          : item.status === "needs_attention"
+                            ? "needs-attention"
+                            : "disconnected"
                     }
                   >
                     <span className="text-sm font-semibold text-[#1f1c19]">
                       {item.label}
                     </span>
                     <span className="text-sm font-semibold text-[#1e4f4f]">
-                      {item.showConnectedCheck
-                        ? "Connected ✓"
-                        : item.status === "needs_attention"
-                          ? "Needs attention"
-                          : "Connect"}
+                      {item.statusLabel}
                     </span>
                   </button>
                   {isManagingItem(item.id) && managingId ? (
