@@ -128,12 +128,13 @@ describe("ADR-012 Phase 4 — round trip: client request → /api/companion-chat
     expect(systemPrompt).toContain("Active Support Style: Practical First.");
   }, 20000);
 
-  it("keeps delivery guidance and routing guidance as separate blocks, guardrail first", async () => {
+  it("keeps delivery guidance and routing guidance as separate blocks, guardrail first, when the requesting surface asks for routing guidance", async () => {
     const { systemPrompt } = await sendCompanionChat({
       messages: [{ role: "user", content: "hello" }],
       aiTone: "gentle", // → routing guidance applies
       helpMode: "direct",
       supportStyleId: "practical-first",
+      includeRoutingGuidance: true, // only main chat's initial turn sets this
     });
     const guardrailIdx = systemPrompt.indexOf("THE IMMUTABLE FRIEND (constitutional");
     const deliveryIdx = systemPrompt.indexOf(
@@ -157,14 +158,30 @@ describe("ADR-012 Phase 4 — round trip: client request → /api/companion-chat
     ).toBe(1);
   }, 20000);
 
-  it("omits the routing guidance block when no delivery preference outranks routing", async () => {
+  it("omits the routing guidance block when no delivery preference outranks routing, even when requested", async () => {
     const { systemPrompt } = await sendCompanionChat({
       messages: [{ role: "user", content: "hello" }],
       aiTone: "direct",
       helpMode: "direct",
       supportStyleId: "practical-first",
+      includeRoutingGuidance: true,
     });
     expect(systemPrompt).not.toContain("ROUTING GUIDANCE (separate from");
+  }, 20000);
+
+  it("[behavior preservation — ADR-012 Phase 4 correction] omits routing guidance by default, even when a delivery preference would otherwise outrank routing — Hospitality, Spark Alpha, and the repair request never built this sentence pre-Phase-4 and must not gain it now", async () => {
+    const { systemPrompt } = await sendCompanionChat({
+      messages: [{ role: "user", content: "hello" }],
+      aiTone: "gentle", // would qualify if requested
+      helpMode: "ask-first", // the DEFAULT helpMode — would qualify too
+      supportStyleId: "gentle-first", // would qualify too
+      // No includeRoutingGuidance — this is what Hospitality, Spark Alpha,
+      // and main chat's repair request actually send.
+    });
+    expect(systemPrompt).not.toContain("ROUTING GUIDANCE (separate from");
+    expect(systemPrompt).not.toContain(
+      "Member tone preference in Settings overrides conflicting action-first routing hints this turn.",
+    );
   }, 20000);
 });
 

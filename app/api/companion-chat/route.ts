@@ -266,6 +266,9 @@ export async function POST(request: NextRequest) {
       guidedFieldHelpHint,
       // Resolved once, above — the prompt builder does not re-resolve.
       delivery,
+      // Behavior-preservation (ADR-012 Phase 4 correction) — only the
+      // surface that built this sentence pre-Phase-4 requests it now.
+      includeRoutingGuidance: Boolean(body.includeRoutingGuidance),
       userName,
       intentHint,
       responseLanguageHint,

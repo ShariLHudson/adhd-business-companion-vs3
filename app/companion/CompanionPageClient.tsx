@@ -21049,6 +21049,11 @@ export default function CompanionPageClient() {
           supportStyle: prefs.supportStyle,
           useMostOfTheTime: supportStylePreference.useMostOfTheTime,
           customSettings: supportStylePreference.customSettings,
+          // Behavior preservation: this is the one request shape that built
+          // the routing-guidance sentence pre-Phase-4 (in its own intentHint
+          // text). The repair request below, Hospitality, and Spark Alpha
+          // never did — they don't set this flag.
+          includeRoutingGuidance: true,
           userName: prefs.name || undefined,
           businessContext: businessContextForApi,
           intentHint:

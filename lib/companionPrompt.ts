@@ -469,6 +469,17 @@ type PromptContext = {
    * Support Style override — clients no longer send an assembled block.
    */
   latestUserText?: string;
+  /**
+   * Behavior-preservation flag (ADR-012 Phase 4 correction): before Phase 4,
+   * the routing-guidance sentence existed only inside main chat's own
+   * client-built `intentHint` text — Hospitality, Spark Alpha, and main
+   * chat's in-turn repair request never produced it, because none of them
+   * sent that text. Centralizing assembly server-side would otherwise give
+   * it to every request unconditionally, changing three surfaces' prompts
+   * that were never meant to receive it. Only the request that previously
+   * built it sets this flag; everything else stays byte-for-byte as before.
+   */
+  includeRoutingGuidance?: boolean;
   userName?: string;
   intentHint?: string;
   responseLanguageHint?: string;
@@ -544,14 +555,17 @@ export function buildCompanionSystemPrompt(
 
     // Routing guidance stays its own block — delivery guidance describes how
     // Shari speaks; this describes how the saved preference ranks against
-    // action-first routing hints. Server-built since Phase 4.
-    const routingGuidance = buildTonePreferenceRoutingGuidanceBlock({
-      aiTone: delivery.aiTone,
-      helpMode: delivery.helpMode,
-      supportStyle: delivery.supportStyleLegacy,
-      supportStyleId: delivery.supportStyleId,
-    });
-    if (routingGuidance) blocks.push(routingGuidance);
+    // action-first routing hints. Server-built since Phase 4, but gated on
+    // includeRoutingGuidance — see that flag's doc comment above.
+    if (context.includeRoutingGuidance) {
+      const routingGuidance = buildTonePreferenceRoutingGuidanceBlock({
+        aiTone: delivery.aiTone,
+        helpMode: delivery.helpMode,
+        supportStyle: delivery.supportStyleLegacy,
+        supportStyleId: delivery.supportStyleId,
+      });
+      if (routingGuidance) blocks.push(routingGuidance);
+    }
   }
 
   if (context.userName) {
