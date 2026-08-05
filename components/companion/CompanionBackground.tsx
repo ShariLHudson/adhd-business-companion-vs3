@@ -6,10 +6,7 @@ import {
   SCENE_OVERLAY,
   type ScenePage,
 } from "@/lib/companionBackgrounds";
-import {
-  getClearMyMindBackdropImageUrl,
-  useChatBackdropRevision,
-} from "@/lib/chatBackdrop";
+import { useChatBackdropRevision } from "@/lib/chatBackdrop";
 import { SCENE_BG_IMAGE_CLASS } from "@/lib/sceneRenderContract";
 import { HomesteadChatScene } from "./HomesteadChatScene";
 
@@ -42,9 +39,6 @@ export function CompanionBackground({
   // hydration mismatch).
   const [scene, setScene] = useState<string | null>(null);
   const backdropRevision = useChatBackdropRevision();
-  const clearMyMindImage = clearMyMind
-    ? getClearMyMindBackdropImageUrl()
-    : null;
   void backdropRevision;
 
   useEffect(() => {
@@ -67,18 +61,9 @@ export function CompanionBackground({
     );
   }
 
-  const photoUrl =
-    clearMyMind && suppress
-      ? null
-      : clearMyMind
-        ? clearMyMindImage
-        : !suppress
-          ? scene
-          : null;
-  /** When SceneRenderer owns Clear My Mind, keep only a quiet gradient under the panel. */
-  const showAtmosphere = Boolean(
-    (clearMyMind && !suppress) || (!clearMyMind && !suppress),
-  );
+  const photoUrl = suppress ? null : scene;
+  /** Suppressed states own their photo elsewhere — keep only the gradient base here. */
+  const showAtmosphere = !suppress;
 
   return (
     <div
@@ -94,14 +79,8 @@ export function CompanionBackground({
       {photoUrl ? (
         <div
           key={photoUrl}
-          className={`${SCENE_BG_IMAGE_CLASS} companion-bg-scene spark-readability-scene absolute inset-0 ${clearMyMind ? "" : "companion-scene-fade transition-opacity duration-700"}`}
-          style={{
-            backgroundImage: `url('${photoUrl}')`,
-            opacity: clearMyMind ? "1" : undefined,
-          }}
-          data-testid={
-            clearMyMind ? "clear-my-mind-page-backdrop" : undefined
-          }
+          className={`${SCENE_BG_IMAGE_CLASS} companion-bg-scene spark-readability-scene absolute inset-0 companion-scene-fade transition-opacity duration-700`}
+          style={{ backgroundImage: `url('${photoUrl}')` }}
         />
       ) : null}
 

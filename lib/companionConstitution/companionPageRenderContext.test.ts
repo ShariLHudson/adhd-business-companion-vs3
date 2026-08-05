@@ -133,6 +133,41 @@ describe("companionPageRenderContext", () => {
     ).toBe(true);
   });
 
+  it("never returns clearMyMind without suppress (CompanionBackground's Clear My Mind branch is provably dead)", () => {
+    // CompanionBackground.tsx no longer branches on clearMyMind when computing
+    // photoUrl — it relies on this invariant always holding upstream. If any
+    // future branch here ever returns clearMyMind: true with suppress: false,
+    // that legacy component would start rendering the wrong (or no) photo.
+    const candidateInputs: Array<{
+      activeSection: Parameters<typeof buildCompanionPageRenderContext>[0]["activeSection"];
+      workspacePanel: Parameters<typeof buildCompanionPageRenderContext>[0]["workspacePanel"];
+    }> = [
+      { activeSection: "brain-dump", workspacePanel: null },
+      { activeSection: "home", workspacePanel: "brain-dump" },
+      { activeSection: "home", workspacePanel: null },
+      { activeSection: "focus", workspacePanel: null },
+      { activeSection: "plan-my-day", workspacePanel: null },
+      { activeSection: "focus-audio", workspacePanel: null },
+      { activeSection: "create", workspacePanel: null },
+      { activeSection: "project-homes", workspacePanel: null },
+      { activeSection: "growth-journal", workspacePanel: null },
+      { activeSection: "settings", workspacePanel: null },
+    ];
+
+    for (const input of candidateInputs) {
+      const context = buildCompanionPageRenderContext({
+        activeSection: input.activeSection,
+        workspacePanel: input.workspacePanel,
+        workspaceBesideChat: false,
+        displayEmotion: "unclear",
+        messageCount: 0,
+      });
+      if (context.globalBackground.clearMyMind) {
+        expect(context.globalBackground.suppress).toBe(true);
+      }
+    }
+  });
+
   it("flags lower-layer place overrides in development", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const previousEnv = process.env.NODE_ENV;

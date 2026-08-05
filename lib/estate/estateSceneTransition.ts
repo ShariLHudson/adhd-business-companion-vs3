@@ -31,25 +31,21 @@ export type EstateSceneTransitionState = {
   /** Incoming plate loading or fading in */
   incoming: EstateScenePlate | null;
   phase: EstateSceneTransitionPhase;
-  preparingVisible: boolean;
   /** contain = full room plate (Change background); cover = cinematic crop */
   plateObjectFit: "contain" | "cover";
 };
 
 const CROSSFADE_MS = 620;
-const PREPARING_DELAY_MS = 480;
 
 let state: EstateSceneTransitionState = {
   active: null,
   outgoing: null,
   incoming: null,
   phase: "idle",
-  preparingVisible: false,
   plateObjectFit: "cover",
 };
 
 const listeners = new Set<() => void>();
-let preparingTimer: ReturnType<typeof setTimeout> | null = null;
 let crossfadeTimer: ReturnType<typeof setTimeout> | null = null;
 let transitionGeneration = 0;
 
@@ -58,10 +54,6 @@ function notify() {
 }
 
 function clearTimers() {
-  if (preparingTimer) {
-    clearTimeout(preparingTimer);
-    preparingTimer = null;
-  }
   if (crossfadeTimer) {
     clearTimeout(crossfadeTimer);
     crossfadeTimer = null;
@@ -75,7 +67,6 @@ function commitIncoming() {
     outgoing: null,
     incoming: null,
     phase: "ready",
-    preparingVisible: false,
     plateObjectFit: state.plateObjectFit,
   };
   notify();
@@ -86,7 +77,6 @@ function startCrossfade() {
     ...state,
     outgoing: state.active,
     phase: "crossfading",
-    preparingVisible: false,
   };
   notify();
 
@@ -122,19 +112,9 @@ export function syncEstateSceneActivePlate(input: {
     outgoing: null,
     incoming: null,
     phase: "ready",
-    preparingVisible: false,
     plateObjectFit: state.plateObjectFit,
   };
   notify();
-}
-
-export function resolveScenePlateForSection(
-  section: AppSection,
-): EstateScenePlate | null {
-  const roomId = estateEntryIdForSection(section) ?? section;
-  const imageUrl = resolveEstateRoomBackgroundImage(roomId);
-  if (!imageUrl) return null;
-  return { roomId, imageUrl };
 }
 
 /** Preload destination art and update the persistent scene layer. */
@@ -142,7 +122,7 @@ export async function prepareEstateSceneTransition(input: {
   toSection?: AppSection;
   toRoomId?: string;
   imageUrl?: string | null;
-  /** Skip "Preparing the room…" status — use for in-place environment swaps. */
+  /** Reserved for callers signaling an in-place environment swap; no current effect on state. */
   silent?: boolean;
   /** Show the full room plate without cropping (Change background). */
   showFullPlate?: boolean;
@@ -174,18 +154,9 @@ export async function prepareEstateSceneTransition(input: {
     ...state,
     incoming: { roomId, imageUrl },
     phase: "preparing",
-    preparingVisible: false,
     plateObjectFit,
   };
   notify();
-
-  preparingTimer = setTimeout(() => {
-    if (generation !== transitionGeneration) return;
-    if (state.phase === "preparing" && !input.silent) {
-      state = { ...state, preparingVisible: true };
-      notify();
-    }
-  }, PREPARING_DELAY_MS);
 
   const ready = await awaitRoomBackgroundReady(imageUrl);
   if (generation !== transitionGeneration) return;
@@ -196,7 +167,6 @@ export async function prepareEstateSceneTransition(input: {
       outgoing: null,
       incoming: null,
       phase: "ready",
-      preparingVisible: false,
       plateObjectFit,
     };
     notify();
@@ -207,7 +177,6 @@ export async function prepareEstateSceneTransition(input: {
     state = {
       ...state,
       phase: "crossfading",
-      preparingVisible: false,
     };
     startCrossfade();
     return;
@@ -219,7 +188,6 @@ export async function prepareEstateSceneTransition(input: {
       outgoing: null,
       incoming: null,
       phase: "ready",
-      preparingVisible: false,
       plateObjectFit: state.plateObjectFit,
     };
     notify();
@@ -232,7 +200,6 @@ export async function prepareEstateSceneTransition(input: {
       outgoing: null,
       incoming: null,
       phase: "ready",
-      preparingVisible: false,
       plateObjectFit,
     };
     notify();
@@ -242,7 +209,6 @@ export async function prepareEstateSceneTransition(input: {
   state = {
     ...state,
     incoming: { roomId, imageUrl },
-    preparingVisible: false,
   };
   startCrossfade();
 }
