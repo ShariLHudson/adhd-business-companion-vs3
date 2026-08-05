@@ -61,7 +61,10 @@ describe("Create polish 129 certification", () => {
 
   it("shows intro guidance once — no Projects cue on entrance", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
-    expect(panel).toContain("CREATE_GUIDED_SUPPORT_LINE");
+    // Phase 0 (Create Entrance Copy and Path Relabel) — entrance invitation
+    // now owns its copy in lib/createEstate/copy.ts; CREATE_GUIDED_SUPPORT_LINE
+    // remains a separate constant for the guided minimal panel elsewhere.
+    expect(panel).toContain("CREATE_ESTATE_ENTRANCE_INVITATION");
     expect(panel).not.toContain("CREATE_VS_PROJECTS_CUE");
     expect(panel).not.toContain("create-vs-projects-cue");
     expect(CREATE_VS_PROJECTS_CUE).toMatch(/Projects organize/i);

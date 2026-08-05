@@ -17,14 +17,19 @@ import {
   CREATE_ESTATE_CREATE_FROM_SCRATCH_LABEL,
   CREATE_ESTATE_DEFAULT_SUGGESTED_CHOICES,
   CREATE_ESTATE_DESCRIBE_PLACEHOLDER,
+  CREATE_ESTATE_ENTRANCE_INVITATION,
   CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING,
   CREATE_ESTATE_FIND_PREVIOUS_WORK_HINT,
   CREATE_ESTATE_HELP_ME_CHOOSE_LABEL,
   CREATE_ESTATE_NO_SEARCH_RESULTS_MESSAGE,
   CREATE_ESTATE_OPEN_FAILED_MESSAGE,
   CREATE_ESTATE_START_CREATING_LABEL,
+  CREATE_ESTATE_START_FREELY_DESCRIPTION,
+  CREATE_ESTATE_START_FREELY_HEADING,
   CREATE_ESTATE_START_NEW_LABEL,
   CREATE_ESTATE_START_NEW_READY_MESSAGE,
+  CREATE_ESTATE_START_WITH_GUIDANCE_DESCRIPTION,
+  CREATE_ESTATE_START_WITH_GUIDANCE_HEADING,
   CREATE_ESTATE_WHAT_WOULD_YOU_LIKE_HEADING,
   CREATE_ESTATE_WINDOW_TITLE,
 } from "@/lib/createEstate/copy";
@@ -60,10 +65,7 @@ import { findCatalogItem } from "@/lib/createCatalog";
 import {
   CREATE_BEGIN_PROGRESS_MESSAGE,
 } from "@/lib/primaryActionFeedback";
-import {
-  CREATE_GUIDED_SUPPORT_LINE,
-  resolveCreateExitDestination,
-} from "@/lib/createGuidedConversation189";
+import { resolveCreateExitDestination } from "@/lib/createGuidedConversation189";
 import type { CreateCatalogItem } from "@/lib/createCatalog";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 import { tryDirectNavigationInterrupt } from "@/lib/conversationRouter/tryDirectNavigationInterrupt";
@@ -529,7 +531,7 @@ export function CreateEstateEntrancePanel({
           className="mt-1 max-w-xl text-base leading-relaxed text-[#4b463f]"
           data-testid="create-estate-explanation"
         >
-          {CREATE_GUIDED_SUPPORT_LINE}
+          {CREATE_ESTATE_ENTRANCE_INVITATION}
         </p>
 
         {/* 1 — Continue Working (Spec 131 Rule 11 — hide when empty) */}
@@ -660,29 +662,58 @@ export function CreateEstateEntrancePanel({
             )
           ) : null}
 
-          <div className="flex flex-col items-start gap-2">
+          <div className="flex flex-col items-start gap-3">
+            {/* Phase 0 — Start Freely / Start With Guidance both reuse the
+                existing free-text Begin and Help Me Choose paths below;
+                only the framing copy and grouping are new. */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <div
+                className="flex max-w-sm flex-col gap-2 rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
+                data-testid="create-estate-start-freely"
+              >
+                <h3 className="text-base font-semibold text-[#1f1c19]">
+                  {CREATE_ESTATE_START_FREELY_HEADING}
+                </h3>
+                <p className="text-sm leading-relaxed text-[#6b635a]">
+                  {CREATE_ESTATE_START_FREELY_DESCRIPTION}
+                </p>
+                <button
+                  type="button"
+                  onClick={submitPrompt}
+                  disabled={beginBusy}
+                  aria-busy={beginBusy}
+                  className="self-start rounded-xl bg-[#3d3429] px-6 py-3 text-base font-semibold text-[#f7f2ea] transition enabled:hover:bg-[#2c241c] disabled:cursor-wait disabled:opacity-70"
+                  data-testid="create-estate-start-creating"
+                  data-primary-action="begin"
+                >
+                  {beginBusy ? "Beginning…" : CREATE_ESTATE_START_CREATING_LABEL}
+                </button>
+              </div>
+
+              <div
+                className="flex max-w-sm flex-col gap-2 rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
+                data-testid="create-estate-start-with-guidance"
+              >
+                <h3 className="text-base font-semibold text-[#1f1c19]">
+                  {CREATE_ESTATE_START_WITH_GUIDANCE_HEADING}
+                </h3>
+                <p className="text-sm leading-relaxed text-[#6b635a]">
+                  {CREATE_ESTATE_START_WITH_GUIDANCE_DESCRIPTION}
+                </p>
+                <button
+                  type="button"
+                  disabled={beginBusy}
+                  aria-pressed={helpMeChooseOpen}
+                  onClick={() => setHelpMeChooseOpen((open) => !open)}
+                  className="self-start rounded-xl border border-[#cfc6b8] bg-white px-5 py-2.5 text-base font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0] disabled:opacity-70"
+                  data-testid="create-estate-help-me-choose"
+                >
+                  {CREATE_ESTATE_HELP_ME_CHOOSE_LABEL}
+                </button>
+              </div>
+            </div>
+
             <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={submitPrompt}
-                disabled={beginBusy}
-                aria-busy={beginBusy}
-                className="rounded-xl bg-[#3d3429] px-6 py-3 text-base font-semibold text-[#f7f2ea] transition enabled:hover:bg-[#2c241c] disabled:cursor-wait disabled:opacity-70"
-                data-testid="create-estate-start-creating"
-                data-primary-action="begin"
-              >
-                {beginBusy ? "Beginning…" : CREATE_ESTATE_START_CREATING_LABEL}
-              </button>
-              <button
-                type="button"
-                disabled={beginBusy}
-                aria-pressed={helpMeChooseOpen}
-                onClick={() => setHelpMeChooseOpen((open) => !open)}
-                className="rounded-xl border border-[#cfc6b8] bg-white px-5 py-2.5 text-base font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0] disabled:opacity-70"
-                data-testid="create-estate-help-me-choose"
-              >
-                {CREATE_ESTATE_HELP_ME_CHOOSE_LABEL}
-              </button>
               <button
                 type="button"
                 onClick={openBrowseMore}

@@ -61,14 +61,16 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
     expect(choices.length).toBeGreaterThan(0);
     expect(choices.length).toBeLessThanOrEqual(4);
 
+    // Phase 0 (Create Entrance Copy and Path Relabel) — Start Freely /
+    // Start With Guidance primary action labels; same underlying handlers.
     expect(
       container.querySelector("[data-testid='create-estate-start-creating']")
         ?.textContent,
-    ).toContain("Start Creating");
+    ).toContain("I know where I want to begin");
     expect(
       container.querySelector("[data-testid='create-estate-help-me-choose']")
         ?.textContent,
-    ).toContain("Help Me Choose");
+    ).toContain("Help me figure this out");
   });
 
   it("Part 3 — never shows source filter chips on the default screen", () => {

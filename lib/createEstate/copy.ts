@@ -148,11 +148,38 @@ export const CREATE_ESTATE_WHAT_WOULD_YOU_LIKE_HEADING =
 export const CREATE_ESTATE_DESCRIBE_PLACEHOLDER =
   "Describe it or search ideas — e.g. email, workshop, client onboarding...";
 
-/** New primary label — clearer intent than the bare "Begin". */
-export const CREATE_ESTATE_START_CREATING_LABEL = "Start Creating";
+/**
+ * Phase 0 (Create Entrance Copy and Path Relabel) — primary action for the
+ * Start Freely path. Still the existing free-text Begin behavior; only the
+ * label changed.
+ */
+export const CREATE_ESTATE_START_CREATING_LABEL = "I know where I want to begin";
 
-/** Guided narrowing when the member does not know what to call it yet. */
-export const CREATE_ESTATE_HELP_ME_CHOOSE_LABEL = "Help Me Choose";
+/**
+ * Phase 0 — primary action for the Start With Guidance path. Still the
+ * existing Help Me Choose toggle behavior; only the label changed.
+ */
+export const CREATE_ESTATE_HELP_ME_CHOOSE_LABEL = "Help me figure this out";
+
+/**
+ * Phase 0 — Create entrance invitation. This is the source of truth for the
+ * entrance screen; CREATE_GUIDED_SUPPORT_LINE (lib/createGuidedConversation189.ts)
+ * remains a separate, still-used copy for the guided minimal panel shown
+ * later in the flow. Documented duplication — full consolidation is a
+ * follow-on, not part of this scoped relabel.
+ */
+export const CREATE_ESTATE_ENTRANCE_INVITATION =
+  "Tell me what you're working on, and we'll figure out the best way forward together.";
+
+/** Start Freely — reuses the existing free-text Begin path (Phase 0). */
+export const CREATE_ESTATE_START_FREELY_HEADING = "Start Freely";
+export const CREATE_ESTATE_START_FREELY_DESCRIPTION =
+  "Begin anywhere. Shari can help you organize your thoughts, research ideas, improve your work, or add structure whenever it becomes helpful.";
+
+/** Start With Guidance — reuses the existing Help Me Choose path (Phase 0). */
+export const CREATE_ESTATE_START_WITH_GUIDANCE_HEADING = "Start With Guidance";
+export const CREATE_ESTATE_START_WITH_GUIDANCE_DESCRIPTION =
+  "Shari helps you think it through, notices what may be missing, researches when helpful, and builds the result with you one step at a time.";
 
 export const CREATE_ESTATE_HELP_ME_CHOOSE_QUESTION =
   "What are you hoping to create?";
