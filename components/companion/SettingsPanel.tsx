@@ -279,16 +279,11 @@ export function SettingsPanel({
       );
     }
     {
+      // Only useSavedPatterns has a visible control (Settings Fix 7 —
+      // Notice New Patterns has no detection engine and was removed from
+      // the UI; its stored value no longer has anything to summarize).
       const pa = getPatternAwarenessControlPrefs();
-      if (!pa.noticeNewPatterns && !pa.useSavedPatterns) {
-        setPatternSummary("Off");
-      } else if (pa.noticeNewPatterns && pa.useSavedPatterns) {
-        setPatternSummary("Noticing & using");
-      } else if (pa.useSavedPatterns) {
-        setPatternSummary("Using saved");
-      } else {
-        setPatternSummary("Noticing only");
-      }
+      setPatternSummary(pa.useSavedPatterns ? "On" : "Off");
     }
     setPlanningView(getDefaultPlanningView() ?? "list");
     setPlan(p.plan);

@@ -48,7 +48,6 @@ const EXAMPLE_PATTERNS = [
 type StatusMsg = { tone: "ok" | "error"; text: string } | null;
 
 export function PatternAwarenessPanel() {
-  const [noticeNew, setNoticeNew] = useState(true);
   const [useSaved, setUseSaved] = useState(true);
   const [patterns, setPatterns] = useState<SavedPattern[]>([]);
   const [status, setStatus] = useState<StatusMsg>(null);
@@ -68,7 +67,6 @@ export function PatternAwarenessPanel() {
 
   function refresh() {
     const prefs = getPatternAwarenessControlPrefs();
-    setNoticeNew(prefs.noticeNewPatterns);
     setUseSaved(prefs.useSavedPatterns);
     setPatterns(listSavedPatterns());
   }
@@ -88,12 +86,13 @@ export function PatternAwarenessPanel() {
     window.setTimeout(() => setStatus(null), 2800);
   }
 
-  function persistControls(nextNotice: boolean, nextUse: boolean) {
-    savePatternAwarenessControlPrefs({
-      noticeNewPatterns: nextNotice,
-      useSavedPatterns: nextUse,
-    });
-    setNoticeNew(nextNotice);
+  function persistControls(nextUse: boolean) {
+    // noticeNewPatterns is intentionally left untouched here — it has no
+    // visible control anymore (no detection engine exists to back it), but
+    // stays in storage as a dormant, future-ready field. See
+    // savePatternAwarenessControlPrefs — omitting it from the patch
+    // preserves whatever value is already stored.
+    savePatternAwarenessControlPrefs({ useSavedPatterns: nextUse });
     setUseSaved(nextUse);
     flash("ok", SETTINGS_SAVED_MESSAGE);
   }
@@ -167,19 +166,11 @@ export function PatternAwarenessPanel() {
 
       <div className="mb-4 flex flex-col gap-3 rounded-xl border border-[#d4cdc3] bg-white px-3.5 py-3">
         <SettingsToggle
-          id="pattern-notice-new"
-          label="Notice New Patterns"
-          description="When on, Spark may gently offer patterns it noticed — never silent saves."
-          checked={noticeNew}
-          onChange={(checked) => persistControls(checked, useSaved)}
-          testId="pattern-notice-new"
-        />
-        <SettingsToggle
           id="pattern-use-saved"
           label="Use My Saved Patterns"
           description="When on, active patterns can shape suggestions. When off, they stay stored but unused."
           checked={useSaved}
-          onChange={(checked) => persistControls(noticeNew, checked)}
+          onChange={(checked) => persistControls(checked)}
           testId="pattern-use-saved"
         />
       </div>
@@ -197,54 +188,6 @@ export function PatternAwarenessPanel() {
           <li>Earlier recognition of overload</li>
           <li>Support based on what has helped you before</li>
         </ul>
-      </SettingsHelpAccordion>
-
-      <SettingsHelpAccordion
-        title="What Spark may notice"
-        testId="pattern-what-may-notice"
-      >
-        <ul className="space-y-2">
-          <li>
-            <span className={`font-semibold ${SETTINGS_TEXT.secondary}`}>
-              Energy and Time
-            </span>
-            — morning energy, slower starts, post-meeting dips
-          </li>
-          <li>
-            <span className={`font-semibold ${SETTINGS_TEXT.secondary}`}>
-              Starting and Focus
-            </span>
-            — small first steps, timers, fewer options
-          </li>
-          <li>
-            <span className={`font-semibold ${SETTINGS_TEXT.secondary}`}>
-              Planning and Workload
-            </span>
-            — fewer priorities, buffer time, realistic estimates
-          </li>
-          <li>
-            <span className={`font-semibold ${SETTINGS_TEXT.secondary}`}>
-              Motivation
-            </span>
-            — interest, accountability, visible progress
-          </li>
-          <li>
-            <span className={`font-semibold ${SETTINGS_TEXT.secondary}`}>
-              Overwhelm and Recovery
-            </span>
-            — brain dumps before planning, quiet recovery time
-          </li>
-          <li>
-            <span className={`font-semibold ${SETTINGS_TEXT.secondary}`}>
-              Communication and Learning
-            </span>
-            — one question at a time, examples, shorter replies
-          </li>
-        </ul>
-        <p className="mt-2">
-          Spark will never treat a guess as fact, invent who you are, or save a
-          pattern without asking. You choose what to keep.
-        </p>
       </SettingsHelpAccordion>
 
       <SettingsHelpAccordion
@@ -425,8 +368,7 @@ export function PatternAwarenessPanel() {
 
       {patterns.length === 0 ? (
         <p className="rounded-xl border border-dashed border-[#d4cdc3] px-3.5 py-4 text-sm text-[#6b635a]">
-          No saved patterns yet. Add one you already know, or wait for a gentle
-          suggestion when Notice New Patterns is on.
+          No saved patterns yet. Add one you already know to get started.
         </p>
       ) : (
         <ul className="flex flex-col gap-2.5">
