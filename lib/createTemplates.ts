@@ -90,6 +90,39 @@ const SOP_SECTIONS: CreateTemplateSection[] = [
   section("notes", "Notes & Tips"),
 ];
 
+/**
+ * 2026-08-05 — ADR-013 routing exposure fix. Checklist requests now
+ * default to Create/Current Focus (previously detoured through Creation
+ * Workspace) and had no dedicated template, so they fell to
+ * GENERIC_SECTIONS (Introduction/Main Content/Call to Action/Closing) —
+ * fine for a persuasive piece, wrong shape for a checklist.
+ */
+const CHECKLIST_SECTIONS: CreateTemplateSection[] = [
+  section("purpose", "Purpose"),
+  section("before-you-start", "Before You Start"),
+  section("items", "Checklist Items"),
+  section("done", "Done / Sign-Off"),
+];
+
+/**
+ * 2026-08-05 — ADR-013 routing exposure fix, same as above. Keyed to
+ * "Document" — the real, reachable catalog item (matchTerms: "document",
+ * "general document"; createParentTypes.ts hint: "Anything else that
+ * does not fit the categories above") — not "Report", which is not
+ * currently a resolvable artifactType anywhere in the app: it exists
+ * only as a disabled subtype (userFacingSubtypeOptionsForItem in
+ * createTypePickers.ts unconditionally returns []), and no free-text,
+ * catalog, or Browse More path ever produces artifactType === "Report".
+ * Report-style single documents are exactly what land here as
+ * "Document" today.
+ */
+const DOCUMENT_SECTIONS: CreateTemplateSection[] = [
+  section("purpose", "Purpose & Overview"),
+  section("key-points", "Key Points"),
+  section("details", "Details"),
+  section("summary", "Summary & Next Steps"),
+];
+
 const TRAINING_SECTIONS: CreateTemplateSection[] = [
   section("overview", "Overview"),
   section("objectives", "Learning Objectives"),
@@ -240,6 +273,18 @@ const PRESET_TEMPLATES: CreateTemplatePreset[] = [
     name: "Default SOP Template",
     itemType: "SOP",
     sections: [...SOP_SECTIONS],
+  },
+  {
+    id: "checklist-default",
+    name: "Default Checklist Template",
+    itemType: "Checklist",
+    sections: [...CHECKLIST_SECTIONS],
+  },
+  {
+    id: "document-default",
+    name: "Default Document Template",
+    itemType: "Document",
+    sections: [...DOCUMENT_SECTIONS],
   },
   {
     id: "training-default",

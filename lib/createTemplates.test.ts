@@ -82,4 +82,77 @@ describe("createTemplates", () => {
     expect(wf.selectedTemplateId).toBe("workshop-default");
     expect(resolveTemplateName(wf)).toContain("Workshop");
   });
+
+  // 2026-08-05 — ADR-013 routing exposure fix (Checklist/Document templates).
+  // Single-artifact Begin requests now default to Create/Current Focus, so
+  // these two types started hitting the generic fallback (Introduction /
+  // Main Content / Call to Action / Closing) instead of a real structure.
+  describe("Checklist and Document dedicated templates", () => {
+    it("Checklist resolves to its own template, not the generic fallback", () => {
+      const preset = defaultTemplateFor("Checklist");
+      expect(preset.id).toBe("checklist-default");
+      const labels = preset.sections.map((s) => s.label);
+      expect(labels).toContain("Checklist Items");
+      expect(labels).toContain("Before You Start");
+      expect(labels).not.toContain("Introduction");
+      expect(labels).not.toContain("Main Content");
+      expect(labels).not.toContain("Call to Action");
+    });
+
+    it("Document resolves to its own template, not the generic fallback", () => {
+      // "Report" is not a resolvable artifactType anywhere in the app
+      // (userFacingSubtypeOptionsForItem is hard-disabled, no free-text /
+      // catalog / Browse More path ever produces "Report") — "Document" is
+      // the real, reachable catalog item that report-style single
+      // documents land on today.
+      const preset = defaultTemplateFor("Document");
+      expect(preset.id).toBe("document-default");
+      const labels = preset.sections.map((s) => s.label);
+      expect(labels).toContain("Key Points");
+      expect(labels).toContain("Purpose & Overview");
+      expect(labels).not.toContain("Introduction");
+      expect(labels).not.toContain("Main Content");
+      expect(labels).not.toContain("Call to Action");
+    });
+
+    it("a type with no dedicated template still falls back to the generic template", () => {
+      // Regression guard — confirms the fallback path itself still works
+      // for types that genuinely have none, distinguishing "no template
+      // exists" from "the lookup is broken."
+      const preset = defaultTemplateFor("Some Unmapped Type");
+      expect(preset.id).toBe("generic-default");
+      expect(preset.sections.map((s) => s.label)).toContain("Introduction");
+    });
+
+    it("existing SOP, Proposal, and Training Guide templates are unchanged", () => {
+      const sop = defaultTemplateFor("SOP");
+      expect(sop.id).toBe("sop-default");
+      expect(sop.sections.map((s) => s.label)).toEqual([
+        "Purpose",
+        "Scope",
+        "Steps",
+        "Notes & Tips",
+      ]);
+
+      const proposal = defaultTemplateFor("Proposal");
+      expect(proposal.id).toBe("proposal-default");
+      expect(proposal.sections.map((s) => s.label)).toEqual([
+        "Executive Summary",
+        "Scope of Work",
+        "Approach",
+        "Timeline",
+        "Investment",
+      ]);
+
+      const training = defaultTemplateFor("Training Guide");
+      expect(training.id).toBe("training-default");
+      expect(training.sections.map((s) => s.label)).toEqual([
+        "Overview",
+        "Learning Objectives",
+        "Main Content",
+        "Exercise / Practice",
+        "Summary",
+      ]);
+    });
+  });
 });
