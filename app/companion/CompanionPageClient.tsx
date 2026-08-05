@@ -12504,6 +12504,15 @@ export default function CompanionPageClient() {
     isEventDomain?: boolean;
     /** Pre-hydrated session from Creation Workspace handoff (never regenerate). */
     seededSession?: CreateBuilderSession | null;
+    /**
+     * Fix C (2026-08-05 audit) — a canonical UWE work id already minted by
+     * resolveGuidedBeginOpen. Seeds the new session's identity so
+     * syncCanonicalWorkFromCreateWorkflow's own id derivation (which reads
+     * workflow.sessionId) lands on the SAME id instead of minting a second
+     * one for the same member intent. No effect on resume/seeded sessions,
+     * which already have their own identity.
+     */
+    canonicalWorkId?: string | null;
   }): boolean {
     // Never call openCreateWorkspace
     const resumeWorkspaceId = opts?.resumeWorkspaceId?.trim();
@@ -12521,7 +12530,9 @@ export default function CompanionPageClient() {
       const prompt = opts?.initialPrompt?.trim() || "";
       let workflow: CreateWorkflowState = {
         ...boot.session.workflow,
-        sessionId: boot.session.workflow.sessionId ?? newCreateSessionId(),
+        sessionId:
+          opts?.canonicalWorkId?.trim() ||
+          (boot.session.workflow.sessionId ?? newCreateSessionId()),
         selectedTypeLabel: artifactType,
         originalRequest: prompt || boot.session.workflow.originalRequest,
         questionMode: coerceCreationDestinationQuestionMode("current_focus"),
@@ -28043,7 +28054,7 @@ export default function CompanionPageClient() {
                 );
                 return true;
               }}
-              onBeginCreate={(outcome) => {
+              onBeginCreate={(outcome, opts) => {
                 // Never call Estate open without artifactType
                 createOpenTraceRef.current = nextCreateOpenTraceId(
                   outcome.text || outcome.artifactType,
@@ -28054,6 +28065,37 @@ export default function CompanionPageClient() {
                   hardNavTarget: "create",
                   note: `begin:${outcome.artifactType}`,
                 });
+                const canonicalWorkId = opts?.canonicalWorkId ?? null;
+                // Fix C (2026-08-05 audit) — a guided domain already minted
+                // this canonical id via resolveGuidedBeginOpen, which is
+                // itself a substantive-work decision. Running the
+                // Creation Workspace pipeline's own independent
+                // classification on top would either strand this id
+                // (pipeline opens instead) or mint a second, different id
+                // for the same intent (pipeline declines). Skip it and
+                // bind straight to the canonical identity.
+                if (canonicalWorkId) {
+                  const ok = startFreshCreateFromEstate({
+                    artifactType: outcome.artifactType,
+                    initialPrompt: outcome.text,
+                    isEventDomain: outcome.isEventDomain,
+                    canonicalWorkId,
+                  });
+                  publishLiveWorkspaceTrace("after_open_create_workspace", {
+                    command: outcome.text,
+                    matchedHardNav: false,
+                    hardNavTarget: "create",
+                    note: ok
+                      ? `estateWorking:true;type:${outcome.artifactType};workId:${canonicalWorkId}`
+                      : `estateWorking:false;type:${outcome.artifactType};workId:${canonicalWorkId}`,
+                  });
+                  if (ok) {
+                    scheduleLiveWorkspaceTraceDelays(
+                      outcome.text || outcome.artifactType,
+                    );
+                  }
+                  return ok;
+                }
                 // Coordinated creations open Creation Workspace before Create polish.
                 const pipeline = runRequestIntoCreationWorkspace(outcome.text, {
                   sourceExperience: "create",

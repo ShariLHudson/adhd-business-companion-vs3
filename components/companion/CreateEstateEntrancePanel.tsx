@@ -79,6 +79,16 @@ type Props = {
    */
   onBeginCreate: (
     outcome: Extract<CreateBeginOutcome, { kind: "open" }>,
+    opts?: {
+      /**
+       * Fix C (2026-08-05 audit) — set only when a guided domain
+       * (Event/Marketing/Business/Facebook Community) already minted a
+       * canonical UWE work id via resolveGuidedBeginOpen. Binds whichever
+       * surface actually opens to that identity instead of leaving it
+       * orphaned or double-minted under a second id.
+       */
+      canonicalWorkId?: string | null;
+    },
   ) => boolean | void | Promise<boolean | void>;
   /** Optional browse — catalog type opens workflow. */
   onSelectCreationType: (item: CreateCatalogItem) => void;
@@ -337,12 +347,20 @@ export function CreateEstateEntrancePanel({
       return;
     }
 
+    // Fix C — a guided domain (open_new) may have already minted a
+    // canonical UWE work id above. Carry it through so whichever surface
+    // onBeginCreate opens binds to that identity instead of orphaning it.
+    const canonicalWorkId =
+      guided.kind === "open_new" ? guided.resolution.workId : null;
+
     void (async () => {
       try {
         // Progress only — do not claim durable "saved" before persist ack.
         setBeginFeedback(CREATE_BEGIN_PROGRESS_MESSAGE);
         setBeginFeedbackKind("progress");
-        const opened = await Promise.resolve(onBeginCreate(outcome));
+        const opened = await Promise.resolve(
+          onBeginCreate(outcome, { canonicalWorkId }),
+        );
         if (opened === false) {
           setBeginFeedback(CREATE_ESTATE_OPEN_FAILED_MESSAGE);
           setBeginFeedbackKind("error");
