@@ -1,9 +1,11 @@
 # ADR-012: Unify Shari's Guidance Settings — Conversation Style, Help Mode, Support Style, How Shari Invites Me
 
-**Status:** Proposed — documentation only, no runtime change in this phase
+**Status:** Approved — documentation only; implementation has not begun
 **Date:** 2026-08-05
-**Decision owner:** Founder (Shari) — final approval required before any implementation phase begins
-**Supersedes / refines:** `docs/estate/SETTINGS_FUNCTIONALITY_AND_DUPLICATION_AUDIT.md` §4 rows 2–3, §5 (see **Relationship to the prior audit**, below)
+**Decision owner:** Founder
+**Approved by:** Shari Hudson
+**Approval date:** August 5, 2026
+**Supersedes / refines:** `docs/estate/SETTINGS_FUNCTIONALITY_AND_DUPLICATION_AUDIT.md` §4 rows 2–3, §5 — this ADR's traced recommendation supersedes the prior audit where they differ (see **Relationship to the prior audit**, below)
 **Related:** `docs/THE_FRIEND_WE_ALL_DESERVE.md` · `docs/constitution/128_SPARK_ESTATE_SIMPLICITY_AND_COGNITIVE_LOAD_CONSTITUTION.md` · `docs/estate/01 - Spark Estate Constitution.md` · `lib/companionTonePreferences.ts` · `lib/conversationStabilization/shariVoiceLayer.ts` · `lib/supportStyle/` · `lib/curiosityBeforeCommands/`
 
 ---
@@ -189,7 +191,7 @@ This ADR reaches the same directional conclusion (fewer, honest settings) via a 
 1. **Where "Listen Only" belongs.** The prior audit implicitly left Listen-Only framing inside Support Style (as one of its 6 kept presets). This ADR places it under Conversation Style instead, because `lib/companionTonePreferences.ts:90-91` explicitly enumerates "Listen Only" as one of Conversation Style's own eight canon values — a fact only visible once the code (not just the settings UI) was traced.
 2. **Support Style's final size.** The prior audit recommended keeping 6 presets (dropping only "Create My Own"). This ADR recommends 4, because the trace showed `gentle-first`, `practical-first`, `talk-it-through`, and `adaptive` are already behaviorally identical at the deterministic layer (`presentationResolver.ts:30-90`) — keeping `talk-it-through` and `give-me-choices` as separately visible rows sells a distinction the runtime does not currently deliver.
 
-Both refinements are grounded in the same evidence cited above and are offered as an update to, not a rejection of, the prior audit's direction. No other repository standard, constitution, or binding document was found to conflict with this decision.
+Both refinements are grounded in the same evidence cited above. Per Founder approval, this ADR's traced recommendation **supersedes** `SETTINGS_FUNCTIONALITY_AND_DUPLICATION_AUDIT.md` §4 rows 2–3 and §5 on these two specific points; the prior audit's broader direction (fewer, honest settings) stands and is not otherwise altered. No other repository standard, constitution, or binding document was found to conflict with this decision.
 
 ---
 
@@ -198,7 +200,7 @@ Both refinements are grounded in the same evidence cited above and are offered a
 - Two settings replace four. No storage key, type, or engine function is deleted.
 - The Immutable Friend guardrail, `THE_IMMUTABLE_FRIEND_GUARDRAIL`, and all identity-preservation code are unaffected — this ADR governs only the HOW layer beneath that guardrail, never the WHO.
 - Pattern Awareness (`noticeNewPatterns`/`useSavedPatterns`) is out of scope; already addressed in a separate contained change this session.
-- Implementation begins only after Founder approval of this record, starting at Phase 1.
+- This record is approved. Implementation has **not** begun — Phase 1 begins as its own separate, contained change.
 
 ## Files changed (this phase)
 
@@ -219,9 +221,10 @@ Reason:        The canon already defines one Level-2 "HOW" axis with 8 named val
                unresolved conflicts, dead options, and 2 live correctness bugs.
                128 Constitution Rules 3, 5, 6, 15.
 Date:          2026-08-05
-Approved by:   —  (documentation only; Founder approval required before Phase 1)
-Supersedes:    Nothing binding; refines SETTINGS_FUNCTIONALITY_AND_DUPLICATION_AUDIT.md
-               §4 rows 2–3 and §5 per "Relationship to the prior audit," above.
+Approved by:   Shari Hudson (Founder) — August 5, 2026
+Supersedes:    SETTINGS_FUNCTIONALITY_AND_DUPLICATION_AUDIT.md §4 rows 2–3 and §5,
+               where they differ from this ADR's traced recommendation — see
+               "Relationship to the prior audit," above.
 Related:       lib/companionTonePreferences.ts · lib/conversationStabilization/shariVoiceLayer.ts
                lib/supportStyle/* · lib/curiosityBeforeCommands/* · lib/companionPrompt.ts
                app/api/companion-chat/route.ts · app/companion/CompanionPageClient.tsx
