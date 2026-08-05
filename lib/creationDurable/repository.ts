@@ -124,6 +124,50 @@ async function resolveUserId(): Promise<
   return { ok: true, userId: data.user.id };
 }
 
+/**
+ * Phase P0.5 — classify a Supabase/PostgREST write error into an honest
+ * durable-failure code + member-facing message.
+ *
+ * Extracted as a pure function so this classification is unit-testable
+ * without mocking the full Supabase client chain, and so authentication
+ * failures (e.g. JWT expiry, PGRST301) are never misclassified as a
+ * missing schema. The previous check matched the bare substring "PGRST",
+ * which is the prefix of every PostgREST error code — including auth
+ * failures — so a mid-session auth failure could false-match as
+ * TABLE_MISSING. Table-missing detection now checks the actual Postgres
+ * "relation does not exist" code/message and PostgREST's own
+ * schema-cache-miss code; auth failures get their own classification.
+ */
+export function classifyCreationDurableWriteError(error: {
+  code?: string | null;
+  message?: string | null;
+}): { errorCode: string; message: string } {
+  const code = error.code || "DB_WRITE_FAILED";
+  const tableMissing =
+    code === "42P01" ||
+    code === "PGRST205" ||
+    /relation .* does not exist/i.test(error.message || "");
+  if (tableMissing) {
+    return {
+      errorCode: "TABLE_MISSING",
+      message:
+        "Secure Creation storage isn't set up yet. Apply the companion_creation_workspaces schema, then Retry.",
+    };
+  }
+  const authFailure = code === "PGRST301";
+  if (authFailure) {
+    return {
+      errorCode: "AUTH_REQUIRED",
+      message: "Sign in so I can keep this work safe across refresh.",
+    };
+  }
+  return {
+    errorCode: code,
+    message:
+      "That didn't finish saving securely. Your work is still on screen — Retry.",
+  };
+}
+
 function supabaseBackend(): CreationDurableBackend {
   return {
     async upsertAndReadBack(record) {
@@ -143,15 +187,10 @@ function supabaseBackend(): CreationDurableBackend {
         .single();
 
       if (error) {
-        const code = error.code || "DB_WRITE_FAILED";
-        const tableMissing =
-          /relation|does not exist|42P01|PGRST/i.test(error.message || "") ||
-          error.code === "42P01";
+        const classified = classifyCreationDurableWriteError(error);
         return durableFail(
-          tableMissing ? "TABLE_MISSING" : code,
-          tableMissing
-            ? "Secure Creation storage isn't set up yet. Apply the companion_creation_workspaces schema, then Retry."
-            : "That didn't finish saving securely. Your work is still on screen — Retry.",
+          classified.errorCode,
+          classified.message,
           true
         );
       }

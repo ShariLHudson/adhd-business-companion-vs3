@@ -16,6 +16,7 @@ export {
   getAuthenticatedCreationUserId,
   setCreationDurableBackendForTests,
   createMemoryCreationDurableBackend,
+  classifyCreationDurableWriteError,
 } from "./repository";
 export {
   persistCreationMutation,

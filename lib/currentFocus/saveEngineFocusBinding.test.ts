@@ -164,7 +164,13 @@ describe("Save Engine — Current Focus durable binding", () => {
       resolve(process.cwd(), "app/companion/CompanionPageClient.tsx"),
       "utf8",
     );
-    const start = client.indexOf("onSubmitCurrentFocus={async (input)");
+    // Phase P0.5 — the inline `onSubmitCurrentFocus={async (input) => {...}}`
+    // handler was extracted to a named `submitCreateFocusResponse` function
+    // (so Retry can replay the exact same submission). Assert the JSX still
+    // wires the extracted function, then check ITS body for the binding
+    // contract this test exists to guard.
+    expect(client).toContain("onSubmitCurrentFocus={submitCreateFocusResponse}");
+    const start = client.indexOf("const submitCreateFocusResponse =");
     expect(start).toBeGreaterThan(-1);
     const block = client.slice(start, start + 1800);
     expect(block).toContain("focusId: input.focus.focusId");

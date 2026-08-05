@@ -657,6 +657,7 @@ import {
   hydrateExactBuilderSession,
   resolveCanonicalCurrentFocus,
   submitCurrentFocusResponse,
+  type CanonicalCurrentFocus,
 } from "@/lib/currentFocus";
 import { registerCreationDestinationWorkspace } from "@/lib/activeWorkspaceRegistry";
 import { syncCanonicalWorkFromCreateWorkflow } from "@/lib/createProjects/syncCanonicalWorkFromCreate";
@@ -4247,6 +4248,89 @@ export default function CompanionPageClient() {
   const createPanelWorkflowRef = useRef(EMPTY_CREATE_WORKFLOW);
   const createWorkflowRecordRef = useRef<CreateWorkflowRecord | null>(null);
   const createPanelBuildRef = useRef<CreateBuildDraftHandler | null>(null);
+  /**
+   * Phase P0.5 — Create Durable Trust Foundation. Holds the exact input of
+   * the most recent Current Focus submission (success or failure) so Retry
+   * can replay it verbatim instead of leaving a failed save as a dead end.
+   */
+  const lastFocusSubmissionRef = useRef<{
+    focus: CanonicalCurrentFocus;
+    response: string;
+    responseType: "multiline" | "ideas" | "unsure" | "skip";
+  } | null>(null);
+
+  const submitCreateFocusResponse = async (input: {
+    focus: CanonicalCurrentFocus;
+    response: string;
+    responseType: "multiline" | "ideas" | "unsure" | "skip";
+  }) => {
+    lastFocusSubmissionRef.current = input;
+    setCreateFocusSubmitting(true);
+    setCreateFocusFailure(null);
+    try {
+      // Non-null: only ever wired to the Estate working panel, which is
+      // itself only mounted when createBuilderSession is non-null (see the
+      // `createBuilderSession &&` guard around its JSX). Same reliance on
+      // that invariant as the original inline handler this was extracted
+      // from — not a new assumption.
+      const workflow = createBuilderSession!.workflow;
+      const creationId = input.focus.creationId || workflow.sessionId || "";
+      const requestId = `focus-${Date.now()}`;
+      // Bind the submission to the exact Focus the member was
+      // answering. Passing the whole focus object (or a hardcoded
+      // contextVersion) desynchronizes the durable applicability
+      // check and makes every Save fail with "This Focus moved".
+      const result = await submitCurrentFocusResponse(
+        {
+          requestId,
+          contextVersion: input.focus.contextVersion,
+          creationId,
+          focusId: input.focus.focusId,
+          response: input.response,
+          responseType: input.responseType,
+        },
+        {
+          workflow,
+          activeRequestId: requestId,
+          activeContextVersion: input.focus.contextVersion,
+          activeCreationId: creationId,
+        },
+      );
+      if (result.updatedWorkflow) {
+        createPanelWorkflowRef.current = result.updatedWorkflow;
+        setCreateBuilderSession((prev) =>
+          prev
+            ? { ...prev, workflow: result.updatedWorkflow! }
+            : prev,
+        );
+        syncCanonicalWorkFromCreateWorkflow({
+          workflow: result.updatedWorkflow,
+          createWorkflowId: result.updatedWorkflow.sessionId,
+          projectHomeId: createLinkedProjectHomeId,
+        });
+      }
+      if (!result.ok) {
+        setCreateFocusFailure(result.failureMessage);
+        setCreatePreservedResponse(result.preservedResponse);
+      } else {
+        setCreateFocusGuidance(result.confirmationGuidance);
+        setCreatePreservedResponse(null);
+      }
+    } finally {
+      setCreateFocusSubmitting(false);
+    }
+  };
+
+  /**
+   * Phase P0.5 — replays the exact submission that just failed. Wires the
+   * Retry affordance CurrentFocusInteraction / submitCurrentFocusResponse
+   * already expose (retryAvailable: true) but which had no working handler
+   * at this mount, so the member was told to "Retry" with no button.
+   */
+  const retryLastFocusSubmission = () => {
+    const last = lastFocusSubmissionRef.current;
+    if (last) void submitCreateFocusResponse(last);
+  };
   const [googleWorkspace, setGoogleWorkspace] =
     useState<GoogleWorkspaceSession | null>(null);
   const googleWorkspaceRef = useRef<GoogleWorkspaceSession | null>(null);
@@ -27924,59 +28008,8 @@ export default function CompanionPageClient() {
                     openProjectHomesPrototypeCore();
                   }
                 }}
-                onSubmitCurrentFocus={async (input) => {
-                  setCreateFocusSubmitting(true);
-                  setCreateFocusFailure(null);
-                  try {
-                    const creationId =
-                      input.focus.creationId ||
-                      createBuilderSession.workflow.sessionId ||
-                      "";
-                    const requestId = `focus-${Date.now()}`;
-                    // Bind the submission to the exact Focus the member was
-                    // answering. Passing the whole focus object (or a hardcoded
-                    // contextVersion) desynchronizes the durable applicability
-                    // check and makes every Save fail with "This Focus moved".
-                    const result = await submitCurrentFocusResponse(
-                      {
-                        requestId,
-                        contextVersion: input.focus.contextVersion,
-                        creationId,
-                        focusId: input.focus.focusId,
-                        response: input.response,
-                        responseType: input.responseType,
-                      },
-                      {
-                        workflow: createBuilderSession.workflow,
-                        activeRequestId: requestId,
-                        activeContextVersion: input.focus.contextVersion,
-                        activeCreationId: creationId,
-                      },
-                    );
-                    if (result.updatedWorkflow) {
-                      createPanelWorkflowRef.current = result.updatedWorkflow;
-                      setCreateBuilderSession((prev) =>
-                        prev
-                          ? { ...prev, workflow: result.updatedWorkflow! }
-                          : prev,
-                      );
-                      syncCanonicalWorkFromCreateWorkflow({
-                        workflow: result.updatedWorkflow,
-                        createWorkflowId: result.updatedWorkflow.sessionId,
-                        projectHomeId: createLinkedProjectHomeId,
-                      });
-                    }
-                    if (!result.ok) {
-                      setCreateFocusFailure(result.failureMessage);
-                      setCreatePreservedResponse(result.preservedResponse);
-                    } else {
-                      setCreateFocusGuidance(result.confirmationGuidance);
-                      setCreatePreservedResponse(null);
-                    }
-                  } finally {
-                    setCreateFocusSubmitting(false);
-                  }
-                }}
+                onSubmitCurrentFocus={submitCreateFocusResponse}
+                onRetryCurrentFocus={retryLastFocusSubmission}
                 focusGuidance={createFocusGuidance}
                 focusFailure={createFocusFailure}
                 focusSubmitting={createFocusSubmitting}
