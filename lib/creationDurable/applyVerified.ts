@@ -10,6 +10,7 @@ import {
   type RuntimeCreationRecord,
 } from "@/lib/currentFocus/creationRecord";
 import { WORKSPACE_SCHEMA_VERSION } from "@/lib/currentFocus/canonicalFacts";
+import type { WorkingMemoryFields } from "@/lib/currentFocus/workingMemory";
 import type { AuthoritativeCreationRecord } from "./types";
 
 export function authoritativeToRuntimeRecord(
@@ -60,6 +61,15 @@ export function authoritativeToRuntimeRecord(
     workingIntent:
       (record.payload.workflowSnapshot as { workingIntent?: string } | null)
         ?.workingIntent ?? null,
+    // SOP Build Journey Phase 2 — reads back whatever the write side put in
+    // the snapshot bag. Absent on every record saved before this phase;
+    // that is the hydrate-safety case the D5 gate required.
+    workingMemory:
+      (
+        record.payload.workflowSnapshot as {
+          workingMemory?: WorkingMemoryFields;
+        } | null
+      )?.workingMemory ?? null,
     createdAt: record.createdAt,
     updatedAt: now,
   };

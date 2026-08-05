@@ -28,6 +28,7 @@ import {
   type CanonicalKnownFact,
   WORKSPACE_SCHEMA_VERSION,
 } from "./canonicalFacts";
+import { deriveWorkingMemoryFields, type WorkingMemoryFields } from "./workingMemory";
 
 const STORAGE_KEY = RUNTIME_CREATION_RECORDS_KEY;
 
@@ -62,6 +63,12 @@ export type RuntimeCreationRecord = {
   originalRequest?: string | null;
   /** Creation Identity — internal routing intent (e.g. Create Checklist). */
   workingIntent?: string | null;
+  /**
+   * SOP Build Journey Phase 2 (2026-08-05) — approved 10-field Working Memory
+   * model. Optional and additive; every field may be absent on records
+   * created before this phase. See lib/currentFocus/workingMemory.ts.
+   */
+  workingMemory?: WorkingMemoryFields | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -234,6 +241,13 @@ export function ensureRuntimeCreationRecord(
     null;
   const workingIntent =
     workflow.workingIntent?.trim() || existing?.workingIntent?.trim() || null;
+  // SOP Build Journey Phase 2 — progressive, Build-Type-agnostic derivation.
+  // See lib/currentFocus/workingMemory.ts for what is and is not populated.
+  const workingMemory = deriveWorkingMemoryFields({
+    sectionContent,
+    nextSectionLabel: focusSection?.label ?? null,
+    existing: existing?.workingMemory,
+  });
   return upsertRuntimeCreationRecord({
     id,
     typeLabel: typeLabel || existing?.typeLabel || "Creation",
@@ -269,6 +283,7 @@ export function ensureRuntimeCreationRecord(
     draftContent: workflow.draftContent ?? existing?.draftContent ?? null,
     originalRequest,
     workingIntent,
+    workingMemory,
     createdAt: existing?.createdAt ?? now,
     updatedAt: now,
   });
@@ -298,6 +313,14 @@ export function applyAnswerToRuntimeCreationRecord(
 
   const sections = record.templateSections ?? [];
   const canonicalFacts = buildCanonicalKnownFacts(sectionContent, sections);
+  const nextSection = sections.find(
+    (s) => !skipped.includes(s.id) && !sectionContent[s.id]?.trim(),
+  );
+  const workingMemory = deriveWorkingMemoryFields({
+    sectionContent,
+    nextSectionLabel: nextSection?.label ?? null,
+    existing: record.workingMemory,
+  });
 
   return upsertRuntimeCreationRecord({
     ...record,
@@ -307,6 +330,7 @@ export function applyAnswerToRuntimeCreationRecord(
     canonicalFacts,
     focusSectionId: sectionId ?? record.focusSectionId,
     schemaVersion: WORKSPACE_SCHEMA_VERSION,
+    workingMemory,
   });
 }
 

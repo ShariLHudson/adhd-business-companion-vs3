@@ -172,6 +172,12 @@ export function buildPayloadFromWorkflow(
       workspacePhaseLabel: workflow.workspacePhaseLabel,
       questionMode: workflow.questionMode,
       creationWorkspaceKind: workflow.creationWorkspaceKind,
+      // SOP Build Journey Phase 2 (2026-08-05) — approved 10-field Working
+      // Memory model. Carried inside the existing free-form snapshot bag,
+      // same pattern as workingIntent/discoveryAnswers above — no schema
+      // migration, additive to every creation type. Only present when the
+      // record actually has something to carry.
+      workingMemory: runtime?.workingMemory ?? null,
     },
     registryMeta: {
       humanTitle: title,
