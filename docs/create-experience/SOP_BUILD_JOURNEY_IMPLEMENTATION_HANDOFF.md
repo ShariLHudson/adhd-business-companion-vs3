@@ -1,8 +1,9 @@
 # SOP Build Journey — Implementation Handoff
 
-**Version:** 1.1
-**Status:** Planning artifact. Architectural decisions approved 2026-08-05. No code changes yet — implementation has not begun.
+**Version:** 1.2
+**Status:** Planning artifact. Phase 1 shipped (`87cf2feb`). D1–D5 approved. Phase 2 blocked on the revised field list below — awaiting confirmation.
 **Acceptance specification:** [`SOP_BUILD_JOURNEY_SPECIFICATION.md`](./SOP_BUILD_JOURNEY_SPECIFICATION.md)
+**Acceptance example:** [`SOP_BUILD_JOURNEY_ACCEPTANCE_EXAMPLE.md`](./SOP_BUILD_JOURNEY_ACCEPTANCE_EXAMPLE.md) — 2026-08-05 gap check against this plan revised the D5 field list (§10) and named a scope gap on visual mapping (§8).
 **Purpose:** Translate the approved specification into a precise coding plan that reuses Spark Estate's existing architecture.
 
 ---
@@ -311,22 +312,26 @@ Two carriers existed and were not linked:
 
 **Decision D1 (approved): extend `RuntimeCreationRecord` additively.** Adopting `CreationWorkspace` would either re-route SOP back into the surface ADR-013 just moved it out of, or create a second record per creation — the duplicate-system risk the non-negotiables forbid. Extension keeps one record, one save path, and one resume path.
 
-**Field list to agree at the Phase 2 gate (D5).** These are the §9 fields not already covered above. All optional, all additive, so existing records hydrate unchanged:
+**Field list — revised 2026-08-05 against the acceptance example.** All optional, all additive, so existing records hydrate unchanged. The original eight are kept; three are added because the acceptance example treats them as load-bearing, not optional color:
 
 | Field | Why it is not already covered |
 |---|---|
 | Desired result | Distinct from purpose — what the *reader* achieves, not why the SOP exists |
+| Primary user + responsibilities | Who follows it, and who owns which step (example Stage 2, Stage 9 responsibility map) |
+| **Existing assets found** *(added)* | Reuse-before-reinvention marker — example Stage 3: "we won't start over" requires remembering what was already mentioned, or Spark re-asks about it |
 | Open questions | Nothing today records "we still don't know X" |
 | Decisions | Why a step is ordered this way; lost entirely on resume today |
-| People responsible | Owner/performer/reviewer, when named in conversation |
 | Dependencies | Tools, permissions, prerequisites surfaced but not yet sectioned |
+| **Waiting items** *(added, distinct from open questions)* | A waiting item is blocked on an external event ("after the next client's onboarding"), not an unanswered question — example Stage 17. Conflating the two loses a distinction the resume experience depends on. |
 | Next helpful step | `focusSectionId` gives location, not the human next action |
 | Why it matters | The urgency behind the SOP; shapes tone and completeness |
-| External document link | Where the real procedure lives, if elsewhere |
+| Connected assets / external document link | Where the real procedure lives, or what it's linked to |
 
-Research-used is **excluded** per D2 — recording a field for a capability that does not exist would be architecture ahead of need.
+Research-used is **excluded** per D2 — recording a field for a capability that does not exist would be architecture ahead of need. When D2 is revisited, "research source summary" and "findings approved" (example Stage 7) are the fields to add then, not now.
 
 **Gate condition:** Phase 2 does not open until this list is confirmed or amended. Fields must be optional; `lib/creationDurable/mapping.ts` carries them into the durable payload additively; a hydrate test must prove records saved without them still open.
+
+**Named scope gap (not a blocker, recorded honestly):** the acceptance example's Stage 5 shows Spark building a process map organically mid-conversation, and using it to catch a hidden gap (the missing intake follow-up). The existing §8 decision (no map in this pilot) still holds — `VisualFocusMap` has no field linking it to a creation record, and closing that gap is real scope, correctly deferred. This means the pilot proves hidden-decision discovery through conversation alone, not through mapping. That is a smaller claim than the full acceptance example makes, and is recorded here so it is not mistaken for full coverage later.
 
 ---
 
