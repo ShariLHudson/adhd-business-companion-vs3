@@ -65,6 +65,12 @@ export type CreationRegistryItem = {
   name: string;
   singularLabel: string;
   pluralLabel?: string;
+  /**
+   * Optional — only needed by registryItemToConfirmShape() (confirmAdapter.ts)
+   * to satisfy CreateCatalogItem's required `emoji`. Additive field; existing
+   * seeds may omit it (the adapter falls back to a generic default for them).
+   */
+  emoji?: string;
 
   categoryId: string;
   subcategoryId: string;
