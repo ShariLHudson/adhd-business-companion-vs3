@@ -259,8 +259,11 @@ describe("Welcome Home menu — action wiring", () => {
     expect(source).toContain('setCurrentRoom("welcome-home")');
     expect(source).toContain("estateSectionNavEpochRef.current += 1");
     expect(source).toContain("skipSectionRestore: true");
-    expect(source).toContain('clearRoomBackdropOverride("welcome-home")');
-    expect(source).toContain("const welcomeHomePlate = WELCOME_ROOM_ASSET");
+    // Routine navigation must never erase a member's saved background choice.
+    expect(source).not.toContain('clearRoomBackdropOverride("welcome-home")');
+    expect(source).toContain(
+      "const welcomeHomePlate = resolveWelcomeHomeHeroImageUrl()",
+    );
     expect(source).toContain("force: true");
     expect(source).toContain(
       "if (isEstateHomeDestination(workspacePanelBackLabel))",
@@ -273,12 +276,14 @@ describe("Welcome Home menu — action wiring", () => {
     expect(roomMenuSource).toMatch(/"wander-the-grounds":\s*onExploreSpark/);
     expect(roomMenuSource).toMatch(/onOpenFocusLibrary/);
 
-    // Must not fall back to member overrides, login art, or history restore.
+    // Must honor the member's saved welcome-home choice, not login art or history restore.
     const lobbyFn = source.match(
       /function returnToWelcomeHomeLobby\(reason: string\) \{[\s\S]*?\n  \}/,
     )?.[0];
     expect(lobbyFn).toBeTruthy();
-    expect(lobbyFn).toContain("const welcomeHomePlate = WELCOME_ROOM_ASSET");
+    expect(lobbyFn).toContain(
+      "const welcomeHomePlate = resolveWelcomeHomeHeroImageUrl()",
+    );
     expect(lobbyFn).not.toMatch(
       /resolveEstateRoomBackgroundImage\(\s*["']welcome-home["']/,
     );

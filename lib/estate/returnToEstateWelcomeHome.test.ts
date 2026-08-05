@@ -50,8 +50,11 @@ describe("Return to Estate → Welcome Home", () => {
     expect(lobby).toContain('setCurrentRoom("welcome-home")');
     expect(lobby).toContain('setActiveSection("home")');
     expect(lobby).toContain('onEstatePlaceArrived({ placeId: "welcome-home"');
-    expect(lobby).toContain('clearRoomBackdropOverride("welcome-home")');
-    expect(lobby).toContain("const welcomeHomePlate = WELCOME_ROOM_ASSET");
+    // Routine navigation must never erase a member's saved background choice.
+    expect(lobby).not.toContain('clearRoomBackdropOverride("welcome-home")');
+    expect(lobby).toContain(
+      "const welcomeHomePlate = resolveWelcomeHomeHeroImageUrl()",
+    );
     expect(lobby).toContain("force: true");
     expect(lobby).toContain('toRoomId: "welcome-home"');
 

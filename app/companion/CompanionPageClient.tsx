@@ -1629,10 +1629,7 @@ import {
   standaloneToolAck,
 } from "@/lib/standaloneToolRouting";
 import { isClearMyMindSection } from "@/lib/clearMyMindRouting";
-import {
-  clearRoomBackdropOverride,
-  getClearMyMindBackdropImageUrl,
-} from "@/lib/chatBackdrop";
+import { getClearMyMindBackdropImageUrl } from "@/lib/chatBackdrop";
 import { isEstateHomeDestination } from "@/lib/navigationBack";
 import {
   enterClearMyMindMode,
@@ -1884,7 +1881,7 @@ import {
   prepareEstateSceneTransitionFireAndForget,
   syncEstateSceneActivePlate,
 } from "@/lib/estate/estateSceneTransition";
-import { WELCOME_ROOM_ASSET } from "@/lib/welcomeRoom/types";
+import { resolveWelcomeHomeHeroImageUrl } from "@/lib/welcomeHome/resolveWelcomeHomeHeroImageUrl";
 import { resolveMomentumBuilderRoomState } from "@/lib/momentumBuilderRoom/roomExperience";
 import { recordMomentumPathMilestone } from "@/lib/momentumBuilderRoom/momentumPathHooks";
 import { MOMENTUM_BUILDER_ROOM_BG } from "@/lib/momentumBuilderRoom/roomRegistry";
@@ -11620,11 +11617,11 @@ export default function CompanionPageClient() {
     setExploreSparkMapOpen(false);
 
     /**
-     * Always the Welcome Home entrance photograph — never a leftover Library
-     * plate or a room backdrop override from Change background.
+     * The Welcome Home entrance photograph — the member's saved welcome-home
+     * choice when they have one, else the default lobby plate. Routine
+     * navigation must never erase an explicit background choice.
      */
-    clearRoomBackdropOverride("welcome-home");
-    const welcomeHomePlate = WELCOME_ROOM_ASSET;
+    const welcomeHomePlate = resolveWelcomeHomeHeroImageUrl();
     syncEstateSceneActivePlate({
       toRoomId: "welcome-home",
       imageUrl: welcomeHomePlate,
