@@ -47,6 +47,11 @@ const IDEAS_BY_SECTION: Record<string, string> = {
   subject: "A subject line that names the benefit works well — even a rough draft.",
   offer: "Name who it's for and what changes for them.",
   steps: "Three to five plain steps is enough to start.",
+  // SOP Build Journey Phase 2 (2026-08-05) — shared keys, not SOP-owned.
+  "intended-user": "Picture the one specific person who'll actually use this.",
+  "before-you-begin": "List what has to already exist — an account, a login, a file.",
+  "completion-check": "Describe what it looks like when it worked, not just \"it's done.\"",
+  troubleshooting: "Think of the last time this went wrong — what happened right before?",
 };
 
 export function ideasGuidanceForFocus(focus: CanonicalCurrentFocus): string {

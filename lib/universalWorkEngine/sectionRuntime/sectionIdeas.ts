@@ -122,6 +122,33 @@ const SHARED_SECTION_IDEAS: SectionIdeasCatalog = {
     "Include one pause so people can catch their breath.",
     "End with a tiny win they can feel before they leave.",
   ],
+  // SOP Build Journey Phase 2 (2026-08-05) — shared, not SOP-owned. If any
+  // future Build Type's section ids match these, it benefits too; that is
+  // the point of the shared catalog rather than a per-work-type one.
+  "intended-user": [
+    "Picture the one specific person who’ll actually use this — not a category.",
+    "Note what they already know, so you don’t over- or under-explain.",
+    "If more than one person might use it, write for the least experienced one.",
+    "Name what they’d have to ask you if this weren’t written down.",
+  ],
+  "before-you-begin": [
+    "List what has to already exist — an account, a login, a file, a password.",
+    "Think about what you’d forget to mention if you were explaining this out loud.",
+    "Include anything they’d need to request from someone else first.",
+    "Name the one thing that, if missing, stops everything else.",
+  ],
+  "completion-check": [
+    "Describe what it looks like when it worked — not just “it’s done.”",
+    "Name one way they could check without having to ask you.",
+    "If they got it wrong, what would look different?",
+    "What would you glance at to confirm it, if you were checking yourself?",
+  ],
+  troubleshooting: [
+    "Think of the last time this went wrong — what happened right before?",
+    "Name the mistake that happens most often here, even now.",
+    "What should they do if they get stuck and can’t reach you?",
+    "Is there a step people skip when they’re in a hurry? Name it here.",
+  ],
   offer: [
     "Name who it’s for and what changes for them.",
     "One outcome, one audience, one clear way to say yes.",
