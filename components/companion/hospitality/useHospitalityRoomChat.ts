@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { routeCompanionFailure } from "@/lib/companionContextRouting";
 import { getPrefs } from "@/lib/companionStore";
+import { getSupportStylePreference } from "@/lib/supportStyle";
 import { tryCommitMicCaptureOnEnd } from "@/lib/voiceMicCommit";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
@@ -137,6 +138,10 @@ export function useHospitalityRoomChat() {
 
     try {
       const prefs = getPrefs();
+      // ADR-012 Phase 4 — send the canonical Support Style id. The legacy
+      // mirror alone silently collapsed step-by-step, give-me-choices, and
+      // custom to "Adapt to the Situation" on this surface.
+      const supportStylePreference = getSupportStylePreference();
       const res = await fetch("/api/companion-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -147,7 +152,10 @@ export function useHospitalityRoomChat() {
           userName: prefs.name || undefined,
           aiTone: prefs.aiTone,
           helpMode: prefs.helpMode,
+          supportStyleId: supportStylePreference.styleId,
           supportStyle: prefs.supportStyle,
+          useMostOfTheTime: supportStylePreference.useMostOfTheTime,
+          customSettings: supportStylePreference.customSettings,
         }),
       });
       const data = (await res.json()) as { message?: string; error?: string };

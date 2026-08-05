@@ -10,7 +10,8 @@ import {
   type RelationshipResponseEnforcementResult,
 } from "@/lib/relationshipResponseContract";
 import { applyShariVoiceLayer } from "@/lib/conversationStabilization/shariVoiceLayer";
-import type { AiTone, HelpMode, SupportStyle } from "@/lib/companionStore";
+import { resolveCompanionDeliveryPreferences } from "@/lib/companionDeliveryContract";
+import type { SupportStyleCustomSettings } from "@/lib/supportStyle/types";
 import type { RelationshipMemoryConfidence } from "@/lib/relationshipIntelligencePrompt";
 import {
   buildCoachingFallbackResponse,
@@ -213,9 +214,20 @@ export async function POST(request: NextRequest) {
     const dayState = body.dayState as string | undefined;
     const dailyContextHint = body.dailyContextHint as string | undefined;
     const guidedFieldHelpHint = body.guidedFieldHelpHint as string | undefined;
-    const aiTone = body.aiTone as string | undefined;
-    const helpMode = body.helpMode as string | undefined;
-    const supportStyle = body.supportStyle as string | undefined;
+    // ADR-012 Phase 4 — one typed delivery contract, resolved once, server-side.
+    // Clients send raw canonical preferences only; every model-facing delivery
+    // and routing block below is assembled from `delivery`.
+    const delivery = resolveCompanionDeliveryPreferences({
+      aiTone: body.aiTone as string | undefined,
+      helpMode: body.helpMode as string | undefined,
+      supportStyleId: body.supportStyleId as string | undefined,
+      supportStyle: body.supportStyle as string | undefined,
+      useMostOfTheTime: body.useMostOfTheTime as boolean | undefined,
+      customSettings: body.customSettings as SupportStyleCustomSettings | undefined,
+      // The server — not the client — reads the latest user message for a
+      // temporary Support Style override.
+      latestUserText: userProbe,
+    });
     const userName = body.userName as string | undefined;
     const businessContext = body.businessContext as string | undefined;
     const intentHint = body.intentHint as string | undefined;
@@ -252,9 +264,8 @@ export async function POST(request: NextRequest) {
       dayState,
       dailyContextHint,
       guidedFieldHelpHint,
-      aiTone,
-      helpMode,
-      supportStyle,
+      // Resolved once, above — the prompt builder does not re-resolve.
+      delivery,
       userName,
       intentHint,
       responseLanguageHint,
@@ -396,10 +407,10 @@ export async function POST(request: NextRequest) {
                   finalResponseOwner: "chat_api_stream",
                   contentPlanOwner: "chat_api",
                   profileOverride: {
-                    aiTone: aiTone as AiTone | undefined,
-                    helpMode: helpMode as HelpMode | undefined,
-                    supportStyle: supportStyle as SupportStyle | undefined,
-                    supportStyleId: supportStyle,
+                    aiTone: delivery.aiTone,
+                    helpMode: delivery.helpMode,
+                    supportStyle: delivery.supportStyleLegacy,
+                    supportStyleId: delivery.supportStyleId,
                   },
                   gentle:
                     emotionalState?.toLowerCase().includes("overwhelm") ||
@@ -514,10 +525,10 @@ export async function POST(request: NextRequest) {
       finalResponseOwner: "chat_api",
       contentPlanOwner: "chat_api",
       profileOverride: {
-        aiTone: aiTone as AiTone | undefined,
-        helpMode: helpMode as HelpMode | undefined,
-        supportStyle: supportStyle as SupportStyle | undefined,
-        supportStyleId: supportStyle,
+        aiTone: delivery.aiTone,
+        helpMode: delivery.helpMode,
+        supportStyle: delivery.supportStyleLegacy,
+        supportStyleId: delivery.supportStyleId,
       },
       gentle:
         emotionalState?.toLowerCase().includes("overwhelm") ||

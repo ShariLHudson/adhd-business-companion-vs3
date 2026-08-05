@@ -15,9 +15,15 @@
 import type { AiTone, HelpMode } from "@/lib/companionStore";
 import { getPrefs } from "@/lib/companionStore";
 import {
+  isAiTone,
+  isHelpMode,
+  isSupportStyleId,
+} from "@/lib/companionDeliveryContract";
+import {
   buildMemberTonePreferenceBlocks,
   type MemberTonePreferenceInput,
 } from "@/lib/companionTonePreferences";
+import type { SupportStyleCustomSettings } from "@/lib/supportStyle/types";
 import { enforceHumanConversation } from "@/lib/humanConversation";
 import { getActiveSupportStyleId } from "@/lib/supportStyle";
 import { supportStyleIdFromLegacy } from "@/lib/supportStyle/legacyBridge";
@@ -71,23 +77,6 @@ export type ApplyShariVoiceResult = {
   metadata: ShariVoiceRuntimeMetadata;
 };
 
-const AI_TONES: readonly AiTone[] = [
-  "gentle",
-  "balanced",
-  "direct",
-  "playful",
-  "strategic",
-  "motivational",
-];
-
-const HELP_MODES: readonly HelpMode[] = [
-  "step-by-step",
-  "ask-first",
-  "direct",
-  "concise",
-  "navigate",
-];
-
 const SOFT_OPENER_RE =
   /^(?:i hear you[.!]?|that sounds (?:really )?(?:hard|heavy|tough)[.!]?|i'?m sorry you'?re dealing with that[.!]?|thanks for telling me[.!]?)\s*/i;
 
@@ -96,14 +85,6 @@ const EXAGGERATED_PRAISE_RE =
 
 const REPETITIVE_SMALL_STEP_RE =
   /\b(?:what(?:'s| is) one small step(?: you can take)?[?.!]*)/gi;
-
-function isAiTone(value: unknown): value is AiTone {
-  return typeof value === "string" && (AI_TONES as readonly string[]).includes(value);
-}
-
-function isHelpMode(value: unknown): value is HelpMode {
-  return typeof value === "string" && (HELP_MODES as readonly string[]).includes(value);
-}
 
 function sentenceSplit(text: string): string[] {
   return text
@@ -183,12 +164,29 @@ export function loadShariVoiceProfile(
 export function buildShariVoicePromptBlocks(input: {
   profile?: ShariVoiceProfile;
   emotionalCondition?: string;
+  /**
+   * ADR-012 Phase 4 — the member's real Support Style values and this turn's
+   * latest user message, so the single assembler can honor the opt-out, the
+   * custom settings, and any temporary override without a second copy.
+   */
+  useMostOfTheTime?: boolean;
+  customSettings?: SupportStyleCustomSettings;
+  latestUserText?: string;
+  /** Legacy listen-only selection (no canonical id was sent). */
+  legacyListenOnly?: boolean;
 }): string[] {
   const profile = input.profile ?? loadShariVoiceProfile();
   const blocks = buildMemberTonePreferenceBlocks({
     aiTone: profile.aiTone,
     helpMode: profile.helpMode,
     supportStyle: profile.supportStyleLegacy,
+    supportStyleId: isSupportStyleId(profile.supportStyleId)
+      ? profile.supportStyleId
+      : undefined,
+    useMostOfTheTime: input.useMostOfTheTime,
+    customSettings: input.customSettings,
+    latestUserText: input.latestUserText,
+    legacyListenOnly: input.legacyListenOnly,
   });
 
   blocks.push(

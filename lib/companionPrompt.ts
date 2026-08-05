@@ -6,8 +6,13 @@ import { TODAYS_LITTLE_SPARK_PROMPT_BLOCK } from "./todaysLittleSpark";
 import { ESTATE_BEHAVIORAL_RULES_BLOCK } from "./estateIntelligence/estateRoomLifecycle";
 import { momentumAppointmentHintForChat } from "./momentumAppointment";
 import { plainLanguageFormattingHintForPrompt } from "./plainLanguageFormatting";
-import type { AiTone, HelpMode, SupportStyle } from "./companionStore";
+import {
+  resolveCompanionDeliveryPreferences,
+  type ResolvedDeliveryPreferences,
+} from "./companionDeliveryContract";
+import { buildTonePreferenceRoutingGuidanceBlock } from "./companionTonePreferences";
 import { buildShariVoicePromptBlocks } from "./conversationStabilization/shariVoiceLayer";
+import type { SupportStyleCustomSettings } from "./supportStyle/types";
 import { BANNED_UI_REFERENCE_HINT } from "./conversationFirstLanguage";
 import { GLOBAL_CONVERSATION_CONTINUITY_OVERRIDE_BLOCK } from "./conversationContinuity/globalConversationContinuityOverride";
 
@@ -445,20 +450,29 @@ type PromptContext = {
   guidedFieldHelpHint?: string;
   aiTone?: string;
   helpMode?: string;
+  /** Legacy `Prefs.supportStyle` mirror — fallback only. */
   supportStyle?: string;
+  /**
+   * ADR-012 Phase 4 — already-resolved delivery preferences. The API route
+   * resolves the request body ONCE and passes the result here; the flat fields
+   * below stay for internal callers and tests, which are resolved on the spot.
+   */
+  delivery?: ResolvedDeliveryPreferences;
+  /** Canonical Support Style id; wins over `supportStyle`. */
+  supportStyleId?: string;
+  /** Member's "use this most of the time" checkbox — no longer assumed true. */
+  supportStyleUseMostOfTheTime?: boolean;
+  /** Member-built Support Style details, when the id is `custom`. */
+  supportStyleCustomSettings?: SupportStyleCustomSettings;
+  /**
+   * Latest user message this turn. The server reads it to detect a temporary
+   * Support Style override — clients no longer send an assembled block.
+   */
+  latestUserText?: string;
   userName?: string;
   intentHint?: string;
   responseLanguageHint?: string;
 };
-
-function normalizeTonePrefs(context: PromptContext) {
-  return {
-    aiTone: (context.aiTone as AiTone | undefined) ?? "balanced",
-    helpMode: (context.helpMode as HelpMode | undefined) ?? "ask-first",
-    supportStyle:
-      (context.supportStyle as SupportStyle | undefined) ?? "balanced",
-  };
-}
 
 export function buildCompanionSystemPrompt(
   coachingMode: CoachingMode,
@@ -488,23 +502,56 @@ export function buildCompanionSystemPrompt(
 
   // Shari Voice Layer — always inject Conversation Style / Help Mode / Support Style.
   // Defaults apply when the client omits fields; never silently skip the voice layer.
+  //
+  // ADR-012 Phase 4: this is the ONLY place model-facing delivery guidance is
+  // assembled. Clients send raw canonical preferences; the block below is
+  // built once, from one resolved source of truth.
   {
-    const prefs = normalizeTonePrefs(context);
+    const delivery =
+      context.delivery ??
+      resolveCompanionDeliveryPreferences({
+        aiTone: context.aiTone,
+        helpMode: context.helpMode,
+        supportStyleId: context.supportStyleId,
+        supportStyle: context.supportStyle,
+        useMostOfTheTime: context.supportStyleUseMostOfTheTime,
+        customSettings: context.supportStyleCustomSettings,
+        latestUserText: context.latestUserText,
+      });
     blocks.push(
       ...buildShariVoicePromptBlocks({
         profile: {
-          aiTone: prefs.aiTone,
-          helpMode: prefs.helpMode,
-          supportStyleId: String(context.supportStyle ?? prefs.supportStyle),
-          supportStyleLegacy: prefs.supportStyle,
+          aiTone: delivery.aiTone,
+          helpMode: delivery.helpMode,
+          supportStyleId: delivery.supportStyleId,
+          supportStyleLegacy: delivery.supportStyleLegacy,
           source:
-            context.aiTone || context.helpMode || context.supportStyle
+            context.delivery ||
+            context.aiTone ||
+            context.helpMode ||
+            context.supportStyle ||
+            context.supportStyleId
               ? "request_override"
               : "defaults",
         },
         emotionalCondition: context.emotionalState,
+        useMostOfTheTime: delivery.useMostOfTheTime,
+        customSettings: delivery.customSettings,
+        latestUserText: delivery.latestUserText,
+        legacyListenOnly: delivery.legacyListenOnly,
       }),
     );
+
+    // Routing guidance stays its own block — delivery guidance describes how
+    // Shari speaks; this describes how the saved preference ranks against
+    // action-first routing hints. Server-built since Phase 4.
+    const routingGuidance = buildTonePreferenceRoutingGuidanceBlock({
+      aiTone: delivery.aiTone,
+      helpMode: delivery.helpMode,
+      supportStyle: delivery.supportStyleLegacy,
+      supportStyleId: delivery.supportStyleId,
+    });
+    if (routingGuidance) blocks.push(routingGuidance);
   }
 
   if (context.userName) {

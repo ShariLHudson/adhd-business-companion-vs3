@@ -7,6 +7,7 @@ import { SparkAlphaDevPanel } from "./SparkAlphaDevPanel";
 import { SparkAlphaSuggestionChips } from "./SparkAlphaSuggestionChips";
 import { SparkAlphaTopBar } from "./SparkAlphaTopBar";
 import { getPrefs } from "@/lib/companionStore";
+import { getSupportStylePreference } from "@/lib/supportStyle";
 import { usePomodoroTimer } from "@/lib/usePomodoroTimer";
 import {
   createHiddenWorkLog,
@@ -335,6 +336,9 @@ export function SparkAlphaPage() {
 
       try {
         const prefs = getPrefs();
+        // ADR-012 Phase 4 — canonical Support Style id; the legacy mirror
+        // alone collapsed three of seven member choices on this surface.
+        const supportStylePreference = getSupportStylePreference();
         const apiMessages = nextMessages.map((m) => ({
           role: m.role === "user" ? ("user" as const) : ("assistant" as const),
           content: m.text,
@@ -350,7 +354,10 @@ export function SparkAlphaPage() {
             userName: prefs.name || undefined,
             aiTone: prefs.aiTone,
             helpMode: prefs.helpMode,
+            supportStyleId: supportStylePreference.styleId,
             supportStyle: prefs.supportStyle,
+            useMostOfTheTime: supportStylePreference.useMostOfTheTime,
+            customSettings: supportStylePreference.customSettings,
             intentHint: intent,
             hiddenIntentHint,
           }),

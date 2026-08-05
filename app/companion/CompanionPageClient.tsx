@@ -2323,9 +2323,6 @@ import {
 } from "@/lib/profile/advisoryHelpTypes";
 import "@/app/companion/guided-field-help-chat.css";
 import {
-  tonePreferenceOverridesRoutingGuidance,
-} from "@/lib/companionTonePreferences";
-import {
   formatAssistantParagraphs,
   structureMultiItemResponse,
   toPlainLanguageDisplay,
@@ -2495,7 +2492,7 @@ import {
 } from "@/lib/notifications/playNotificationSound";
 import { resolveDeliverableSoundEvent } from "@/lib/notifications/resolveNotificationSoundEvent";
 import { buildSavedPatternsPromptHint } from "@/lib/patternAwareness";
-import { getActiveSupportStyleId, supportStyleHintForChat } from "@/lib/supportStyle";
+import { getActiveSupportStyleId, getSupportStylePreference } from "@/lib/supportStyle";
 // ADR-012 Phase 1: "How Shari Invites Me" no longer contributes to the prompt —
 // buildCuriosityBeforeCommandsPromptHint is dormant in lib/curiosityBeforeCommands/,
 // not imported here.
@@ -20662,6 +20659,10 @@ export default function CompanionPageClient() {
       await companionPresenceDelay(speedProfile.skipLayers.presenceDelay);
 
       const prefs = getPrefs();
+      // ADR-012 Phase 4 — the member's saved Support Style, sent raw to the
+      // server (canonical id + useMostOfTheTime + customSettings). No prompt
+      // text is assembled on this side.
+      const supportStylePreference = getSupportStylePreference();
       const day = getDayState();
       const workspaceEnergy = resolveWorkspaceEnergy(
         day?.energy,
@@ -21039,23 +21040,25 @@ export default function CompanionPageClient() {
             if (advisory) parts.push(advisory);
             return parts.length ? parts.join("\n\n") : undefined;
           })(),
+          // ADR-012 Phase 4 — raw canonical preferences only. The server owns
+          // every model-facing delivery and routing block; this surface no
+          // longer builds a second Support Style copy or the routing sentence.
           aiTone: prefs.aiTone,
           helpMode: prefs.helpMode,
-          supportStyle: getActiveSupportStyleId(),
+          supportStyleId: supportStylePreference.styleId,
+          supportStyle: prefs.supportStyle,
+          useMostOfTheTime: supportStylePreference.useMostOfTheTime,
+          customSettings: supportStylePreference.customSettings,
           userName: prefs.name || undefined,
           businessContext: businessContextForApi,
           intentHint:
             mergeGovernorHints(
               [
-                tonePreferenceOverridesRoutingGuidance(prefs)
-                  ? "Member tone preference in Settings overrides conflicting action-first routing hints this turn."
-                  : null,
                 continuityOwnerHintForChat({
                   activeSection: activeSectionRef.current,
                 }),
                 estateMemoryHintForChat(),
                 buildSavedPatternsPromptHint(),
-                supportStyleHintForChat(trimmed),
                 adhdStrategyHintForChat(trimmed),
                 techFutureHintForChat(trimmed),
                 chamberMemberChatHint,
@@ -21805,7 +21808,10 @@ export default function CompanionPageClient() {
                   coachingMode,
                   aiTone: prefs.aiTone,
                   helpMode: prefs.helpMode,
-                  supportStyle: getActiveSupportStyleId(),
+                  supportStyleId: supportStylePreference.styleId,
+                  supportStyle: prefs.supportStyle,
+                  useMostOfTheTime: supportStylePreference.useMostOfTheTime,
+                  customSettings: supportStylePreference.customSettings,
                   userName: prefs.name || undefined,
                   businessContext: businessContextForApi,
                   companionGuidanceHint: [

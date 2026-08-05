@@ -13,6 +13,10 @@ import {
   buildSupportStylePromptBlock,
   supportStyleIdFromLegacy,
 } from "@/lib/supportStyle";
+import type {
+  SupportStyleCustomSettings,
+  SupportStyleId,
+} from "@/lib/supportStyle/types";
 // ADR-012 Phase 1: "How Shari Invites Me" no longer contributes to the prompt.
 // buildCuriosityBeforeCommandsPromptHint is dormant in lib/curiosityBeforeCommands/
 // — this was also the server-side rebuild that ignored the member's real
@@ -23,6 +27,28 @@ export type MemberTonePreferenceInput = Pick<
   Prefs,
   "aiTone" | "helpMode" | "supportStyle"
 >;
+
+/**
+ * ADR-012 Phase 4 — everything the single (server-side) assembler needs.
+ *
+ * The canonical `supportStyleId` wins over the lossy legacy `supportStyle`
+ * mirror; `useMostOfTheTime` and `customSettings` are the member's real saved
+ * values instead of the hardcoded `true` / dropped object this file used
+ * before; `latestUserText` lets the server — and only the server — detect a
+ * temporary override, so one component decides the effective style.
+ */
+export type MemberDeliveryPreferenceInput = MemberTonePreferenceInput & {
+  supportStyleId?: SupportStyleId;
+  useMostOfTheTime?: boolean;
+  customSettings?: SupportStyleCustomSettings;
+  latestUserText?: string;
+  /**
+   * Honor the legacy listen-only constraint. Defaults to inferring it from a
+   * legacy-only input; the server passes it explicitly (see
+   * `ResolvedDeliveryPreferences.legacyListenOnly`).
+   */
+  legacyListenOnly?: boolean;
+};
 
 /** What member tone preferences may adjust — delivery posture only. */
 export const TONE_DELIVERY_MAY_CHANGE = [
@@ -242,8 +268,9 @@ const HELP_MODE_DELIVERY: Record<HelpMode, string> = {
 };
 
 export function buildMemberTonePreferenceBlocks(
-  prefs: MemberTonePreferenceInput,
+  prefs: MemberDeliveryPreferenceInput,
 ): string[] {
+  // Identity guardrail first, always — order is load-bearing (constitutional).
   const blocks: string[] = [
     THE_IMMUTABLE_FRIEND_GUARDRAIL,
     TONE_PREFERENCE_FOUNDATION,
@@ -256,18 +283,32 @@ export function buildMemberTonePreferenceBlocks(
   if (help) blocks.push(help);
 
   // Support Style = what Spark does first when they need help (not Conversation Style).
+  // ADR-012 Phase 4: canonical id wins, the member's real useMostOfTheTime and
+  // customSettings are honored, and the temporary override is detected HERE —
+  // once — from the latest user message instead of by a second client-side copy.
   blocks.push(
-    buildSupportStylePromptBlock({
-      styleId: supportStyleIdFromLegacy(prefs.supportStyle),
-      useMostOfTheTime: true,
-      savedAt: new Date().toISOString(),
-      version: 1,
-    }),
+    buildSupportStylePromptBlock(
+      {
+        styleId:
+          prefs.supportStyleId ?? supportStyleIdFromLegacy(prefs.supportStyle),
+        customSettings: prefs.customSettings,
+        useMostOfTheTime: prefs.useMostOfTheTime ?? true,
+        savedAt: new Date().toISOString(),
+        version: 1,
+      },
+      prefs.latestUserText,
+    ),
   );
 
-  // Legacy "listen" prefs keep an explicit presence-first constraint for Conversation Style tests
-  // and older saved selections that meant listen-only support.
-  if (prefs.supportStyle === "listen") {
+  // Legacy "listen" prefs keep an explicit presence-first constraint for older
+  // saved selections that meant listen-only support. Skipped when a canonical
+  // id is supplied: the legacy mirror maps "listen" and "talk-it-through" onto
+  // each other, so honoring it alongside a canonical id would silently impose
+  // a no-advice constraint on members who chose Talk It Through.
+  const legacyListenOnly =
+    prefs.legacyListenOnly ??
+    (!prefs.supportStyleId && prefs.supportStyle === "listen");
+  if (legacyListenOnly) {
     blocks.push(
       "SUPPORT — LISTEN ONLY: Presence over fixing. Reflect what you heard. Do NOT give advice, steps, recommendations, or plans unless they explicitly ask for help solving it. One gentle question is fine; no lists.",
     );
@@ -277,9 +318,31 @@ export function buildMemberTonePreferenceBlocks(
 }
 
 export function memberTonePreferenceHintForChat(
-  prefs: MemberTonePreferenceInput,
+  prefs: MemberDeliveryPreferenceInput,
 ): string {
   return buildMemberTonePreferenceBlocks(prefs).join("\n\n");
+}
+
+/**
+ * Routing guidance — deliberately a SEPARATE block from delivery guidance.
+ *
+ * Delivery guidance says how Shari sounds and what she does first. This says
+ * how the member's saved preference ranks against action-first routing hints.
+ * ADR-012 Phase 4 moves the sentence from the client's intentHint to the
+ * server so both blocks have one owner; keeping them separate preserves the
+ * distinction the Support Style block's own PRIORITY line depends on.
+ */
+export const TONE_PREFERENCE_ROUTING_GUIDANCE_SENTENCE =
+  "Member tone preference in Settings overrides conflicting action-first routing hints this turn.";
+
+export function buildTonePreferenceRoutingGuidanceBlock(
+  prefs: MemberDeliveryPreferenceInput,
+): string | null {
+  if (!tonePreferenceOverridesRoutingGuidance(prefs)) return null;
+  return [
+    "ROUTING GUIDANCE (separate from the delivery guidance above):",
+    TONE_PREFERENCE_ROUTING_GUIDANCE_SENTENCE,
+  ].join("\n");
 }
 
 /** Map test / doc profiles to stored preference triples. */
@@ -307,14 +370,19 @@ export function toneDeliveryProfilePrefs(
 }
 
 export function tonePreferenceOverridesRoutingGuidance(
-  prefs: MemberTonePreferenceInput,
+  prefs: MemberDeliveryPreferenceInput,
 ): boolean {
+  // Canonical id first. The legacy checks this replaced (`understand`, `sos`,
+  // `listen`) map exactly onto gentle-first / talk-it-through, so legacy input
+  // is unchanged — but a surface that sends the canonical id no longer falls
+  // through to `false` the way main chat silently did before Phase 4.
+  const styleId =
+    prefs.supportStyleId ?? supportStyleIdFromLegacy(prefs.supportStyle);
   return (
     prefs.aiTone === "gentle" ||
     prefs.aiTone === "playful" ||
-    prefs.supportStyle === "understand" ||
-    prefs.supportStyle === "listen" ||
-    prefs.supportStyle === "sos" ||
+    styleId === "gentle-first" ||
+    styleId === "talk-it-through" ||
     prefs.helpMode === "ask-first" ||
     prefs.helpMode === "concise"
   );
