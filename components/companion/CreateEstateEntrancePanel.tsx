@@ -8,14 +8,11 @@ import { CreateWorkspaceResumeList } from "@/components/companion/CreateWorkspac
 import { AppBackButton } from "@/components/companion/AppBackButton";
 import {
   CREATE_ESTATE_AMBIGUITY_CANCEL,
-  CREATE_ESTATE_BROWSE_MORE_HEADING,
-  CREATE_ESTATE_BROWSE_MORE_HINT,
-  CREATE_ESTATE_BROWSE_MORE_LABEL,
+  CREATE_ESTATE_BROWSE_CATEGORIES_HEADING,
   CREATE_ESTATE_CONFIRM_CANCEL,
   CREATE_ESTATE_CONFIRM_OTHER,
   CREATE_ESTATE_CONTINUE_HEADING,
   CREATE_ESTATE_CREATE_FROM_SCRATCH_LABEL,
-  CREATE_ESTATE_DEFAULT_SUGGESTED_CHOICES,
   CREATE_ESTATE_DESCRIBE_PLACEHOLDER,
   CREATE_ESTATE_ENTRANCE_INVITATION,
   CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING,
@@ -41,7 +38,6 @@ import { listActiveCreationWorkspaces } from "@/lib/createEstate/listActiveCreat
 import {
   resolveSuggestionContext,
 } from "@/lib/createEstate/contextAwareSuggestions";
-import { buildExploreIdeaRecommendations } from "@/lib/createEstate/exploreIdeas/recommendations";
 import { queryExploreIdeas } from "@/lib/createEstate/exploreIdeas/search";
 import type { ExploreIdeaResult } from "@/lib/createEstate/exploreIdeas/types";
 import {
@@ -61,7 +57,6 @@ import {
 } from "@/lib/createEstate/forceNewCreateSession";
 import { SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS } from "@/lib/sparkCreateIntentConstitution/types";
 import { resolveCreateLauncherType } from "@/lib/createLauncherTypes";
-import { findCatalogItem } from "@/lib/createCatalog";
 import {
   CREATE_BEGIN_PROGRESS_MESSAGE,
 } from "@/lib/primaryActionFeedback";
@@ -167,9 +162,11 @@ export function CreateEstateEntrancePanel({
   > | null>(null);
   const [helpMeChooseOpen, setHelpMeChooseOpen] = useState(false);
   const [findPreviousWorkOpen, setFindPreviousWorkOpen] = useState(false);
-  const [browseMoreOpen, setBrowseMoreOpen] = useState(false);
+  // Entrance Cleanup (2026-08) — Start Freely narrows the screen to a
+  // focused writing surface once the member has engaged with the input.
+  // Never hides the feedback area; reverts once blurred with empty text.
+  const [composerFocused, setComposerFocused] = useState(false);
   const confirmRegionRef = useRef<HTMLDivElement | null>(null);
-  const browseMoreRef = useRef<HTMLDetailsElement | null>(null);
   const promptInputRef = useRef<HTMLTextAreaElement | null>(null);
 
   const exitDestination = resolveCreateExitDestination(exitOriginHint);
@@ -177,26 +174,6 @@ export function CreateEstateEntrancePanel({
     () => resolveSuggestionContext(activeWorkspaces),
     [activeWorkspaces],
   );
-
-  // Part 1 — ≤4 suggested choices, personalized when Spark has something
-  // honest to recommend; otherwise the calm defaults (Email, Social Post,
-  // Client Onboarding, Workshop).
-  const suggestedChoices = useMemo(() => {
-    const personalized = buildExploreIdeaRecommendations({
-      workspaces: activeWorkspaces,
-      suggestionContext,
-    }).map((rec) => rec.result.label);
-    const merged: string[] = [];
-    for (const label of personalized) {
-      if (merged.length >= 4) break;
-      if (!merged.includes(label)) merged.push(label);
-    }
-    for (const label of CREATE_ESTATE_DEFAULT_SUGGESTED_CHOICES) {
-      if (merged.length >= 4) break;
-      if (!merged.includes(label)) merged.push(label);
-    }
-    return merged.slice(0, 4);
-  }, [activeWorkspaces, suggestionContext]);
 
   // Part 10 — the same field doubles as natural-language search. Two
   // characters is enough to start narrowing; never a separate search box.
@@ -209,6 +186,11 @@ export function CreateEstateEntrancePanel({
     }).slice(0, 5);
   }, [trimmedPrompt, suggestionContext]);
   const isSearching = trimmedPrompt.length >= 2;
+
+  // Entrance Cleanup (2026-08) — Start Freely: once the member has engaged
+  // with the input (focused it or typed anything), narrow to a focused
+  // writing surface. Reverts once blurred with the field empty again.
+  const composerEngaged = composerFocused || trimmedPrompt.length > 0;
 
   // Spec 132 — Escape dismisses the confirm layer before leaving Create.
   useDismissibleWindow({
@@ -527,11 +509,6 @@ export function CreateEstateEntrancePanel({
     }
   }
 
-  function openBrowseMore() {
-    setBrowseMoreOpen(true);
-    browseMoreRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
   return (
     <CreateEstateRoomShell onOutsideDismiss={onBack}>
       <div
@@ -599,6 +576,8 @@ export function CreateEstateEntrancePanel({
               setPrompt(e.target.value);
               clearFeedbackOnEdit();
             }}
+            onFocus={() => setComposerFocused(true)}
+            onBlur={() => setComposerFocused(false)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -612,32 +591,6 @@ export function CreateEstateEntrancePanel({
             aria-label={CREATE_ESTATE_DESCRIBE_PLACEHOLDER}
             disabled={beginBusy}
           />
-
-          {/* Part 1 — ≤4 suggested choices while the field is empty/short. */}
-          {!isSearching ? (
-            <ul
-              className="flex max-w-2xl flex-wrap gap-2"
-              data-testid="create-estate-suggested-choices"
-              aria-label="Suggested things to create"
-            >
-              {suggestedChoices.map((label) => (
-                <li key={label}>
-                  <button
-                    type="button"
-                    disabled={beginBusy}
-                    className="rounded-full border border-[#cfc6b8] bg-white px-4 py-2 text-sm font-semibold text-[#3d3429] transition hover:border-[#1e4f4f]/45 hover:bg-[#f3ebe0] disabled:opacity-70"
-                    data-testid="create-estate-suggested-choice"
-                    onClick={() => {
-                      const item = findCatalogItem(label);
-                      if (item) requestCatalogConfirm(item);
-                    }}
-                  >
-                    {label}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : null}
 
           {/* Part 10 — the description field doubles as natural-language search. */}
           {isSearching ? (
@@ -715,39 +668,63 @@ export function CreateEstateEntrancePanel({
                 </button>
               </div>
 
-              <div
-                className="flex max-w-sm flex-col gap-2 rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
-                data-testid="create-estate-start-with-guidance"
-              >
-                <h3 className="text-base font-semibold text-[#1f1c19]">
-                  {CREATE_ESTATE_START_WITH_GUIDANCE_HEADING}
-                </h3>
-                <p className="text-sm leading-relaxed text-[#6b635a]">
-                  {CREATE_ESTATE_START_WITH_GUIDANCE_DESCRIPTION}
-                </p>
-                <button
-                  type="button"
-                  disabled={beginBusy}
-                  aria-pressed={helpMeChooseOpen}
-                  onClick={() => setHelpMeChooseOpen((open) => !open)}
-                  className="self-start rounded-xl border border-[#cfc6b8] bg-white px-5 py-2.5 text-base font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0] disabled:opacity-70"
-                  data-testid="create-estate-help-me-choose"
+              {/* Entrance Cleanup (2026-08) — once Start Freely is engaged
+                  (input focused or has text), the alternate path and
+                  secondary navigation step aside; the input + its own Begin
+                  button remain the primary focus. Nothing about routing,
+                  the confirm gate, or Start With Guidance's own logic changes
+                  — only whether this card and the items below it render. */}
+              {!composerEngaged ? (
+                <div
+                  className="flex max-w-sm flex-col gap-2 rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
+                  data-testid="create-estate-start-with-guidance"
                 >
-                  {CREATE_ESTATE_HELP_ME_CHOOSE_LABEL}
-                </button>
-              </div>
+                  <h3 className="text-base font-semibold text-[#1f1c19]">
+                    {CREATE_ESTATE_START_WITH_GUIDANCE_HEADING}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-[#6b635a]">
+                    {CREATE_ESTATE_START_WITH_GUIDANCE_DESCRIPTION}
+                  </p>
+                  <button
+                    type="button"
+                    disabled={beginBusy}
+                    aria-pressed={helpMeChooseOpen}
+                    onClick={() => setHelpMeChooseOpen((open) => !open)}
+                    className="self-start rounded-xl border border-[#cfc6b8] bg-white px-5 py-2.5 text-base font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0] disabled:opacity-70"
+                    data-testid="create-estate-help-me-choose"
+                  >
+                    {CREATE_ESTATE_HELP_ME_CHOOSE_LABEL}
+                  </button>
+
+                  {/* Part 9 — Help Me Choose is one guided question at a
+                      time. Renamed from the separate "Browse More" section
+                      (2026-08 Entrance Cleanup) — same CreateBrowseCategoriesPanel,
+                      same requestCatalogConfirm gate, now the single mount
+                      point instead of a second, duplicate one further down
+                      the page. */}
+                  {helpMeChooseOpen ? (
+                    <div
+                      className="mt-2 rounded-2xl border border-[#e7dfd4] bg-white/80 px-4 py-3"
+                      data-testid="create-estate-browse-categories"
+                      data-max-decision-layers={SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS}
+                    >
+                      <h4 className="text-sm font-semibold text-[#1f1c19]">
+                        {CREATE_ESTATE_BROWSE_CATEGORIES_HEADING}
+                      </h4>
+                      <div className="mt-2">
+                        <CreateBrowseCategoriesPanel
+                          mode="guided"
+                          onRequestCreate={requestCatalogConfirm}
+                        />
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
 
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={openBrowseMore}
-                className="text-sm font-semibold text-[#1e4f4f] hover:underline"
-                data-testid="create-estate-browse-more-link"
-              >
-                {CREATE_ESTATE_BROWSE_MORE_LABEL}
-              </button>
-              {hasWorkspaces ? (
+            {!composerEngaged && hasWorkspaces ? (
+              <div className="flex flex-wrap items-center gap-3">
                 <button
                   type="button"
                   disabled={startNewBusy || beginBusy}
@@ -774,19 +751,6 @@ export function CreateEstateEntrancePanel({
                 >
                   {startNewBusy ? "Starting…" : CREATE_ESTATE_START_NEW_LABEL}
                 </button>
-              ) : null}
-            </div>
-
-            {/* Part 9 — Help Me Choose is one guided question at a time. */}
-            {helpMeChooseOpen ? (
-              <div
-                className="max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/80 px-4 py-3"
-                data-testid="create-estate-help-me-choose-body"
-              >
-                <CreateBrowseCategoriesPanel
-                  mode="guided"
-                  onRequestCreate={requestCatalogConfirm}
-                />
               </div>
             ) : null}
 
@@ -941,61 +905,40 @@ export function CreateEstateEntrancePanel({
           </div>
         </section>
 
-        {/* 3 — Find Previous Work (Part 2 — separate from idea discovery) */}
-        <details
-          className="mt-6 max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
-          data-testid="create-estate-find-previous-work"
-          open={findPreviousWorkOpen}
-          onToggle={(e) =>
-            setFindPreviousWorkOpen((e.target as HTMLDetailsElement).open)
-          }
-        >
-          <summary className="cursor-pointer text-lg font-semibold text-[#1f1c19]">
-            {CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING}
-          </summary>
-          <p className="mt-2 text-sm text-[#6b635a]">
-            {CREATE_ESTATE_FIND_PREVIOUS_WORK_HINT}
-          </p>
+        {/* 3 — Find Previous Work (Part 2 — separate from idea discovery).
+            Entrance Cleanup (2026-08) — steps aside while Start Freely is
+            engaged, per the same composerEngaged rule as Start With
+            Guidance above; the old separate "Browse More" section (Part 4)
+            is retired — its category picker is now the single mount nested
+            inside Start With Guidance. */}
+        {!composerEngaged ? (
+          <details
+            className="mt-6 max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
+            data-testid="create-estate-find-previous-work"
+            open={findPreviousWorkOpen}
+            onToggle={(e) =>
+              setFindPreviousWorkOpen((e.target as HTMLDetailsElement).open)
+            }
+          >
+            <summary className="cursor-pointer text-lg font-semibold text-[#1f1c19]">
+              {CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING}
+            </summary>
+            <p className="mt-2 text-sm text-[#6b635a]">
+              {CREATE_ESTATE_FIND_PREVIOUS_WORK_HINT}
+            </p>
 
-          {findPreviousWorkOpen ? (
-            <div className="mt-3">
-              <CreateFindPreviousWorkPanel
-                onOpen={onOpenSavedDraft}
-                onRename={onRenameDraft}
-                onDuplicate={onDuplicateDraft}
-                onDelete={onDeleteDraft}
-              />
-            </div>
-          ) : null}
-        </details>
-
-        {/* 4 — Browse More (Part 4 — short category list, not the full catalog) */}
-        <details
-          ref={browseMoreRef}
-          className="mt-3 max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
-          data-testid="create-estate-browse-more"
-          data-max-decision-layers={SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS}
-          open={browseMoreOpen}
-          onToggle={(e) =>
-            setBrowseMoreOpen((e.target as HTMLDetailsElement).open)
-          }
-        >
-          <summary className="cursor-pointer text-lg font-semibold text-[#1f1c19]">
-            {CREATE_ESTATE_BROWSE_MORE_HEADING}
-          </summary>
-          <p className="mt-2 text-sm text-[#6b635a]">
-            {CREATE_ESTATE_BROWSE_MORE_HINT}
-          </p>
-
-          {browseMoreOpen ? (
-            <div className="mt-3">
-              <CreateBrowseCategoriesPanel
-                mode="browse"
-                onRequestCreate={requestCatalogConfirm}
-              />
-            </div>
-          ) : null}
-        </details>
+            {findPreviousWorkOpen ? (
+              <div className="mt-3">
+                <CreateFindPreviousWorkPanel
+                  onOpen={onOpenSavedDraft}
+                  onRename={onRenameDraft}
+                  onDuplicate={onDuplicateDraft}
+                  onDelete={onDeleteDraft}
+                />
+              </div>
+            ) : null}
+          </details>
+        ) : null}
       </div>
     </CreateEstateRoomShell>
   );

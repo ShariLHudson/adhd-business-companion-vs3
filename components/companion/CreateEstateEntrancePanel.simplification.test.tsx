@@ -45,7 +45,7 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
     });
   }
 
-  it("Part 1 — shows one description field with the required placeholder and ≤4 suggested choices", () => {
+  it("Part 1 — shows one description field with the required placeholder", () => {
     renderPanel();
     const input = container.querySelector<HTMLTextAreaElement>(
       "[data-testid='create-estate-nl-input']",
@@ -55,12 +55,6 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
     expect(input?.placeholder).toBe(
       "Tell me what you're thinking about, even if it's not fully formed yet...",
     );
-
-    const choices = container.querySelectorAll(
-      "[data-testid='create-estate-suggested-choice']",
-    );
-    expect(choices.length).toBeGreaterThan(0);
-    expect(choices.length).toBeLessThanOrEqual(4);
 
     // Phase 0 (Create Entrance Copy and Path Relabel) — Start Freely /
     // Start With Guidance primary action labels; same underlying handlers.
@@ -72,6 +66,20 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
       container.querySelector("[data-testid='create-estate-help-me-choose']")
         ?.textContent,
     ).toContain("Help me figure this out");
+  });
+
+  it("Entrance Cleanup (2026-08) — never shows artifact-specific quick-choice chips", () => {
+    renderPanel();
+    // The default/personalized suggested-choice chips (Email, Social Post,
+    // Client Onboarding, Workshop, etc.) were removed — they made Create
+    // feel like a template catalog instead of a thinking conversation.
+    expect(
+      container.querySelector("[data-testid='create-estate-suggested-choices']"),
+    ).toBeNull();
+    expect(
+      container.querySelectorAll("[data-testid='create-estate-suggested-choice']")
+        .length,
+    ).toBe(0);
   });
 
   it("Part 3 — never shows source filter chips on the default screen", () => {
@@ -132,23 +140,28 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
     ).toBeTruthy();
   });
 
-  it("Part 2 — Find Previous Work and Browse More are separate, collapsed by default", () => {
+  it("Part 2 — Find Previous Work is collapsed by default; Browse Categories is not a second, separate section", () => {
     renderPanel();
     const findPrevious = container.querySelector(
       "[data-testid='create-estate-find-previous-work']",
     ) as HTMLDetailsElement | null;
-    const browseMore = container.querySelector(
-      "[data-testid='create-estate-browse-more']",
-    ) as HTMLDetailsElement | null;
     expect(findPrevious).toBeTruthy();
-    expect(browseMore).toBeTruthy();
     expect(findPrevious?.open).toBe(false);
-    expect(browseMore?.open).toBe(false);
     expect(findPrevious?.textContent).toContain("Find Previous Work");
-    expect(browseMore?.textContent).toContain("Browse More");
+
+    // Entrance Cleanup (2026-08) — the old standalone "Browse More" section
+    // is retired. Browse Categories is nested inside Start With Guidance and
+    // only mounts once that path is opened — never a second, separately
+    // mounted category picker sitting elsewhere on the page.
+    expect(
+      container.querySelector("[data-testid='create-estate-browse-more']"),
+    ).toBeNull();
+    expect(
+      container.querySelector("[data-testid='create-estate-browse-categories']"),
+    ).toBeNull();
   });
 
-  it("Help Me Choose opens one guided question at a time, then closes on selection", () => {
+  it("Help Me Choose opens Browse Categories (single mount) one guided question at a time, then closes on selection", () => {
     renderPanel();
     const button = container.querySelector<HTMLButtonElement>(
       "[data-testid='create-estate-help-me-choose']",
@@ -156,6 +169,11 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
     act(() => {
       button.click();
     });
+    const browseCategories = container.querySelector(
+      "[data-testid='create-estate-browse-categories']",
+    );
+    expect(browseCategories).toBeTruthy();
+    expect(browseCategories?.textContent).toContain("Browse Categories");
     expect(
       container.querySelector("[data-testid='create-browse-category-cards']"),
     ).toBeTruthy();
@@ -168,6 +186,57 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
     });
     expect(
       container.querySelector("[data-testid='create-browse-parent-cards']"),
+    ).toBeTruthy();
+  });
+
+  it("Entrance Cleanup (2026-08) — Start Freely engagement narrows to a focused writing surface", () => {
+    renderPanel();
+    const input = container.querySelector<HTMLTextAreaElement>(
+      "[data-testid='create-estate-nl-input']",
+    )!;
+
+    // Before engagement — both paths visible.
+    expect(
+      container.querySelector("[data-testid='create-estate-start-with-guidance']"),
+    ).toBeTruthy();
+    expect(
+      container.querySelector("[data-testid='create-estate-find-previous-work']"),
+    ).toBeTruthy();
+
+    act(() => {
+      const setter = Object.getOwnPropertyDescriptor(
+        window.HTMLTextAreaElement.prototype,
+        "value",
+      )!.set!;
+      setter.call(input, "a checklist for onboarding");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+
+    // Engaged — the alternate path and secondary navigation step aside;
+    // the input and its own Begin button remain.
+    expect(
+      container.querySelector("[data-testid='create-estate-start-with-guidance']"),
+    ).toBeNull();
+    expect(
+      container.querySelector("[data-testid='create-estate-find-previous-work']"),
+    ).toBeNull();
+    expect(
+      container.querySelector("[data-testid='create-estate-start-creating']"),
+    ).toBeTruthy();
+
+    act(() => {
+      const setter = Object.getOwnPropertyDescriptor(
+        window.HTMLTextAreaElement.prototype,
+        "value",
+      )!.set!;
+      setter.call(input, "");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      input.blur();
+    });
+
+    // Cleared and blurred — reverts to showing both paths again.
+    expect(
+      container.querySelector("[data-testid='create-estate-start-with-guidance']"),
     ).toBeTruthy();
   });
 

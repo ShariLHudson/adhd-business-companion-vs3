@@ -11,7 +11,7 @@ import {
   type CreateParentType,
 } from "@/lib/createEstate/createParentTypes";
 import {
-  CREATE_ESTATE_BROWSE_MORE_HINT,
+  CREATE_ESTATE_BROWSE_CATEGORIES_HINT,
   CREATE_ESTATE_HELP_ME_CHOOSE_HINT,
   CREATE_ESTATE_HELP_ME_CHOOSE_QUESTION,
 } from "@/lib/createEstate/copy";
@@ -37,11 +37,11 @@ export function CreateBrowseCategoriesPanel({ mode, onRequestCreate }: Props) {
   const heading =
     mode === "guided"
       ? CREATE_ESTATE_HELP_ME_CHOOSE_QUESTION
-      : "Browse a category";
+      : "Browse Categories";
   const hint =
     mode === "guided"
       ? CREATE_ESTATE_HELP_ME_CHOOSE_HINT
-      : CREATE_ESTATE_BROWSE_MORE_HINT;
+      : CREATE_ESTATE_BROWSE_CATEGORIES_HINT;
 
   // Step 3 — subtype question for the chosen parent type.
   if (parent && parent.subtypes && parent.subtypes.length > 0) {

@@ -137,7 +137,9 @@ describe("Create polish 130 certification", () => {
   it("preserves 127/129 confirm gate and hierarchy", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     expect(panel).toContain("create-estate-intent-confirm");
-    expect(panel).toContain("create-estate-browse-more");
+    // Entrance Cleanup (2026-08) — renamed from "Browse More", now the
+    // single category-picker mount nested in Start With Guidance.
+    expect(panel).toContain("create-estate-browse-categories");
     expect(panel).toContain("CreateWorkspaceResumeList");
   });
 });

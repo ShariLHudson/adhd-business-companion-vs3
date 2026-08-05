@@ -192,21 +192,18 @@ export const CREATE_ESTATE_HELP_ME_CHOOSE_QUESTION =
 export const CREATE_ESTATE_HELP_ME_CHOOSE_HINT =
   "Pick the area that fits best — Shari will narrow it down from there.";
 
-/** Optional secondary — full curated category browse. */
-export const CREATE_ESTATE_BROWSE_MORE_LABEL = "Browse More";
+/**
+ * Entrance Cleanup (2026-08) — renamed from "Browse More". Now the single
+ * category-browsing surface, nested inside Start With Guidance instead of
+ * living as a second, separately-mounted section (see
+ * CreateEstateEntrancePanel.tsx). Same underlying CreateBrowseCategoriesPanel.
+ */
+export const CREATE_ESTATE_BROWSE_CATEGORIES_LABEL = "Browse Categories";
 
-export const CREATE_ESTATE_BROWSE_MORE_HEADING = "Browse More";
+export const CREATE_ESTATE_BROWSE_CATEGORIES_HEADING = "Browse Categories";
 
-export const CREATE_ESTATE_BROWSE_MORE_HINT =
+export const CREATE_ESTATE_BROWSE_CATEGORIES_HINT =
   "A short list of categories — pick one to see a few ideas, not the whole catalog.";
-
-/** Up to four suggested choices shown beside the description field (Part 1). */
-export const CREATE_ESTATE_DEFAULT_SUGGESTED_CHOICES = [
-  "Email",
-  "Social Post",
-  "Client Onboarding",
-  "Workshop",
-] as const;
 
 /** Part 2 — previous work lives in its own section, separate from idea discovery. */
 export const CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING = "Find Previous Work";

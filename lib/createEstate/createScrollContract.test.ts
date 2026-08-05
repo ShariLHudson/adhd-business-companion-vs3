@@ -55,18 +55,20 @@ describe("Create morning-room scroll contract (133)", () => {
     );
   });
 
-  it("Create entrance keeps Browse More / Find Previous Work clickable targets", () => {
+  it("Create entrance keeps Browse Categories / Find Previous Work clickable targets", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     const findPrevious = read(
       "components/companion/CreateFindPreviousWorkPanel.tsx",
     );
     const copy = read("lib/createEstate/copy.ts");
-    expect(panel).toContain("create-estate-browse-more");
+    // Entrance Cleanup (2026-08) — renamed from "Browse More", now the
+    // single category-picker mount nested in Start With Guidance.
+    expect(panel).toContain("create-estate-browse-categories");
     expect(panel).toContain("create-estate-find-previous-work");
     expect(panel).toContain("CreateBrowseCategoriesPanel");
     expect(panel).toContain("CreateFindPreviousWorkPanel");
     expect(panel).toContain("onSelectCreationType");
-    expect(copy).toContain("CREATE_ESTATE_BROWSE_MORE_HEADING");
+    expect(copy).toContain("CREATE_ESTATE_BROWSE_CATEGORIES_HEADING");
     expect(copy).toContain("CREATE_ESTATE_CONTINUE_HEADING");
     expect(findPrevious).toContain("CreateDraftResumeList");
     expect(panel).toContain("useDismissibleWindow");

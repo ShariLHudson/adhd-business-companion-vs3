@@ -13,7 +13,7 @@ import {
   resolveCreateExitDestination,
 } from "@/lib/createGuidedConversation189";
 import {
-  CREATE_ESTATE_BROWSE_MORE_HEADING,
+  CREATE_ESTATE_BROWSE_CATEGORIES_HEADING,
   CREATE_ESTATE_CONTINUE_HEADING,
   CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING,
   CREATE_ESTATE_START_NEW_HEADING,
@@ -38,14 +38,17 @@ describe("Create polish 129 certification", () => {
     expect(CREATE_ESTATE_CONTINUE_HEADING).toBe("Continue Working");
   });
 
-  it("Browse More + Find Previous Work replace Customize/Browse/Explore Ideas (Create Simplification)", () => {
+  it("Browse Categories + Find Previous Work replace Customize/Browse/Explore Ideas (Create Simplification)", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     const findPrevious = read(
       "components/companion/CreateFindPreviousWorkPanel.tsx",
     );
-    expect(panel).toContain("create-estate-browse-more");
+    // Entrance Cleanup (2026-08) — Browse Categories is now the single
+    // category-picker mount, nested inside Start With Guidance instead of
+    // a separately-mounted "Browse More" section.
+    expect(panel).toContain("create-estate-browse-categories");
     expect(panel).toContain("create-estate-find-previous-work");
-    expect(panel).toContain("CREATE_ESTATE_BROWSE_MORE_HEADING");
+    expect(panel).toContain("CREATE_ESTATE_BROWSE_CATEGORIES_HEADING");
     expect(panel).toContain("CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING");
     expect(panel).toContain("CreateBrowseCategoriesPanel");
     expect(panel).toContain("CreateFindPreviousWorkPanel");
@@ -53,7 +56,7 @@ describe("Create polish 129 certification", () => {
     expect(panel).not.toContain('data-testid="create-estate-advanced"');
     expect(panel).not.toContain("create-estate-guided-frameworks");
     expect(panel).not.toContain("CreateExploreIdeasPanel");
-    expect(CREATE_ESTATE_BROWSE_MORE_HEADING).toBe("Browse More");
+    expect(CREATE_ESTATE_BROWSE_CATEGORIES_HEADING).toBe("Browse Categories");
     expect(CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING).toBe(
       "Find Previous Work",
     );
@@ -95,11 +98,16 @@ describe("Create polish 129 certification", () => {
     expect(working).not.toContain("CREATE_BACK_TO_FOCUS_DESTINATION");
   });
 
-  it("hierarchy: Continue Working before composer before Browse More", () => {
+  it("hierarchy: Continue Working before composer before Browse Categories", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     const continueAt = panel.indexOf('data-testid="create-estate-continue"');
     const startAt = panel.indexOf('data-testid="create-estate-composer"');
-    const browseAt = panel.indexOf('data-testid="create-estate-browse-more"');
+    // Entrance Cleanup (2026-08) — Browse Categories now nests inside the
+    // composer section (under Start With Guidance) rather than following it
+    // as a separate page section.
+    const browseAt = panel.indexOf(
+      'data-testid="create-estate-browse-categories"',
+    );
     expect(continueAt).toBeGreaterThan(-1);
     expect(startAt).toBeGreaterThan(continueAt);
     expect(browseAt).toBeGreaterThan(startAt);

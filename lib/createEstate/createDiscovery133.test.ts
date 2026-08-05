@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
-  CREATE_ESTATE_BROWSE_MORE_HEADING,
+  CREATE_ESTATE_BROWSE_CATEGORIES_HEADING,
   CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING,
 } from "./copy";
 import { SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS } from "@/lib/sparkCreateIntentConstitution/types";
@@ -25,13 +25,15 @@ describe("Create Simplification — Find Previous Work + Browse More replace Exp
     expect(panel).not.toContain("CreateExploreIdeasPanel");
     expect(panel).not.toContain('data-testid="create-estate-explore-ideas"');
     expect(panel).toContain("create-estate-find-previous-work");
-    expect(panel).toContain("create-estate-browse-more");
+    // Entrance Cleanup (2026-08) — renamed from "Browse More", now the
+    // single category-picker mount nested in Start With Guidance.
+    expect(panel).toContain("create-estate-browse-categories");
     expect(panel).not.toContain("create-estate-guided-frameworks");
     expect(panel).not.toContain("UniversalBlueprintInterface");
     expect(panel).not.toContain("CreateCatalogPicker");
     expect(panel).not.toContain("create-estate-blueprint-marketing");
     expect(panel).not.toMatch(/aria-pressed=\{blueprintWorkTypeId/);
-    expect(CREATE_ESTATE_BROWSE_MORE_HEADING).toBe("Browse More");
+    expect(CREATE_ESTATE_BROWSE_CATEGORIES_HEADING).toBe("Browse Categories");
     expect(CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING).toBe(
       "Find Previous Work",
     );
@@ -47,12 +49,18 @@ describe("Create Simplification — Find Previous Work + Browse More replace Exp
     expect(browse).toContain("onRequestCreate");
   });
 
-  it("Find Previous Work is a distinct section from Browse More", () => {
+  it("Find Previous Work is a distinct section from Browse Categories", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     const prevAt = panel.indexOf('data-testid="create-estate-find-previous-work"');
-    const browseAt = panel.indexOf('data-testid="create-estate-browse-more"');
+    // Entrance Cleanup (2026-08) — Browse Categories now nests inside the
+    // composer section (under Start With Guidance), ahead of Find Previous
+    // Work, instead of following it as a separate page section.
+    const browseAt = panel.indexOf(
+      'data-testid="create-estate-browse-categories"',
+    );
     expect(prevAt).toBeGreaterThan(-1);
-    expect(browseAt).toBeGreaterThan(prevAt);
+    expect(browseAt).toBeGreaterThan(-1);
+    expect(prevAt).toBeGreaterThan(browseAt);
     const findPrevious = read(
       "components/companion/CreateFindPreviousWorkPanel.tsx",
     );
@@ -70,15 +78,17 @@ describe("Create Simplification — Find Previous Work + Browse More replace Exp
     expect(SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS).toBe(3);
   });
 
-  it("hierarchy on entrance: Continue → composer → Find Previous Work → Browse More", () => {
+  it("hierarchy on entrance: Continue → composer (with nested Browse Categories) → Find Previous Work", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     const continueAt = panel.indexOf('data-testid="create-estate-continue"');
     const startAt = panel.indexOf('data-testid="create-estate-composer"');
+    const browseAt = panel.indexOf(
+      'data-testid="create-estate-browse-categories"',
+    );
     const prevAt = panel.indexOf('data-testid="create-estate-find-previous-work"');
-    const browseAt = panel.indexOf('data-testid="create-estate-browse-more"');
     expect(continueAt).toBeGreaterThan(-1);
     expect(startAt).toBeGreaterThan(continueAt);
-    expect(prevAt).toBeGreaterThan(startAt);
-    expect(browseAt).toBeGreaterThan(prevAt);
+    expect(browseAt).toBeGreaterThan(startAt);
+    expect(prevAt).toBeGreaterThan(browseAt);
   });
 });
