@@ -1,7 +1,12 @@
 import type { SupportStyle as LegacySupportStyle } from "@/lib/companionStore";
 import type { SupportStyleId } from "./types";
 
-/** Map companion-prefs supportStyle → canonical Support Style. */
+/**
+ * The explicit legacy migration boundary (ADR-012 Phase 4b): the only place
+ * that accepts the legacy alphabet and converts it to canonical. `| string`
+ * stays broad on purpose — it also normalizes raw wire values from older or
+ * uncontrolled clients, not just the narrowed `LegacySupportStyle` type.
+ */
 export function supportStyleIdFromLegacy(
   value: LegacySupportStyle | string | null | undefined,
 ): SupportStyleId {

@@ -10,14 +10,13 @@ import {
   skipDiscoveryQuestion,
   writeDiscoveryStore,
 } from "./companionDiscovery";
+import { getPrefs } from "./companionStore";
+import { getSupportStylePreference } from "./supportStyle";
 
 describe("companionDiscovery", () => {
   beforeEach(() => {
     const mem = new Map<string, string>();
-    vi.stubGlobal("window", {
-      dispatchEvent: vi.fn(),
-    });
-    vi.stubGlobal("localStorage", {
+    const storage = {
       getItem: (k: string) => mem.get(k) ?? null,
       setItem: (k: string, v: string) => {
         mem.set(k, v);
@@ -28,7 +27,14 @@ describe("companionDiscovery", () => {
       clear: () => {
         mem.clear();
       },
+    };
+    vi.stubGlobal("window", {
+      dispatchEvent: vi.fn(),
+      // lib/supportStyle/prefs.ts reads/writes window.localStorage
+      // specifically (not just the global) — same backing store as below.
+      localStorage: storage,
     });
+    vi.stubGlobal("localStorage", storage);
     restartDiscovery();
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-06-12T10:00:00Z"));
@@ -70,5 +76,18 @@ describe("companionDiscovery", () => {
       discoveriesMade: 1,
       label: "1 discovery made",
     });
+  });
+
+  it("ADR-012 Phase 4b — an overwhelm answer updates the CANONICAL Support Style store, not just the legacy mirror", () => {
+    // Before Phase 4b this wrote only Prefs.supportStyle = "sos" via savePrefs,
+    // never touching the canonical store every chat surface actually reads —
+    // so the onboarding signal never reached a real turn. It now goes through
+    // saveSupportStylePreference, which updates both in one place.
+    recordDiscoveryAnswer("why-here", "I feel so overwhelmed by everything");
+    expect(getSupportStylePreference().styleId).toBe("gentle-first");
+    // Legacy mirror stays in sync — "understand", not the old "sos" — and
+    // "sos"/"understand" both resolve to gentle-first, so routing/delivery
+    // guidance built from either value is unchanged.
+    expect(getPrefs().supportStyle).toBe("understand");
   });
 });

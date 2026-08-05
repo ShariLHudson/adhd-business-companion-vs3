@@ -74,6 +74,9 @@ export type CompanionDeliveryRequest = {
   /**
    * Legacy `Prefs.supportStyle` mirror. Accepted only as a fallback for older
    * clients; it cannot express `step-by-step`, `give-me-choices`, or `custom`.
+   * ADR-012 Phase 4b narrowed `SupportStyle` itself to the true legacy
+   * alphabet, so this field's type can no longer accept a canonical literal
+   * by accident — `| string` stays only for raw/uncontrolled wire input.
    */
   supportStyle?: SupportStyle | string | null;
   /** "Use this Support Style most of the time" — member's real checkbox. */

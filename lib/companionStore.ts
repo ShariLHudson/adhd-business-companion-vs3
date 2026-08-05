@@ -16,6 +16,13 @@ import {
   pushLanguagePrefsToUser,
 } from "./companionUserLanguage";
 import { safeLocalStorageSet } from "./companionStorageRecovery";
+// Type-only import back from supportStyle/legacyBridge — no runtime cycle:
+// legacyBridge.ts's only import of this module is `import type`, so this is
+// a one-directional runtime edge (companionStore -> legacyBridge).
+import {
+  legacySupportStyleFromId,
+  supportStyleIdFromLegacy,
+} from "./supportStyle/legacyBridge";
 import { createCatalogTypeLabels } from "./createCatalog";
 import { sortByDropdownLabel, sortDropdownLabels } from "./dropdownSort";
 import {
@@ -2332,21 +2339,21 @@ export type HelpMode =
   | "navigate"
   | "concise";
 
-// How Spark helps when the member needs support (legacy ids + canonical Support Style ids).
-// Canonical source of truth: lib/supportStyle — these values stay for prefs sync / older readers.
-export type SupportStyle =
-  | "solutions"
-  | "understand"
-  | "balanced"
-  | "sos"
-  | "listen"
-  | "gentle-first"
-  | "practical-first"
-  | "talk-it-through"
-  | "step-by-step"
-  | "give-me-choices"
-  | "adaptive"
-  | "custom";
+/**
+ * How Spark helps when the member needs support — the LEGACY alphabet only.
+ *
+ * Canonical source of truth: `lib/supportStyle` (`SupportStyleId`). This
+ * field is kept only as a mirror for older readers that predate the
+ * canonical store; ADR-012 Phase 4b narrowed it so the legacy and canonical
+ * alphabets can no longer typecheck against the same field — a canonical id
+ * like "gentle-first" must go through `legacySupportStyleFromId()` to become
+ * one of the five values below, never be assigned here directly.
+ *
+ * `getPrefs()` normalizes this field through `supportStyleIdFromLegacy()` →
+ * `legacySupportStyleFromId()` on every read — the explicit migration
+ * boundary for any value stored before this narrowing.
+ */
+export type SupportStyle = "solutions" | "understand" | "balanced" | "sos" | "listen";
 
 export type Prefs = {
   aiTone: AiTone;
@@ -2446,6 +2453,16 @@ export function getPrefs(): Prefs {
     const merged = { ...DEFAULT_PREFS, ...parsed };
     merged.visualMode = normalizeVisualMode(merged.visualMode);
     merged.aiTone = normalizeAiTone(merged.aiTone);
+    // ADR-012 Phase 4b — explicit legacy migration boundary. Round-tripping
+    // through the canonical id guarantees `supportStyle` is always one of
+    // the five legacy values below, even for prefs saved before this
+    // narrowing (which could hold a canonical id written directly, or
+    // garbage). Idempotent: already-valid legacy values pass through
+    // unchanged, since supportStyleIdFromLegacy → legacySupportStyleFromId
+    // is a stable round trip for every legacy value.
+    merged.supportStyle = legacySupportStyleFromId(
+      supportStyleIdFromLegacy(merged.supportStyle),
+    );
     // Legacy prefs may omit newer social URL keys — keep empty strings.
     merged.websiteUrl =
       typeof merged.websiteUrl === "string" ? merged.websiteUrl : "";

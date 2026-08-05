@@ -9,8 +9,8 @@ import {
   savePrefs,
   type AiTone,
   type HelpMode,
-  type SupportStyle,
 } from "@/lib/companionStore";
+import { saveSupportStylePreference } from "@/lib/supportStyle";
 import { saveRecognitionStore } from "@/lib/recognition";
 import { isPhase1OnboardingComplete } from "@/lib/phase1Onboarding";
 import { shouldOfferProgressiveDiscoveryQuestion } from "@/lib/phase2ProgressiveDiscovery";
@@ -596,7 +596,14 @@ export function updateDiscoveryAnswer(id: DiscoveryQuestionId, answer: string) {
 
 function applyDiscoveryAnswer(id: DiscoveryQuestionId, answer: string) {
   if (id === "why-here" && /overwhelm/i.test(answer)) {
-    savePrefs({ supportStyle: "sos" satisfies SupportStyle });
+    // ADR-012 Phase 4b — one writer for both stores. The previous
+    // savePrefs({ supportStyle: "sos" }) wrote only the legacy mirror; the
+    // canonical Support Style store (which every chat surface now reads)
+    // never saw it, so this onboarding signal never actually reached a real
+    // turn. saveSupportStylePreference updates the canonical store AND syncs
+    // the legacy mirror in one place — "sos" and "gentle-first" both resolve
+    // to the same canonical style, so routing/delivery guidance is unchanged.
+    saveSupportStylePreference({ styleId: "gentle-first" });
   }
   if (id === "describes-you") {
     saveBusinessProfile({ role: answer });
