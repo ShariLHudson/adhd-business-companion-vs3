@@ -5720,6 +5720,9 @@ export default function CompanionPageClient() {
   const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
   async function playTTS(text: string) {
     if (isWelcomeHomeIntroAudioBlocked()) return;
+    // Experience Controls → Shari Voice. The single low-level TTS entry
+    // point, so every caller is gated here — not just the chat-reply path.
+    if (!getExperienceControlPrefs().shariVoiceEnabled) return;
     // Voice is metered per plan. Out of minutes → don't spend the API call.
     const vs = getVoiceStatus();
     if (!vs.hasVoice || vs.leftMin <= 0) {

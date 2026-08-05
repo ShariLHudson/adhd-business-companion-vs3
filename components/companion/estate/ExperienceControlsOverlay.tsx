@@ -43,6 +43,7 @@ import {
   kickstartEstateRoomAmbience,
 } from "@/lib/estate/estateRoomAmbience";
 import { resolveEstatePlaceAmbientProfile } from "@/lib/estate/estatePlaceAmbientSound";
+import { pauseChatAssistantAudio } from "@/lib/welcomeHome";
 
 export type ExperienceControlsOverlayProps = {
   open: boolean;
@@ -181,6 +182,12 @@ export function ExperienceControlsOverlay({
 
   const setShariVoice = (enabled: boolean) => {
     patchExperienceControlPrefs({ shariVoiceEnabled: enabled });
+    if (!enabled) {
+      // Stop any Shari reply already speaking — same tagged element playTTS
+      // marks with markChatAssistantAudioElement, reused here rather than
+      // adding a second stop mechanism.
+      pauseChatAssistantAudio();
+    }
   };
 
   const setMasterVolume = (next: number) => {
