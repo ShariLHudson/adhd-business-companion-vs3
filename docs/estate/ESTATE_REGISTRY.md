@@ -126,6 +126,7 @@ Machine-readable: `lib/estateExperiences/legacyWorkspaceMap.ts`
 | `quick-recharge`, `games` | Play | `game-room` |
 | `client-avatars`, `business-profile`, `playbook`, `google-workspace` | Business | `round-table` |
 | `welcome-room`, `home` | Explore | `welcome-home` / `homestead` |
+| `creation-workspace` | Create | `creative-studio` *(coordinated/multi-part work only — ADR-013; single-artifact Begin defaults to Create → Current Focus)* |
 
 Shell mapping: `lib/estate/directory/shell.ts` · Experience routing: `lib/estateExperiences/`
 
