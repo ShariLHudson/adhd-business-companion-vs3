@@ -16,9 +16,22 @@ export function decideCreationWorkspaceOpen(input: {
     | null;
   userAskedToKeepWorking?: boolean;
   fromResearchUse?: boolean;
+  /**
+   * ADR-013 (2026-08-05, founder-approved) — when the request originated
+   * from Create Begin ("create"), apply the narrowed boundary below:
+   * default to Create, Creation Workspace only for explicit
+   * coordinated-work signals. ADR-013 scoped itself to the Begin-time
+   * routing default only, so every other caller (chat, research library,
+   * "creation_workspace" default) keeps the prior broader catch-all
+   * unchanged — see exploratoryCreateRouting.test.ts, which locks in that
+   * chat-originated genuine execution intent still opens Creation
+   * Workspace regardless of this ADR.
+   */
+  sourceExperience?: string | null;
 }): CreationWorkspaceOpenDecision {
   const u = input.understanding;
   const t = u.normalizedRequest.toLowerCase();
+  const isCreateBeginBoundary = input.sourceExperience === "create";
 
   if (!input.hasSubstantivePackage) {
     return {
@@ -116,7 +129,12 @@ export function decideCreationWorkspaceOpen(input: {
     (u.requestedDuration?.value ?? 0) >= 2 ||
     (u.requestedQuantity ?? 0) >= 2 ||
     u.requiresExecutionPlanning ||
-    /\b(best way|figure out|not sure what|organize this)\b/.test(t)
+    // Uncertainty-about-what-to-make language ("best way", "figure out",
+    // "not sure what", "organize this") is not a coordination signal, so
+    // ADR-013's Begin boundary excludes it — that belongs to Start With
+    // Guidance, not this gate. Every other caller keeps it, unchanged.
+    (!isCreateBeginBoundary &&
+      /\b(best way|figure out|not sure what|organize this)\b/.test(t))
   ) {
     return {
       open: true,
@@ -139,7 +157,19 @@ export function decideCreationWorkspaceOpen(input: {
     }
   }
 
-  if (u.primaryIntent === "create" || u.creationFamily !== "unknown") {
+  // ADR-013 (2026-08-05, founder-approved) — for Create Begin specifically,
+  // stop here: default to Create rather than falling through to the
+  // catch-all below. Every single-artifact request (Checklist, SOP,
+  // Report, Proposal, Guide, Email, Blog, Social Post, etc.) lands in
+  // Create → Current Focus unless one of the coordinated-work signals
+  // above already matched. See the 2026-08-05 architectural audit for the
+  // full trace of why the old unqualified catch-all made this qualifier
+  // list's actual behavioral effect nothing beyond an internal telemetry
+  // string.
+  if (
+    !isCreateBeginBoundary &&
+    (u.primaryIntent === "create" || u.creationFamily !== "unknown")
+  ) {
     return {
       open: true,
       reason: "Substantive Creation Package ready for development.",

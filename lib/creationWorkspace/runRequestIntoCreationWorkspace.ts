@@ -65,6 +65,8 @@ export function runRequestIntoCreationWorkspace(
     explicitDestination: options?.explicitDestination ?? null,
     userAskedToKeepWorking: options?.userAskedToKeepWorking,
     fromResearchUse: options?.fromResearchUse,
+    // ADR-013 — only Create Begin ("create") gets the narrowed boundary.
+    sourceExperience: options?.sourceExperience ?? null,
   });
 
   trackCreationWorkspaceEvent("workspace_pipeline_ran", {
