@@ -2492,6 +2492,7 @@ import {
   playNotificationSoundForEvent,
   unlockNotificationSounds,
 } from "@/lib/notifications/playNotificationSound";
+import { resolveDeliverableSoundEvent } from "@/lib/notifications/resolveNotificationSoundEvent";
 import { buildSavedPatternsPromptHint } from "@/lib/patternAwareness";
 import { getActiveSupportStyleId, supportStyleHintForChat } from "@/lib/supportStyle";
 import { buildCuriosityBeforeCommandsPromptHint } from "@/lib/curiosityBeforeCommands";
@@ -7485,7 +7486,7 @@ export default function CompanionPageClient() {
           if (now >= lead && now < start) {
             warnedRef.current.add(b.id);
             setWarning(b);
-            playChime();
+            playNotificationSoundForEvent("time-block", `time-block-warn:${b.id}`);
             notify(
               `Soon: ${b.title}`,
               "Your momentum appointment begins in about 15 minutes.",
@@ -7505,7 +7506,10 @@ export default function CompanionPageClient() {
             setBlockStatus(due.id, "triggered");
             setTriggeredBlock(due);
             setWarning((w) => (w?.id === due.id ? null : w));
-            playChime();
+            playNotificationSoundForEvent(
+              "time-block",
+              `time-block-trigger:${due.id}`,
+            );
             notify(
               `${due.title} — how did it go?`,
               "Every outcome counts — open the app when you're ready.",
@@ -7522,7 +7526,7 @@ export default function CompanionPageClient() {
         const inApp = shouldDeliverInApp();
         const browser = shouldDeliverBrowserNotification();
         if (inApp || browser) {
-          playChime();
+          playNotificationSoundForEvent(resolveDeliverableSoundEvent(item), key);
           if (inApp) {
             setDeliverableNotice({
               title: item.title,

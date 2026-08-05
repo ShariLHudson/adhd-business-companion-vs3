@@ -7,7 +7,6 @@ import {
   SettingsSaveStatus,
   SettingsSection,
   SettingsSlider,
-  SettingsToggle,
   SETTINGS_SAVED_MESSAGE,
   SETTINGS_TEXT,
 } from "@/components/companion/settings";
@@ -74,17 +73,18 @@ export function NotificationSoundPreferences({
     });
   }
 
-  const visibleFamilies = NOTIFICATION_SOUND_FAMILIES.filter((family) => {
-    if (family.id === "reminder" || family.id === "rhythm") return true;
-    if (family.id === "shari-check-in") return true;
-    if (
-      family.id === "priority-alert" ||
-      family.id === "attention-needed"
-    ) {
-      return prefs.attentionNeededEnabled;
-    }
-    return true;
-  });
+  // Reminder, Rhythm, and Priority Alert are routed to real events (time
+  // blocks, chat reminders/rhythms, critical-priority reminders). Shari
+  // Check-In and Attention Needed describe features that do not exist yet
+  // anywhere in the app (no proactive check-in trigger, no overdue/conflict
+  // detection) — showing their dropdowns would promise a sound that can
+  // never play, so they stay hidden until a real trigger exists.
+  const visibleFamilies = NOTIFICATION_SOUND_FAMILIES.filter(
+    (family) =>
+      family.id === "reminder" ||
+      family.id === "rhythm" ||
+      family.id === "priority-alert",
+  );
 
   return (
     <section
@@ -112,21 +112,6 @@ export function NotificationSoundPreferences({
               setPrefs(next);
             }}
             testId="notification-volume-slider"
-          />
-
-          <SettingsToggle
-            id="attention-needed-enabled"
-            label="Allow Attention Needed sounds"
-            description="Only for overdue or conflicting items — never for routine reminders."
-            checked={prefs.attentionNeededEnabled}
-            onChange={(checked) => {
-              const next = saveNotificationSoundPrefs({
-                attentionNeededEnabled: checked,
-              });
-              setPrefs(next);
-              flashSaved();
-            }}
-            testId="attention-needed-toggle"
           />
 
           <p className={`text-sm leading-relaxed ${SETTINGS_TEXT.helper}`}>
@@ -165,14 +150,6 @@ export function NotificationSoundPreferences({
                   onChange={(value) => selectOption(family.prefKey, value)}
                   testId={`notification-sound-dropdown-${family.id}`}
                 />
-                {family.id === "attention-needed" ? (
-                  <p
-                    className={`mt-2 text-sm ${SETTINGS_TEXT.helper}`}
-                    data-testid="attention-needed-note"
-                  >
-                    Used only for overdue or conflicting items.
-                  </p>
-                ) : null}
                 {!compactAbout ? (
                   <SettingsHelpAccordion
                     title="Learn more"
