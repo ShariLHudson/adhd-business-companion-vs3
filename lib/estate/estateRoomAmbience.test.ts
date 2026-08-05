@@ -29,8 +29,19 @@ describe("estateRoomAmbience", () => {
       volume = 1;
       currentTime = 0;
       src = "";
-      play = play;
-      pause = pause;
+      // Real HTMLMediaElement flips `paused` to false synchronously when
+      // play() is invoked — the returned promise settles once playback
+      // actually starts. Mirror that instead of waiting on the promise, so
+      // this mock does not add an extra microtask tick vs. real audio.
+      paused = true;
+      play(): Promise<void> {
+        this.paused = false;
+        return play();
+      }
+      pause(): void {
+        pause();
+        this.paused = true;
+      }
     }
 
     vi.stubGlobal("Audio", MockAudio);
@@ -159,5 +170,112 @@ describe("estateRoomAmbience", () => {
     expect(play).toHaveBeenCalled();
     const lastPlayCall = play.mock.invocationCallOrder.at(-1);
     expect(lastPlayCall).toBeDefined();
+  });
+
+  describe("GlobalSoundControl honesty (Settings Fix 3)", () => {
+    it("isEstateRoomAmbiencePlaying is false until a room's loop is audible", async () => {
+      const { kickstartEstateRoomAmbience, isEstateRoomAmbiencePlaying } =
+        await loadAmbience();
+      expect(isEstateRoomAmbiencePlaying()).toBe(false);
+
+      kickstartEstateRoomAmbience("journal", {
+        src: "/audio/room-primary.mp3",
+        volume: 0.1,
+        character: "test",
+      });
+      await vi.waitFor(() => {
+        expect(isEstateRoomAmbiencePlaying()).toBe(true);
+      });
+    });
+
+    it("isEstateRoomAmbienceSelected stays true while paused, false after Off", async () => {
+      const {
+        kickstartEstateRoomAmbience,
+        stopEstateRoomAmbience,
+        pauseEstateRoomAmbience,
+        isEstateRoomAmbienceSelected,
+        isEstateRoomAmbiencePlaying,
+      } = await loadAmbience();
+
+      kickstartEstateRoomAmbience("journal", {
+        src: "/audio/room-primary.mp3",
+        volume: 0.1,
+        character: "test",
+      });
+      await vi.waitFor(() => {
+        expect(isEstateRoomAmbiencePlaying()).toBe(true);
+      });
+
+      await pauseEstateRoomAmbience();
+      expect(pause).toHaveBeenCalled();
+      expect(isEstateRoomAmbiencePlaying()).toBe(false);
+      expect(isEstateRoomAmbienceSelected()).toBe(true);
+
+      await stopEstateRoomAmbience();
+      expect(isEstateRoomAmbienceSelected()).toBe(false);
+    });
+
+    it("resumeEstateRoomAmbience continues the same loop without restarting it", async () => {
+      const {
+        kickstartEstateRoomAmbience,
+        pauseEstateRoomAmbience,
+        resumeEstateRoomAmbience,
+        activeEstateAmbienceRoomId,
+        isEstateRoomAmbiencePlaying,
+      } = await loadAmbience();
+
+      kickstartEstateRoomAmbience("journal", {
+        src: "/audio/room-primary.mp3",
+        volume: 0.1,
+        character: "test",
+      });
+      await vi.waitFor(() => {
+        expect(isEstateRoomAmbiencePlaying()).toBe(true);
+      });
+
+      await pauseEstateRoomAmbience();
+      const callsBeforeResume = play.mock.calls.length;
+      await resumeEstateRoomAmbience();
+
+      expect(activeEstateAmbienceRoomId()).toBe("journal");
+      expect(isEstateRoomAmbiencePlaying()).toBe(true);
+      expect(play.mock.calls.length).toBe(callsBeforeResume + 1);
+    });
+
+    it("notifies subscribers when the room loop starts, pauses, resumes, and stops", async () => {
+      const {
+        kickstartEstateRoomAmbience,
+        pauseEstateRoomAmbience,
+        resumeEstateRoomAmbience,
+        stopEstateRoomAmbience,
+        subscribeEstateRoomAmbience,
+      } = await loadAmbience();
+
+      const listener = vi.fn();
+      const unsubscribe = subscribeEstateRoomAmbience(listener);
+
+      kickstartEstateRoomAmbience("journal", {
+        src: "/audio/room-primary.mp3",
+        volume: 0.1,
+        character: "test",
+      });
+      await vi.waitFor(() => {
+        expect(listener).toHaveBeenCalled();
+      });
+
+      listener.mockClear();
+      await pauseEstateRoomAmbience();
+      expect(listener).toHaveBeenCalled();
+
+      listener.mockClear();
+      await resumeEstateRoomAmbience();
+      expect(listener).toHaveBeenCalled();
+
+      listener.mockClear();
+      await stopEstateRoomAmbience();
+      expect(listener).toHaveBeenCalled();
+
+      unsubscribe();
+    });
   });
 });

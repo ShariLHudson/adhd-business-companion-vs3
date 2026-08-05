@@ -1,6 +1,6 @@
 /**
  * Canonical Estate Sounds transport — one On / Paused / Off home for all
- * intentional audio (Layer 2 soundscape + layered mix).
+ * intentional audio (Layer 1 room ambience + Layer 2 soundscape + layered mix).
  */
 
 import {
@@ -16,6 +16,13 @@ import {
   setEstateSilenced,
   subscribeEstateAudioSettings,
 } from "@/lib/estate/estateAudioSettings";
+import {
+  isEstateRoomAmbiencePlaying,
+  isEstateRoomAmbienceSelected,
+  pauseEstateRoomAmbience,
+  resumeEstateRoomAmbience,
+  subscribeEstateRoomAmbience,
+} from "@/lib/estate/estateRoomAmbience";
 import { stopAllAudio } from "@/lib/estate/stopAllAudio";
 import {
   getLayeredAudioEngine,
@@ -63,6 +70,22 @@ function layeredSelected(): boolean {
   }
 }
 
+function roomAmbiencePlaying(): boolean {
+  try {
+    return isEstateRoomAmbiencePlaying();
+  } catch {
+    return false;
+  }
+}
+
+function roomAmbienceSelected(): boolean {
+  try {
+    return isEstateRoomAmbienceSelected();
+  } catch {
+    return false;
+  }
+}
+
 function buildMixSummary(): {
   mixSummary: string | null;
   mixTitle: string | null;
@@ -98,9 +121,10 @@ export function getEstateSoundsPlaybackState(): EstateSoundsPlaybackState {
   const silenced = sessionOff || getEstateAudioSettings().silenced;
   if (silenced) return "off";
   if (memberPaused) return "paused";
-  if (isSoundscapePlaying() || layeredPlaying()) return "on";
-  // Loaded overlay or layered selection that is not audible = paused, not Off.
-  if (activeSoundscapeLabel() || layeredSelected()) {
+  if (isSoundscapePlaying() || layeredPlaying() || roomAmbiencePlaying()) return "on";
+  // Loaded overlay, layered selection, or room ambience that is not audible
+  // = paused, not Off.
+  if (activeSoundscapeLabel() || layeredSelected() || roomAmbienceSelected()) {
     return "paused";
   }
   return "off";
@@ -128,11 +152,13 @@ export function subscribeEstateSoundsTransport(listener: Listener): () => void {
   const unsubSettings = subscribeEstateAudioSettings(() => notify());
   const unsubSoundscape = subscribeSoundscapePlayback(() => notify());
   const unsubLayered = subscribeLayeredAudio(() => notify());
+  const unsubRoomAmbience = subscribeEstateRoomAmbience(() => notify());
   return () => {
     listeners.delete(listener);
     unsubSettings();
     unsubSoundscape();
     unsubLayered();
+    unsubRoomAmbience();
   };
 }
 
@@ -142,6 +168,7 @@ export async function pauseEstateSounds(): Promise<void> {
   sessionOff = false;
   setEstateSilenced(false);
   await pauseSoundscapeOverlay();
+  await pauseEstateRoomAmbience();
   try {
     await getLayeredAudioEngine().pauseAllLayers();
   } catch {
@@ -156,6 +183,7 @@ export async function resumeEstateSounds(): Promise<void> {
   sessionOff = false;
   setEstateSilenced(false);
   await resumeSoundscapeOverlay();
+  await resumeEstateRoomAmbience();
   try {
     await getLayeredAudioEngine().resumeAllLayers();
   } catch {
@@ -165,7 +193,8 @@ export async function resumeEstateSounds(): Promise<void> {
   if (
     !isSoundscapePlaying() &&
     !layeredPlaying() &&
-    (layeredSelected() || activeSoundscapeLabel())
+    !roomAmbiencePlaying() &&
+    (layeredSelected() || activeSoundscapeLabel() || roomAmbienceSelected())
   ) {
     memberPaused = true;
   }
@@ -205,7 +234,12 @@ export async function turnOffEstateSounds(): Promise<void> {
 export async function turnOnEstateSounds(): Promise<void> {
   sessionOff = false;
   setEstateSilenced(false);
-  if (memberPaused || layeredSelected() || activeSoundscapeLabel()) {
+  if (
+    memberPaused ||
+    layeredSelected() ||
+    activeSoundscapeLabel() ||
+    roomAmbienceSelected()
+  ) {
     await resumeEstateSounds();
     return;
   }

@@ -20,10 +20,18 @@ const pauseAllLayers = vi.fn(async () => {});
 const resumeAllLayers = vi.fn(async () => {
   layeredPlaying = layeredSelected;
 });
+const pauseRoomAmbience = vi.fn(async () => {
+  roomAmbiencePlaying = false;
+});
+const resumeRoomAmbience = vi.fn(async () => {
+  roomAmbiencePlaying = roomAmbienceSelected;
+});
 
 let soundscapePlaying = false;
 let layeredPlaying = false;
 let layeredSelected = false;
+let roomAmbiencePlaying = false;
+let roomAmbienceSelected = false;
 
 vi.mock("@/lib/estate/estateAudioService", () => ({
   activeSoundscapeLabel: () => (soundscapePlaying ? "Soft Piano" : null),
@@ -32,6 +40,14 @@ vi.mock("@/lib/estate/estateAudioService", () => ({
   resumeSoundscapeOverlay: () => resumeSoundscape(),
   stopSoundscapeOverlay: () => stopSoundscape(),
   subscribeSoundscapePlayback: () => () => {},
+}));
+
+vi.mock("@/lib/estate/estateRoomAmbience", () => ({
+  isEstateRoomAmbiencePlaying: () => roomAmbiencePlaying,
+  isEstateRoomAmbienceSelected: () => roomAmbienceSelected,
+  pauseEstateRoomAmbience: () => pauseRoomAmbience(),
+  resumeEstateRoomAmbience: () => resumeRoomAmbience(),
+  subscribeEstateRoomAmbience: () => () => {},
 }));
 
 vi.mock("@/lib/estate/stopAllAudio", () => ({
@@ -90,12 +106,16 @@ beforeEach(() => {
   soundscapePlaying = false;
   layeredPlaying = false;
   layeredSelected = false;
+  roomAmbiencePlaying = false;
+  roomAmbienceSelected = false;
   pauseSoundscape.mockClear();
   resumeSoundscape.mockClear();
   stopSoundscape.mockClear();
   stopAll.mockClear();
   pauseAllLayers.mockClear();
   resumeAllLayers.mockClear();
+  pauseRoomAmbience.mockClear();
+  resumeRoomAmbience.mockClear();
 });
 
 afterEach(() => {
@@ -186,5 +206,85 @@ describe("estateSoundsTransport", () => {
     expect(getEstateSoundsTransportSnapshot().closedLabel).toBe(
       "Sounds Paused",
     );
+  });
+
+  describe("Layer 1 room ambience honesty (Settings Fix 3)", () => {
+    it("reports On when only room ambience is playing — no false Sounds Off", () => {
+      roomAmbienceSelected = true;
+      roomAmbiencePlaying = true;
+      expect(getEstateSoundsPlaybackState()).toBe("on");
+      expect(getEstateSoundsTransportSnapshot().closedLabel).toBe(
+        "Sounds On",
+      );
+    });
+
+    it("reports Paused when room ambience is selected but not audible", () => {
+      roomAmbienceSelected = true;
+      roomAmbiencePlaying = false;
+      expect(getEstateSoundsPlaybackState()).toBe("paused");
+      expect(getEstateSoundsTransportSnapshot().closedLabel).toBe(
+        "Sounds Paused",
+      );
+    });
+
+    it("reports Off when nothing — including room ambience — is active", () => {
+      roomAmbienceSelected = false;
+      roomAmbiencePlaying = false;
+      expect(getEstateSoundsPlaybackState()).toBe("off");
+      expect(getEstateSoundsTransportSnapshot().closedLabel).toBe(
+        "Sounds Off",
+      );
+    });
+
+    it("Pause reaches room ambience alongside soundscape and layered mixes", async () => {
+      roomAmbienceSelected = true;
+      roomAmbiencePlaying = true;
+      await pauseEstateSounds();
+      expect(pauseRoomAmbience).toHaveBeenCalled();
+      expect(getEstateSoundsPlaybackState()).toBe("paused");
+    });
+
+    it("Resume restores room ambience after Pause", async () => {
+      roomAmbienceSelected = true;
+      roomAmbiencePlaying = true;
+      await pauseEstateSounds();
+      expect(getEstateSoundsPlaybackState()).toBe("paused");
+      await resumeEstateSounds();
+      expect(resumeRoomAmbience).toHaveBeenCalled();
+      expect(getEstateSoundsPlaybackState()).toBe("on");
+    });
+
+    it("Turn Off silences a room-ambience-only Estate", async () => {
+      roomAmbienceSelected = true;
+      roomAmbiencePlaying = true;
+      await turnOffEstateSounds();
+      expect(stopAll).toHaveBeenCalledWith({ silenceEstate: true });
+      roomAmbienceSelected = false;
+      roomAmbiencePlaying = false;
+      expect(getEstateSoundsPlaybackState()).toBe("off");
+    });
+
+    it("Turn On works after Off when room ambience remains selected", async () => {
+      roomAmbienceSelected = true;
+      roomAmbiencePlaying = true;
+      await turnOffEstateSounds();
+      roomAmbiencePlaying = false;
+      expect(getEstateSoundsPlaybackState()).toBe("off");
+      // Real stopEstateRoomAmbience() clears selection on Off; a room that
+      // re-selects ambience (e.g. the member is still in that room) should
+      // resume cleanly through Turn On.
+      roomAmbienceSelected = true;
+      await turnOnEstateSounds();
+      expect(getEstateSoundsPlaybackState()).toBe("on");
+    });
+
+    it("does not report On from room ambience alone once Estate is silenced", async () => {
+      roomAmbienceSelected = true;
+      roomAmbiencePlaying = true;
+      // Off latch takes priority even if the ambience fade-out has not
+      // finished yet (roomAmbiencePlaying still true mid-fade).
+      await turnOffEstateSounds();
+      expect(getEstateSoundsPlaybackState()).toBe("off");
+    });
   });
 });

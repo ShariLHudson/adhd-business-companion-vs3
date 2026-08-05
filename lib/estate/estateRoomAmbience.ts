@@ -33,6 +33,71 @@ let activeAmbienceSrc: string | null = null;
 let transitionInFlight: string | null = null;
 let fadeToken = 0;
 
+/**
+ * Now Playing / GlobalSoundControl subscribers — lets the header (and any
+ * other surface) reflect Layer 1 room ambience without owning a second
+ * copy of the audio element.
+ */
+const roomAmbienceListeners = new Set<() => void>();
+
+function notifyRoomAmbienceListeners(): void {
+  for (const listener of [...roomAmbienceListeners]) {
+    try {
+      listener();
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+/** Subscribe to Layer 1 room ambience play/pause/selection changes. */
+export function subscribeEstateRoomAmbience(listener: () => void): () => void {
+  roomAmbienceListeners.add(listener);
+  return () => {
+    roomAmbienceListeners.delete(listener);
+  };
+}
+
+function activeSlotAudio(): HTMLAudioElement | null {
+  if (!activeSlot) return null;
+  return activeSlot === "a" ? slotA : slotB;
+}
+
+/** True only while a room's Layer 1 loop has an active track and is not paused. */
+export function isEstateRoomAmbiencePlaying(): boolean {
+  if (currentRoomId === null) return false;
+  const audio = activeSlotAudio();
+  return Boolean(audio && !audio.paused);
+}
+
+/** True while a room has selected Layer 1 ambience, whether playing or paused. */
+export function isEstateRoomAmbienceSelected(): boolean {
+  return currentRoomId !== null;
+}
+
+/**
+ * Pause without clearing the active room — Resume can continue the same
+ * loop rather than restarting it. Mirrors the Layer 2 overlay's pause.
+ */
+export async function pauseEstateRoomAmbience(): Promise<void> {
+  const audio = activeSlotAudio();
+  if (!audio || currentRoomId === null) return;
+  audio.pause();
+  notifyRoomAmbienceListeners();
+}
+
+/** Resume a previously paused room loop. No-op if nothing is selected. */
+export async function resumeEstateRoomAmbience(): Promise<void> {
+  const audio = activeSlotAudio();
+  if (!audio || currentRoomId === null) return;
+  try {
+    await audio.play();
+  } catch {
+    /* browser blocked resume; caller keeps Paused so the UI stays honest */
+  }
+  notifyRoomAmbienceListeners();
+}
+
 export type EstateRoomAmbienceStartOptions = {
   /** Member clicked Sound on — unlock autoplay; skip reduced-motion block. */
   userInitiated?: boolean;
@@ -173,6 +238,7 @@ export function kickstartEstateRoomAmbience(
       currentRoomId = roomId;
       activeAmbienceSrc = profile.src;
       activeSlot = nextSlot;
+      notifyRoomAmbienceListeners();
 
       const target = effectiveAmbienceVolume(profile.volume);
       if (outgoing && outgoing !== incoming) {
@@ -221,10 +287,12 @@ export async function startEstateRoomAmbience(
 export async function stopEstateRoomAmbience(): Promise<void> {
   if (typeof window === "undefined") return;
   const token = ++fadeToken;
+  const hadActive = currentRoomId !== null;
   currentRoomId = null;
   activeSlot = null;
   activeAmbienceSrc = null;
   transitionInFlight = null;
+  if (hadActive) notifyRoomAmbienceListeners();
 
   const outs = [slotA, slotB].filter(Boolean) as HTMLAudioElement[];
   await Promise.all(
