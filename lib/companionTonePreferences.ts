@@ -13,7 +13,11 @@ import {
   buildSupportStylePromptBlock,
   supportStyleIdFromLegacy,
 } from "@/lib/supportStyle";
-import { buildCuriosityBeforeCommandsPromptHint } from "@/lib/curiosityBeforeCommands";
+// ADR-012 Phase 1: "How Shari Invites Me" no longer contributes to the prompt.
+// buildCuriosityBeforeCommandsPromptHint is dormant in lib/curiosityBeforeCommands/
+// — this was also the server-side rebuild that ignored the member's real
+// selection (see ADR-012 "Audit findings" — bug #2), so removing the call
+// here is a pure correctness fix, not just a UI-parity change.
 
 export type MemberTonePreferenceInput = Pick<
   Prefs,
@@ -268,9 +272,6 @@ export function buildMemberTonePreferenceBlocks(
       "SUPPORT — LISTEN ONLY: Presence over fixing. Reflect what you heard. Do NOT give advice, steps, recommendations, or plans unless they explicitly ask for help solving it. One gentle question is fine; no lists.",
     );
   }
-
-  const curiosity = buildCuriosityBeforeCommandsPromptHint();
-  if (curiosity) blocks.push(curiosity);
 
   return blocks;
 }

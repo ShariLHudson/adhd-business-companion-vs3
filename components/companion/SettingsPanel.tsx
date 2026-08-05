@@ -24,15 +24,14 @@ import {
 import { SupportStylePanel } from "@/components/companion/SupportStylePanel";
 import { ConversationStylePanel } from "@/components/companion/ConversationStylePanel";
 import { HelpModePanel } from "@/components/companion/HelpModePanel";
-import { CuriosityBeforeCommandsPanel } from "@/components/companion/CuriosityBeforeCommandsPanel";
 import {
   catalogEntryForStyle,
   getSupportStylePreference,
 } from "@/lib/supportStyle";
-import {
-  CURIOSITY_MODE_OPTIONS,
-  getCuriosityBeforeCommandsPreference,
-} from "@/lib/curiosityBeforeCommands";
+// ADR-012 Phase 1: the How-Shari-Invites-Me row is dormant — its panel component,
+// CURIOSITY_MODE_OPTIONS, and getCuriosityBeforeCommandsPreference are no longer
+// imported here. Storage, types, and the phrasing engine remain untouched in
+// lib/curiosityBeforeCommands/ as a future-ready hook.
 import { useVisualMode } from "@/lib/useVisualMode";
 import { useCompanionLanguage } from "@/components/companion/CompanionLanguageProvider";
 import { playChime, unlockChime } from "@/lib/chime";
@@ -98,7 +97,9 @@ type Section =
   | "tone"
   | "help"
   | "support"
-  | "curiosity"
+  // ADR-012 Phase 1: "curiosity" removed as a reachable Section — the row,
+  // panel, and dropdown are hidden. Type/storage/engine hooks stay dormant
+  // in lib/curiosityBeforeCommands/.
   | "language"
   | "notifications"
   | "appearance"
@@ -186,9 +187,6 @@ export function SettingsPanel({
   const [aiTone, setAiTone] = useState<AiTone>("balanced");
   const [helpMode, setHelpMode] = useState<HelpMode>("ask-first");
   const [supportStyleSummary, setSupportStyleSummary] = useState("Adaptive");
-  const [curiositySummary, setCuriositySummary] = useState(
-    "Use the situation — Recommended",
-  );
   const visualMode = useVisualMode();
   const [patternSummary, setPatternSummary] = useState("On");
   const [planningView, setPlanningView] = useState<PlanningViewMode>("list");
@@ -272,11 +270,6 @@ export function SettingsPanel({
     {
       const support = getSupportStylePreference();
       setSupportStyleSummary(catalogEntryForStyle(support.styleId).label);
-      const curiosity = getCuriosityBeforeCommandsPreference();
-      setCuriositySummary(
-        CURIOSITY_MODE_OPTIONS.find((o) => o.id === curiosity.mode)?.label ??
-          "Use the situation — Recommended",
-      );
     }
     {
       // Only useSavedPatterns has a visible control (Settings Fix 7 —
@@ -344,11 +337,10 @@ export function SettingsPanel({
       value: HELP_MODE_SUMMARY.find((h) => h.id === helpMode)?.label ?? "",
     },
     { id: "support", label: "Support Style", value: supportStyleSummary },
-    {
-      id: "curiosity",
-      label: "How Shari Invites Me",
-      value: curiositySummary,
-    },
+    // ADR-012 Phase 1: the How-Shari-Invites-Me row was removed — never
+    // server-persisted, and its one live bit of signal was silently
+    // discarded server-side on every request (see ADR-012). Dormant hooks
+    // preserved in lib/curiosityBeforeCommands/.
     {
       id: "language",
       label: "Language & Communication",
@@ -677,16 +669,6 @@ export function SettingsPanel({
         {header("Support Style")}
         <div className="mt-3">
           <SupportStylePanel />
-        </div>
-      </div>
-    );
-  }
-  if (open === "curiosity") {
-    return (
-      <div className={wrap} data-testid="settings-curiosity-before-commands">
-        {header("How Shari Invites Me")}
-        <div className="mt-3">
-          <CuriosityBeforeCommandsPanel />
         </div>
       </div>
     );

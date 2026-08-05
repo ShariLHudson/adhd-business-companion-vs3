@@ -2496,7 +2496,9 @@ import {
 import { resolveDeliverableSoundEvent } from "@/lib/notifications/resolveNotificationSoundEvent";
 import { buildSavedPatternsPromptHint } from "@/lib/patternAwareness";
 import { getActiveSupportStyleId, supportStyleHintForChat } from "@/lib/supportStyle";
-import { buildCuriosityBeforeCommandsPromptHint } from "@/lib/curiosityBeforeCommands";
+// ADR-012 Phase 1: "How Shari Invites Me" no longer contributes to the prompt —
+// buildCuriosityBeforeCommandsPromptHint is dormant in lib/curiosityBeforeCommands/,
+// not imported here.
 import { adhdStrategyHintForChat } from "@/lib/adhdEverydayStrategies";
 import { techFutureHintForChat } from "@/lib/technologyFutureIntelligence";
 import {
@@ -21054,7 +21056,6 @@ export default function CompanionPageClient() {
                 estateMemoryHintForChat(),
                 buildSavedPatternsPromptHint(),
                 supportStyleHintForChat(trimmed),
-                buildCuriosityBeforeCommandsPromptHint(),
                 adhdStrategyHintForChat(trimmed),
                 techFutureHintForChat(trimmed),
                 chamberMemberChatHint,
