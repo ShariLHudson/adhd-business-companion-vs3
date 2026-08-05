@@ -1,7 +1,9 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { EstateRoomFullBleedBackground } from "@/components/companion/estate/EstateRoomFullBleedBackground";
+import { useChatBackdropRevision } from "@/lib/chatBackdrop";
+import { resolveRoomFullBleedBackground } from "@/lib/estate/resolveRoomFullBleedBackground";
 import { STABLES_ROOM_BG } from "@/lib/stables/stablesRoomRegistry";
 
 type Props = {
@@ -12,6 +14,15 @@ type Props = {
 
 /** Full-viewport Stables — spark-estate-stables plate edge to edge. */
 export function StablesRoomShell({ children }: Props) {
+  const backdropRevision = useChatBackdropRevision();
+  const backgroundImageUrl = useMemo(() => {
+    void backdropRevision;
+    return resolveRoomFullBleedBackground("stables", {
+      backgroundId: "stables",
+      imageUrl: STABLES_ROOM_BG,
+    }).imageUrl;
+  }, [backdropRevision]);
+
   return (
     <div
       className="stables-room"
@@ -20,7 +31,7 @@ export function StablesRoomShell({ children }: Props) {
     >
       <EstateRoomFullBleedBackground
         roomId="stables"
-        imageUrl={STABLES_ROOM_BG}
+        imageUrl={backgroundImageUrl}
         className="stables-room__fullbleed"
       />
       <div className="stables-room__vignette" aria-hidden />

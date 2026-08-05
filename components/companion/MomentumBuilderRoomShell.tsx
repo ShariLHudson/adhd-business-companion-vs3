@@ -1,7 +1,9 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useMemo, type ReactNode } from "react";
 import { EstateRoomFullBleedBackground } from "@/components/companion/estate/EstateRoomFullBleedBackground";
+import { useChatBackdropRevision } from "@/lib/chatBackdrop";
+import { resolveRoomFullBleedBackground } from "@/lib/estate/resolveRoomFullBleedBackground";
 import { celebrationMotionClass } from "@/lib/momentumBuilderRoom/estateIntegration";
 import type { MomentumBuilderCelebrationKind } from "@/lib/momentumBuilderRoom/estateIntegration";
 import { MOMENTUM_BUILDER_ROOM_BG } from "@/lib/momentumBuilderRoom/roomRegistry";
@@ -35,6 +37,15 @@ export function MomentumBuilderRoomShell({
     ? celebrationMotionClass(celebrationKind)
     : "";
 
+  const backdropRevision = useChatBackdropRevision();
+  const backgroundImageUrl = useMemo(() => {
+    void backdropRevision;
+    return resolveRoomFullBleedBackground("momentum-builder", {
+      backgroundId: "momentum-builder",
+      imageUrl: MOMENTUM_BUILDER_ROOM_BG,
+    }).imageUrl;
+  }, [backdropRevision]);
+
   return (
     <div
       className={`momentum-builder-room${celebrationClass ? ` ${celebrationClass}` : ""}`}
@@ -44,7 +55,7 @@ export function MomentumBuilderRoomShell({
     >
       <EstateRoomFullBleedBackground
         roomId="momentum-builder"
-        imageUrl={MOMENTUM_BUILDER_ROOM_BG}
+        imageUrl={backgroundImageUrl}
         className="momentum-builder-room__fullbleed"
       />
       <MomentumBuilderStudioScene />
