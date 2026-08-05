@@ -12,13 +12,19 @@ import { sortByDropdownLabel } from "@/lib/dropdownSort";
 
 type StatusMsg = { tone: "ok" | "error"; text: string } | null;
 
+// ADR-012 Phase 2: "step-by-step" and "navigate" retired from the visible
+// dropdown — the audit found zero deterministic readers for either (only
+// HELP_MODE_DELIVERY prompt text, lib/companionTonePreferences.ts:227-238,
+// never keyed on by any routing/formatting logic). The HelpMode type, both
+// values, and HELP_MODE_DELIVERY stay untouched as dormant hooks. Default
+// prefs have always been "ask-first" (lib/companionStore.ts:2404), so no
+// member should have either dead value saved; if one somehow does, this
+// native <select> will visually show the first remaining option instead
+// (browser behavior for a value with no matching <option>) until they pick
+// something — the underlying stored value and prompt text are untouched
+// unless they actually choose a new one.
 const HELP_MODE_OPTIONS = sortByDropdownLabel(
   [
-    {
-      value: "step-by-step" as const,
-      label: "Step-by-step guidance",
-      description: "One small step at a time.",
-    },
     {
       value: "ask-first" as const,
       label: "Ask me questions first",
@@ -33,11 +39,6 @@ const HELP_MODE_OPTIONS = sortByDropdownLabel(
       value: "concise" as const,
       label: "Concise replies",
       description: "Shorter sentences — still warm.",
-    },
-    {
-      value: "navigate" as const,
-      label: "Take me to the right place",
-      description: "Point me to the tool that fits.",
     },
   ],
   (o) => o.label,
