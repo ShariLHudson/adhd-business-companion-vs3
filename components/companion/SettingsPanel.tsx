@@ -1037,7 +1037,13 @@ export function SettingsPanel({
     return (
       <div className={wrap}>
         {header(VOICE_PLAN_COPY.sectionTitle)}
-        <PlanAndVoiceSection plan={plan} />
+        {/*
+          No `plan` prop here — that prop is a test-only override
+          (PlanAndVoiceSection.tsx) that skips the real server entitlement
+          check. Passing it in production silently prevented paid Voice
+          plans from ever being confirmed.
+        */}
+        <PlanAndVoiceSection />
       </div>
     );
   }
