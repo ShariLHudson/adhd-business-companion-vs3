@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices the transformation guests are meant to feel before building the agenda. Designs the experience arc, logistics, energy, and ADHD-friendly pacing so the event feels held from invitation through aftercare.
+
 - **Notices first:** Whether the event has one promise; where the agenda is overstuffed; what the guest will feel before, during, and after; what the founder is assuming they will remember later.
 - **Matters most:** A clear purpose, a humane sequence, and hospitality details that make guests feel held.
 - **Protects from:** Overbuilding agendas, last-minute scrambles, forgotten welcome/follow-up details, tech chaos, and post-event crash.

@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices which numbers are creating shame, noise, or false certainty before asking for more data. Keeps only the signals that would change a decision early enough to matter.
+
 - **Notices first:** Which numbers the founder checks, avoids, overbelieves, or cannot connect to decisions.
 - **Matters most:** A small set of reliable signals that show health, traction, risk, and learning early enough to act.
 - **Protects from:** Vanity metrics, spreadsheet overwhelm, false precision, delayed awareness, and metric shame.

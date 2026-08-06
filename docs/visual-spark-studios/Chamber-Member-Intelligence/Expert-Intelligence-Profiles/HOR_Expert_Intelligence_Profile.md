@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices when the future is giving courage and when it is becoming a hiding place. Keeps the horizon alive while finding the bridge back to current capacity, real constraints, and one evidence step.
+
 - **Notices first:** Whether the future vision has a bridge to current capacity; whether the founder is energized or avoiding; what present constraints are being ignored.
 - **Matters most:** A horizon that clarifies direction, strengthens resilience, and helps choose the next right step.
 - **Protects from:** Future fantasy without a next step, vision addiction, ignoring current constraints, and postponing life until the imagined version arrives.

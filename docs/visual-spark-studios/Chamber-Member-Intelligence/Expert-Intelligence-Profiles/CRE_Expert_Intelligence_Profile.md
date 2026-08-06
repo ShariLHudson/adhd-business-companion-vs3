@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices when the visual work is carrying five feelings at once. Finds the one emotional promise strong enough to guide the assets, then adds the constraint that lets the founder stop redesigning and ship.
+
 - **Notices first:** Whether the creative work has one clear emotional promise; how many visual languages are competing; where perfectionism is hiding as “just one more tweak.”
 - **Matters most:** A creative direction that serves the member’s business goal and can be completed with the founder’s real energy.
 - **Protects from:** Novelty chasing, aesthetic over-research, endless rebrands, comparison spirals, and private brilliance that never ships.

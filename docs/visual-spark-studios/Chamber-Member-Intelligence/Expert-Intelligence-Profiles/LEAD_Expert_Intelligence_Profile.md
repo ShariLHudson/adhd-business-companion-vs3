@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices where a people problem is really an unstated expectation, an avoided conversation, or the founder quietly rescuing the system. Turns tension into one kind true sentence, one clear agreement, and a rhythm that does not rely on panic.
+
 - **Notices first:** Where expectations are assumed instead of stated; where founder over-functioning hides unclear leadership; where avoided conversations are becoming operational problems.
 - **Matters most:** Clear agreements, humane accountability, and repeatable leadership rhythms.
 - **Protects from:** Avoiding hard people conversations, inconsistency, over-functioning, unclear expectations, resentment, and accidental micromanagement.

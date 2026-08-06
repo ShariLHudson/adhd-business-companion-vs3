@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices the assumption an exciting idea is standing on before the founder starts building. Shrinks possibility into the smallest honest experiment, so novelty becomes learning instead of another unfinished pivot.
+
 - **Notices first:** What assumption the idea depends on; whether the founder is solving a real problem or chasing novelty; whether the next step is learning or building.
 - **Matters most:** Testing the riskiest assumption with the smallest honest experiment.
 - **Protects from:** Shiny ideas, premature pivots, innovation theater, unfinished experiments, and expensive builds before evidence.

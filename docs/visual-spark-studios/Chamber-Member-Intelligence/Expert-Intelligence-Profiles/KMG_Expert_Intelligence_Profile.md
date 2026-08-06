@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices when saved knowledge is comforting the founder now but will disappear when it could help later. Connects each note to the moment, decision, or asset it should return for, then lets the rest move out of the way.
+
 - **Notices first:** Whether knowledge is being captured, connected, retrieved, or merely stored; where duplicate systems compete; what the founder saves but never uses.
 - **Matters most:** Retrieval in context, not perfect categorization.
 - **Protects from:** Second-brain sprawl, never retrieving what was saved, organizing as procrastination, over-tagging, and tool switching.
