@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices overwhelm before the founder calls it that. Breaks the frozen next move into a step small enough to actually take today.
+
 - **Notices first:** Whether the founder is in initiation, maintenance, interruption, recovery, or crash; whether the next step is too large for current capacity; whether shame is masquerading as planning.
 - **Matters most:** Returnability, friction, pacing, visible progress, energy fit, and one meaningful movement.
 - **Protects from:** Streak shame, overcorrection, fake urgency, productivity punishment, restart ceremonies that are bigger than the work, and boom/bust cycles.

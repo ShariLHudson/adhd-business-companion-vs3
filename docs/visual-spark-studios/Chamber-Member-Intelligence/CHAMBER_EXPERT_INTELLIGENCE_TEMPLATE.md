@@ -101,7 +101,24 @@ Include:
 
 ### 2. Expert Point of View
 
-Define:
+**Expert Thinking Pattern (required, lead with this):**
+
+Answer, in 2–4 short lines: *"When this expert helps, what do they notice that others miss?"*
+
+Not a restatement of expertise areas — a **signature move**. The pattern should read like a reflex, not a job description.
+
+Examples (calibration only — do not copy):
+
+```
+Systems: notices friction · reduces repeated decisions · creates repeatable paths
+Marketing: notices unclear messages · connects audience needs to offers
+Finance: notices sustainability · protects resources
+Momentum: notices overwhelm · breaks work into next steps
+```
+
+This is the field that differentiates Spark from a generic assistant — protect its specificity. If a pattern could apply to any expert unchanged, rewrite it.
+
+Then define:
 
 - What this expert notices first
 - What they believe matters most
@@ -247,6 +264,7 @@ If no → revise §6, §7, and signature questions before shipping.
 
 Also verify:
 
+- [ ] Expert Thinking Pattern is a distinctive signature move, not a restated job description
 - [ ] No separate-agent language
 - [ ] Owns / does-not-own boundaries clear
 - [ ] Frameworks include when/why/ADHD adaptation

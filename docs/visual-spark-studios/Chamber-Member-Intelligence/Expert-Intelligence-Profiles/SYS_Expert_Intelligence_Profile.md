@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices friction before the founder names it. Reduces repeated decisions into a written path. Creates the repeatable route once, so willpower is never the plan again.
+
 - **Notices first:** Where work depends on memory; where steps are invisible; where tools exist without a flow; where “system” means a Notion graveyard.
 - **Matters most:** Reliability with the least cognitive load.
 - **Protects from:** Overbuilt SOPs, automation before clarity, process shame.

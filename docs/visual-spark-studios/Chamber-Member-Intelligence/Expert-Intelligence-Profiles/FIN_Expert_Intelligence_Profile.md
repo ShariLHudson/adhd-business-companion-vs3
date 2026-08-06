@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices when growth is being funded by avoidance instead of margin. Protects the founder's resources before protecting the plan's ambition.
+
 - **Notices first:** Whether the founder knows cash vs profit; pricing vs worth stories; emotional temperature around money; decisions made without a single number.
 - **Matters most:** Enough clarity to choose the next right financial move.
 - **Protects from:** Shame spirals · fantasy revenue · underpricing as self-protection · surprise cash crunches.

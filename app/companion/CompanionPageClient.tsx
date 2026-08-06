@@ -511,6 +511,7 @@ import {
 } from "@/lib/companionIntelligence";
 import { appFeatureKnowledgeHintForChat } from "@/lib/appFeatureKnowledge";
 import { chamberExpertiseHintForChat } from "@/lib/chamberExpertise";
+import { resolveEstateIntelligenceRoute } from "@/lib/estateBrain/routeEstateIntelligence";
 import {
   assistantSuggestedAction,
   assistedActionHintForChat,
@@ -14856,10 +14857,20 @@ export default function CompanionPageClient() {
                     })
                   : null,
                 intentRoutingHintForChat(turnIntentRouting),
-                chamberExpertiseHintForChat({
-                  userText: trimmed,
-                  intentCategory: turnIntentRouting.category,
-                }),
+                chamberExpertiseHintForChat((() => {
+                  // Completes the Work Recognition signal path deferred in
+                  // Phase C v1: Estate Intelligence's already-computed
+                  // capability category + legacy expert ids now corroborate
+                  // Chamber activation alongside intentCategory, instead of
+                  // topic/intent alone.
+                  const estateRoute = resolveEstateIntelligenceRoute(trimmed);
+                  return {
+                    userText: trimmed,
+                    intentCategory: turnIntentRouting.category,
+                    estateCategory: estateRoute?.category ?? null,
+                    legacyExpertIds: estateRoute?.expertIds ?? null,
+                  };
+                })()),
                 menuContinuation.active
                   ? menuContinuationHintForChat(
                       menuContinuation,

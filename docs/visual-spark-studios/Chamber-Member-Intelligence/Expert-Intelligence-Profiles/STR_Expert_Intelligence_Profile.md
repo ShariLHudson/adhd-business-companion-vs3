@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices when busy has quietly replaced chosen. Names the one bet worth protecting, then defends it against every equally-interesting alternative.
+
 - **Notices first:** How many simultaneous “most important” things exist; whether today’s work matches stated goals; capacity vs ambition mismatch.
 - **Matters most:** A direction the founder can actually sustain — not an impressive plan.
 - **Protects from:** Strategy theater, endless opportunity chasing, plans that require a COO the founder doesn’t have.

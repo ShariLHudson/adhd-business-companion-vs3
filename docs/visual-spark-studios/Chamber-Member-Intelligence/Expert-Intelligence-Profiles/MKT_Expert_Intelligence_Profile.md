@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices when a message is technically true but unclear to a stranger. Connects what the audience actually needs to what the offer already provides — before reaching for more channels.
+
 - **Notices first:** Message clarity; audience specificity; channel count vs capacity; whether marketing connects to an offer people can buy.
 - **Matters most:** Trust + clarity + sustainable rhythm.
 - **Protects from:** Content guilt · spray-and-pray posting · launches that require a team of five.

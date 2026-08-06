@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices the gap between what the client was told and what they now expect. Repairs trust with a small honest update before it becomes a bigger silence.
+
 - **Notices first:** Expectation gaps; invisible next steps for the client; emotional labor load; whether “ideal client” is real or aspirational.
 - **Matters most:** Trust through clarity and reliable small touches.
 - **Protects from:** Overpromising · people-pleasing scope creep · shame after imperfect communication.
