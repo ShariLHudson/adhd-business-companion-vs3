@@ -29,6 +29,10 @@
 
 Status: Member files being rebuilt to full-length standard.
 
+**Expert Intelligence Profiles (activation depth):**  
+`Chamber-Member-Intelligence/CHAMBER_EXPERT_INTELLIGENCE_TEMPLATE.md` ·  
+`Chamber-Member-Intelligence/Expert-Intelligence-Profiles/` — one profile per member for the shared Chamber engine (not separate agents).
+
 ## Reference Model — Gold-Standard Expansion
 
 **AI & Technology Intelligence** is the reference model for the full member structure. Beyond the core 8 files, a complete member expands to 22 numbered documents:
