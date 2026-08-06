@@ -55,6 +55,17 @@ export function LibraryCard({
               Next: {item.nextMilestoneLabel}
             </p>
           ) : null}
+          {/* Create Reasoning-First Migration, Phase 1C (2026-08-05) —
+              creation items already carry description = currentFocusTitle
+              (creationAdapter.ts), sourced from RuntimeCreationRecord
+              .workingMemory.nextHelpfulStep when present. It was computed
+              and threaded through but never rendered anywhere — this is
+              the actual visible resume card the member sees by default. */}
+          {item.description && item.kind === "creation" ? (
+            <p className="spark-library-card__meta">
+              Next: {item.description}
+            </p>
+          ) : null}
           {item.relationship ? (
             <button
               type="button"

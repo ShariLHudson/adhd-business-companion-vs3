@@ -219,7 +219,12 @@ export function registerCreationDestinationWorkspace(
     workspaceId: runtime.id,
     creationType: typeLabel,
     title,
-    currentFocusTitle: focus.title,
+    // Create Reasoning-First Migration, Phase 1C (2026-08-05) — prefer the
+    // Working Memory next-step phrase ("Continue with Intended User") over
+    // the bare section label. Reuses an already-wired field; nothing new is
+    // plumbed. Falls back to today's label for records / Build Types with
+    // no Working Memory yet.
+    currentFocusTitle: runtime.workingMemory?.nextHelpfulStep || focus.title,
     currentFocusId: focus.focusId,
     progressLabel:
       status === "Draft Ready" ? "Draft ready for review" : progressLabel,

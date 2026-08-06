@@ -24,7 +24,7 @@ export type CreationDurableHydrationResult = {
   message?: string;
 };
 
-function entryFromAuthoritative(
+export function entryFromAuthoritative(
   record: AuthoritativeCreationRecord
 ): ActiveWorkspaceEntry {
   const draft = record.payload.draft?.trim() || null;
@@ -41,11 +41,22 @@ function entryFromAuthoritative(
     draftContent: draft,
     workspacePhaseLabel: draft ? "Draft ready" : "Shaping",
   });
+  // Create Reasoning-First Migration, Phase 1C (2026-08-05) — the same
+  // Working Memory preference as registerCreationDestinationWorkspace, here
+  // for the fresh-login DB-hydration path, which previously hardcoded null
+  // and showed nothing until the member actively reopened the creation.
+  // Already persisted additively via mapping.ts (SOP Phase 2) — read only.
+  const nextHelpfulStep =
+    (
+      record.payload.workflowSnapshot as {
+        workingMemory?: { nextHelpfulStep?: string | null };
+      } | null
+    )?.workingMemory?.nextHelpfulStep || null;
   return {
     workspaceId: record.workspaceId,
     creationType: record.creationType,
     title: record.title,
-    currentFocusTitle: null,
+    currentFocusTitle: nextHelpfulStep,
     currentFocusId: record.payload.currentFocusId
       ? `section:${record.payload.currentFocusId}`
       : null,

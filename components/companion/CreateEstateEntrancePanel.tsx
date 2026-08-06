@@ -35,6 +35,7 @@ import {
 } from "@/lib/createEstate/createIntentConfirmation";
 import type { ActiveCreationWorkspaceSummary } from "@/lib/createEstate/listActiveCreationWorkspaces";
 import { listActiveCreationWorkspaces } from "@/lib/createEstate/listActiveCreationWorkspaces";
+import { getRuntimeCreationRecord } from "@/lib/currentFocus/creationRecord";
 import {
   resolveSuggestionContext,
 } from "@/lib/createEstate/contextAwareSuggestions";
@@ -267,6 +268,13 @@ export function CreateEstateEntrancePanel({
   }, []);
 
   function resumeWorkId(workId: string, artifactType: string): boolean {
+    // Create Reasoning-First Migration, Phase 1C (2026-08-05) — same
+    // Working Memory preference as registerCreationDestinationWorkspace;
+    // this is the ambiguity-clarify resume path's own construction site,
+    // so it needs the same fallback wired here too.
+    const nextAction =
+      getRuntimeCreationRecord(workId)?.workingMemory?.nextHelpfulStep ||
+      "Continue";
     const result = onResumeCreationWorkspace({
       id: workId,
       title: artifactType,
@@ -276,7 +284,7 @@ export function CreateEstateEntrancePanel({
       eventRecordId: workId,
       creationRecordId: workId,
       projectHomeId: null,
-      nextAction: "Continue",
+      nextAction,
     });
     if (result && typeof result === "object" && "ok" in result) {
       return Boolean(result.ok);
