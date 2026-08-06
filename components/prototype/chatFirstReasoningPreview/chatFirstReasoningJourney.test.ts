@@ -19,6 +19,11 @@ import {
   journeyFor,
   OPENING_QUESTION,
   OPENING_SUPPORT,
+  RESEARCH_DECLINE_LINE,
+  RESEARCH_KEPT_NOTE,
+  RESEARCH_RETURN_LINE,
+  researchAcceptMessages,
+  researchDeclineMessages,
   researchOfferFor,
   startJourney,
   thinkingHelpFor,
@@ -129,6 +134,28 @@ describe("SOP journey — the founder-specified script", () => {
   });
 });
 
+describe("research as a capability at every step", () => {
+  it("accepted research shows the concept finding, keeps the learning, and returns to the exact question", () => {
+    const started = startJourney("I want to plan a workshop.");
+    let state = started!.state;
+    state = answerCurrentQuestion(state, "Run discovery calls confidently").state;
+
+    const q2 = currentQuestion(state)!;
+    const messages = researchAcceptMessages(state);
+    expect(messages[0]).toBe(journeyFor("workshop").researchPreviewFinding);
+    expect(messages[1]).toBe(RESEARCH_KEPT_NOTE);
+    expect(messages.at(-1)).toBe(`${RESEARCH_RETURN_LINE}\n\n${q2.prompt}`);
+  });
+
+  it("declined research adds no friction and still returns to the exact question", () => {
+    const started = startJourney("I need a newsletter.");
+    const q1 = currentQuestion(started!.state)!;
+    const messages = researchDeclineMessages(started!.state);
+    expect(messages[0]).toBe(RESEARCH_DECLINE_LINE);
+    expect(messages.at(-1)).toBe(`${RESEARCH_RETURN_LINE}\n\n${q1.prompt}`);
+  });
+});
+
 describe("the one universal pattern across journeys", () => {
   it("every journey has three authored questions with help and recap", () => {
     for (const id of ALL_JOURNEYS) {
@@ -141,7 +168,25 @@ describe("the one universal pattern across journeys", () => {
         expect(q.recapLabel.trim()).not.toBe("");
       }
       expect(journey.researchOffer).toMatch(/^Would it help if I/);
+      expect(journey.researchPreviewFinding).toContain("Concept demonstration");
+      expect(journey.openDecisionNote).toMatch(/^One thing we haven't settled yet/);
     }
+  });
+
+  it("names one unsettled decision at journey close, before suggesting direction", () => {
+    const { sparkLines } = runFullJourney("I need a marketing strategy.", [
+      "Steady inquiries",
+      "Local creatives",
+      "Posted sporadically",
+    ]);
+    const decisionIndex = sparkLines.indexOf(
+      journeyFor("marketing").openDecisionNote,
+    );
+    const directionIndex = sparkLines.findIndex((line) =>
+      line.includes("nothing gets created until you say go"),
+    );
+    expect(decisionIndex).toBeGreaterThan(-1);
+    expect(directionIndex).toBeGreaterThan(decisionIndex);
   });
 
   it("thinking help follows the current question as it advances", () => {
@@ -200,6 +245,10 @@ describe("what the preview must never show", () => {
       const journey = journeyFor(id);
       const lines = [
         journeyAcknowledgment(id, journey.chipExample),
+        journey.researchPreviewFinding,
+        journey.openDecisionNote,
+        RESEARCH_KEPT_NOTE,
+        RESEARCH_DECLINE_LINE,
         ...journey.questions.flatMap((q) => [
           q.prompt,
           q.learnedAcknowledgment,

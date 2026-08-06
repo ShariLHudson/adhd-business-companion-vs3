@@ -9,7 +9,10 @@ import {
   OPENING_SUPPORT,
   PREVIEW_BOUNDARY_REPLY,
   PROGRESS_CAPTION,
-  RESEARCH_CONCEPT_NOTE,
+  RESEARCH_CHOICE_NOT_NOW,
+  RESEARCH_CHOICE_YES,
+  researchAcceptMessages,
+  researchDeclineMessages,
   researchOfferFor,
   startJourney,
   thinkingHelpFor,
@@ -35,6 +38,9 @@ export function ChatFirstReasoningPreviewPage() {
   const [journeyState, setJourneyState] = useState<JourneyState | null>(null);
   const [messages, setMessages] = useState<PreviewMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
+  // Research was offered and awaits the member's choice. Answering the
+  // question instead simply dissolves the offer — research never blocks.
+  const [researchPending, setResearchPending] = useState(false);
 
   const inJourney = journeyState !== null && !isJourneyComplete(journeyState);
   const complete = journeyState !== null && isJourneyComplete(journeyState);
@@ -53,12 +59,14 @@ export function ChatFirstReasoningPreviewPage() {
     setJourneyState(null);
     setMessages([]);
     setInputValue("");
+    setResearchPending(false);
   }
 
   function send(rawText?: string) {
     const text = (rawText ?? inputValue).trim();
     if (!text) return;
     setInputValue("");
+    setResearchPending(false);
     setMessages((prev) => [...prev, { role: "user", content: text }]);
 
     if (journeyState === null) {
@@ -90,7 +98,25 @@ export function ChatFirstReasoningPreviewPage() {
 
   function researchThis() {
     if (!journeyState) return;
-    appendSpark([researchOfferFor(journeyState), RESEARCH_CONCEPT_NOTE]);
+    appendSpark([researchOfferFor(journeyState)]);
+    setResearchPending(true);
+  }
+
+  function chooseResearch(accepted: boolean) {
+    if (!journeyState) return;
+    setResearchPending(false);
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "user",
+        content: accepted ? RESEARCH_CHOICE_YES : RESEARCH_CHOICE_NOT_NOW,
+      },
+    ]);
+    appendSpark(
+      accepted
+        ? researchAcceptMessages(journeyState)
+        : researchDeclineMessages(journeyState),
+    );
   }
 
   return (
@@ -157,7 +183,27 @@ export function ChatFirstReasoningPreviewPage() {
       </ul>
 
       {/* Optional companions to the current question — never required. */}
-      {inJourney ? (
+      {inJourney && researchPending ? (
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => chooseResearch(true)}
+            className="rounded-full bg-[#3d3429] px-4 py-2 text-sm font-semibold text-[#f7f2ea] transition hover:bg-[#2c241c]"
+            data-testid="preview-research-yes"
+          >
+            {RESEARCH_CHOICE_YES}
+          </button>
+          <button
+            type="button"
+            onClick={() => chooseResearch(false)}
+            className="rounded-full border border-[#cfc6b8] bg-white px-4 py-2 text-sm font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0]"
+            data-testid="preview-research-not-now"
+          >
+            {RESEARCH_CHOICE_NOT_NOW}
+          </button>
+        </div>
+      ) : null}
+      {inJourney && !researchPending ? (
         <div className="flex flex-wrap gap-2">
           <button
             type="button"

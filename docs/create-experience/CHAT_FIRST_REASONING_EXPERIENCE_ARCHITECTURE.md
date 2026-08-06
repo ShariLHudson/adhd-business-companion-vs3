@@ -19,6 +19,34 @@ member from idea to working result inside one continuous conversation.
 The output is one result of the conversation. **The product is the thinking
 journey.**
 
+## The entrance (Founder decision, 2026-08-06)
+
+The entrance language remains **"What would you like to create, develop, or
+build?"** — members often *do* know they want to make something, and the
+question honors that. What changes is what happens next: **the member's
+description is the starting point for a conversation, not a classification
+command.** Spark never immediately converts their words into a template or
+Build Type.
+
+## The canonical reasoning process (Founder, 2026-08-06)
+
+Whatever the member wants to create, develop, or build, Spark follows the
+same process:
+
+1. Understand what the member wants to accomplish.
+2. Understand why it matters.
+3. Understand who it is for.
+4. Understand what already exists.
+5. Identify what is missing, unknown, or needs a decision.
+6. Help the member think through the next best step.
+7. Offer research whenever additional information could improve the decision.
+8. Use research, examples, expertise, or existing information as needed.
+9. Return to the exact step or decision being worked on.
+10. Continue guiding, creating, reviewing, implementing, and improving.
+
+Steps 7–9 can occur at **any** point — they are a loop available inside every
+other step, not a phase.
+
 ## The universal journey (invisible to the member)
 
 Every kind of work moves through the same arc. The member never sees these
@@ -130,16 +158,26 @@ being made:
 
 ## How Spark researches
 
-Research is a **capability woven into any moment**, not a destination:
+Research is not a separate destination or phase. It is an **available
+capability at every step**:
 
-- Offered at journey-defined research moments, or whenever a decision is
-  being made on guesswork: "Would it help if I researched … before we decide?"
+- Spark recognizes when additional information could improve understanding
+  or a decision, and offers naturally: "Would it help if I researched …
+  before we decide?" — at journey-defined moments *and* anywhere a decision
+  is resting on guesswork.
 - Always consent-first, always framed by the question it will answer.
+- **The member decides how the research is used** — apply it to the current
+  decision, keep it for later, or set it aside. Research informs; it never
+  overrides.
 - Honest about its mode: interpretation vs. sourced evidence, never invented
   citations (the existing research engine's two-mode honesty is the standard).
 - What returns is **applied, not delivered**: findings arrive as "here's what
-  this suggests for *your* decision," feed the decision point, and are
-  remembered with the work.
+  this suggests for *your* decision," not as a report.
+- **Research and the decisions it shaped are preserved in Working Memory**
+  with the work itself — nothing learned is ever lost.
+- Afterward, Spark **returns the member to the exact step or decision they
+  paused on** — research is never a detour the member has to find their way
+  back from.
 
 ## How Spark suggests
 

@@ -36,6 +36,10 @@ export type BuildJourney = {
   chipExample: string;
   questions: readonly [JourneyQuestion, JourneyQuestion, JourneyQuestion];
   researchOffer: string;
+  /** What accepted research would bring back — concept demonstration only. */
+  researchPreviewFinding: string;
+  /** One thing still unsettled — the "what's missing or needs a decision" beat. */
+  openDecisionNote: string;
 };
 
 export type JourneyState = {
@@ -58,8 +62,17 @@ export const OPENING_SUPPORT =
 export const UNCLEAR_REPLY =
   "I'd love to help. Tell me a little more about what you'd like to create, develop, or build — even a rough version is plenty to start from.";
 
-export const RESEARCH_CONCEPT_NOTE =
-  "(Preview note: research here is a concept demonstration. In the full experience, I'd actually gather this and bring back what matters for your decision.)";
+export const RESEARCH_CHOICE_YES = "Yes — research this";
+
+export const RESEARCH_CHOICE_NOT_NOW = "Not right now";
+
+export const RESEARCH_KEPT_NOTE =
+  "I'd keep what we find — and the decisions it helps you make — with this work, so nothing gets lost.";
+
+export const RESEARCH_RETURN_LINE = "Now, back to where we were:";
+
+export const RESEARCH_DECLINE_LINE =
+  "No problem — research is always here whenever a decision could use it.";
 
 export const PREVIEW_BOUNDARY_REPLY =
   "This is where the preview pauses. In the full experience, we'd carry everything you just shared straight into shaping the real thing together — and nothing would be created until you say go.";
@@ -104,6 +117,10 @@ const JOURNEYS: Record<JourneyId, BuildJourney> = {
     ],
     researchOffer:
       "Would it help if I researched current client onboarding best practices before we design this section?",
+    researchPreviewFinding:
+      "Here's the kind of thing I'd bring back: how other service businesses welcome new clients, the first-week missteps that quietly cost trust, and what clients say makes them feel taken care of — applied to your decisions, not delivered as a report. (Concept demonstration — no real research runs in this preview.)",
+    openDecisionNote:
+      "One thing we haven't settled yet: what should happen when a step doesn't go to plan. That's the kind of decision we'd think through together as we build — not something you need to answer now.",
   },
   workshop: {
     id: "workshop",
@@ -143,6 +160,10 @@ const JOURNEYS: Record<JourneyId, BuildJourney> = {
     ],
     researchOffer:
       "Would it help if I looked into how similar workshops are running right now — lengths, group sizes, what participants respond to — before we design yours?",
+    researchPreviewFinding:
+      "Here's the kind of thing I'd bring back: how workshops like yours are being run right now, what keeps people engaged past the first hour, and where first-time attendees tend to get lost — applied to your design choices, not delivered as a report. (Concept demonstration — no real research runs in this preview.)",
+    openDecisionNote:
+      "One thing we haven't settled yet: how long it should be. That choice follows from the transformation you named — not the other way around — and we'd decide it together.",
   },
   newsletter: {
     id: "newsletter",
@@ -182,6 +203,10 @@ const JOURNEYS: Record<JourneyId, BuildJourney> = {
     ],
     researchOffer:
       "Would it help if I researched what's working in newsletters for audiences like yours before we settle on the shape?",
+    researchPreviewFinding:
+      "Here's the kind of thing I'd bring back: what newsletters your readers already open and why, subject-line patterns that feel human instead of salesy, and the length people actually finish — applied to your choices, not delivered as a report. (Concept demonstration — no real research runs in this preview.)",
+    openDecisionNote:
+      "One thing we haven't settled yet: how often it should arrive. Rhythm matters more than frequency, and it's worth deciding together rather than defaulting to weekly.",
   },
   marketing: {
     id: "marketing",
@@ -220,6 +245,10 @@ const JOURNEYS: Record<JourneyId, BuildJourney> = {
     ],
     researchOffer:
       "Would it help if I researched how businesses like yours are reaching similar audiences right now before we choose a direction?",
+    researchPreviewFinding:
+      "Here's the kind of thing I'd bring back: where businesses like yours are actually finding clients right now, what's working for audiences like the one you described, and what tends to burn people out — applied to your direction, not delivered as a report. (Concept demonstration — no real research runs in this preview.)",
+    openDecisionNote:
+      "One thing we haven't settled yet: where to focus first. We don't need to be everywhere — we need the one place that fits you, and that's a decision we'd make together.",
   },
 };
 
@@ -327,6 +356,7 @@ export function completionMessages(state: JourneyState): string[] {
 
   return [
     recap,
+    journey.openDecisionNote,
     direction,
     "(This preview pauses here. The full experience would continue from this exact conversation into creating together.)",
   ];
@@ -363,4 +393,28 @@ export function thinkingHelpFor(state: JourneyState): string | null {
 
 export function researchOfferFor(state: JourneyState): string {
   return JOURNEYS[state.journeyId].researchOffer;
+}
+
+/**
+ * Member said yes to research: show what it would bring back (concept only),
+ * promise the learning stays with the work, then return them to the exact
+ * question they paused on. Research is a capability at every step — never a
+ * detour they have to find their way back from.
+ */
+export function researchAcceptMessages(state: JourneyState): string[] {
+  const journey = JOURNEYS[state.journeyId];
+  const question = currentQuestion(state);
+  const returnTo = question
+    ? [`${RESEARCH_RETURN_LINE}\n\n${question.prompt}`]
+    : [];
+  return [journey.researchPreviewFinding, RESEARCH_KEPT_NOTE, ...returnTo];
+}
+
+/** Member said not now: no friction, straight back to the exact question. */
+export function researchDeclineMessages(state: JourneyState): string[] {
+  const question = currentQuestion(state);
+  const returnTo = question
+    ? [`${RESEARCH_RETURN_LINE}\n\n${question.prompt}`]
+    : [];
+  return [RESEARCH_DECLINE_LINE, ...returnTo];
 }
