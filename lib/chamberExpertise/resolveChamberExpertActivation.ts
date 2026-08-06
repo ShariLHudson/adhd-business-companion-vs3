@@ -3,7 +3,8 @@
  *
  * Fuses multiple, already-computed Work Recognition signals to decide
  * which Chamber Expert Intelligence Profile(s) — if any — would help Shari
- * think through a request. Not called from the chat runtime yet (Phase C).
+ * think through a request. Called live from the chat runtime via
+ * chamberExpertiseHintForChat.ts since Phase C.
  *
  * Signals fused:
  * - userText topic/vocabulary match against each expert's registry entry

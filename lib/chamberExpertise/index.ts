@@ -1,8 +1,12 @@
 /**
- * Chamber Expert Activation — Phase A/B public exports.
+ * Chamber Expert Activation — public exports (Phase A–D).
  *
- * Not wired into the chat runtime yet (Phase C). See
- * docs/estate/CHAMBER_EXPERT_ACTIVATION_ARCHITECTURE.md.
+ * Live in the companion chat runtime via `chamberExpertiseHintForChat`,
+ * called from `app/companion/CompanionPageClient.tsx`'s existing
+ * `intentHint` stack. See docs/estate/CHAMBER_EXPERT_ACTIVATION_ARCHITECTURE.md,
+ * docs/estate/CHAMBER_ACTIVATION_PHASE_C_PREFLIGHT_REVIEW.md,
+ * docs/estate/CHAMBER_EXPERTISE_CONTRIBUTION_TESTS.md, and
+ * docs/estate/CHAMBER_ACTIVATION_PHASE_D_COLLABORATION_LANGUAGE.md.
  */
 
 export * from "./types";
@@ -21,3 +25,4 @@ export {
 } from "./legacyExpertAliasMap";
 export { resolveChamberExpertActivation } from "./resolveChamberExpertActivation";
 export { chamberExpertiseHintForChat } from "./chamberExpertiseHintForChat";
+export { chamberCollaborationBridgeLine } from "./chamberCollaborationLanguage";
