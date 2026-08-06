@@ -32,6 +32,12 @@ Future Estate reasoning and experience standards (protocol + intelligence librar
 | MJ-001 My Workshop Ideas Are Everywhere | Gold Standard journey — organize before produce; reference quality for all later MJs |
 | Build Type Catalog & Behavior Standard v1 | **Canonical split:** shared engine vs Build-Type knowledge only |
 | Build Type specs v1 | Workshop · Marketing Plan · Offer · Proposal · Client Onboarding (plus catalog stubs for SOP · Checklist · Email) |
+| Universal Build Engine v1 | Shared create/orchestrate flow; explicitly does **not** replace existing engines |
+| Spark Reasoning Engine v1 | Listen → … → Implement → Learn coordination blueprint |
+| Intelligence Activation Matrix v1 | Minimum intelligence for maximum value; suppress unrelated domains |
+| Implementation Intelligence Framework v1 | After result: next action, Projects/Calendar, evidence of completion |
+| Reuse Before Reinvention Principle v1 | Mandatory: Reuse → Extend → Connect → Orchestrate → Create (last) |
+| Spark Constitution v1 | Foundational product beliefs/promise — subordinate to Estate + Relationship + Spec 100 authorities |
 | *(not uploaded)* Library `01` · `02` | Named in library README; Spec 103 / Library Standard stand in |
 
 Runtime mirrors already present for many phases under `lib/estate/sparkEstate*.ts` and `lib/universalCreation/` — treated as **partial encoding**, not as proof of full companion-path wiring.
@@ -349,6 +355,54 @@ Workshop ideas everywhere → first problem is **organization**, not Workshop pr
 | Engine, voice, journey, depth model, recognition confidence, reclassification, cross-build linking, Projects/Calendar/Research/Chamber connections as shared services | Essential/expert/conditional areas, question banks, research triggers, output sets, completion criteria, Spark thinking prompts, template defaults |
 | MJ Library validation process | Per-journey situation knowledge (MJ-001…007) |
 | Chamber collaboration under one companion | Domain reasoning libraries (`XXX-006`) |
+| Reasoning / Activation / Implementation orchestration | Domain modules & Build Type payloads those orchestrators select |
+
+---
+
+## 8. Shared engines & governance (Build Engine · Reasoning · Activation · Implementation · Reuse · Constitution)
+
+These six files describe **how existing capabilities work together**. Several open by saying they do not replace sibling systems. Treat them as orchestration specs — not a mandate to ship six new code engines.
+
+### Behaviors required
+
+| Document | Core requirement |
+|----------|------------------|
+| **Reuse Before Reinvention** | Mandatory preference: Reuse → Extend → Connect → Orchestrate → **Create last**. Five questions before any new capability. |
+| **Spark Constitution** | Companion not document generator; understand before advice; invisible work; leave founder better; Shari voice; protect time/attention/momentum/trust. |
+| **Universal Build Engine** | One shared building experience; Start Freely ↔ Start With Guidance (switch without loss); Light/Guided/Living; 12 adaptive stages (Understand → … → Implement → Continue/Learn); reuse-before-create at entrance. |
+| **Reasoning Engine** | Never begin by deciding what to generate. 12 stages: Listen → Context → Expert → System → Stakeholders → Dependencies → Knowledge → Research? → Guide → Build → Implement → Learn. Hide architecture; sound like Shari. |
+| **Activation Matrix** | Minimum intelligence for maximum value. Always: discovery, context, conversation, trust, So what?, Shari. Only when needed: research, Guided Build, Calendar, Project, Visual Thinking, Chamber, Board. Suppress unrelated domains. |
+| **Implementation Intelligence** | Don’t stop at the document. Next meaningful action; Projects/Calendar/delegation/evidence; suggestions ≠ completed actions; one high-value next step. |
+
+### Existing systems that already support this
+
+| Spec concept | Existing home |
+|--------------|---------------|
+| Reuse before reinvention | Intelligence Blueprint · Phase 21 · Capability Matrix · Observation Mode · Estate Brain “does this exist?” |
+| Spark Constitution beliefs | Spec 100 · Relationship Constitution · The Friend We All Deserve · Specs 105–113 · Spec 118 iceberg |
+| Universal Build flow | `lib/universalCreation/` phases + journey + completion; Phase 11/12; free vs guided create paths |
+| Reasoning stages | Specs 105–114 + Wisdom Loop 120–131; `sparkCoreIntelligence/reasoningEngine` (**implemented, largely off companion path**); frictionless/stabilization as live substitute |
+| Activation / minimum expertise | `estateBrain` routeEstateIntelligence · capability/expert registries · Chamber collaboration · Activation samples ≈ Build Type catalog |
+| Implementation after result | Spec 110/113 · Phase 12 · `sparkEstateCompletionSystem` · Project attach / calendar suggestions in create completion |
+
+### Conflicts
+
+1. **Named engines ≠ new packages** — Universal Build Engine, Reasoning Engine, Activation Matrix, Implementation Intelligence, Knowledge Fingers/Domains/Modules are **labels for orchestration**. Creating `lib/universalBuildEngine2` (etc.) would violate Reuse Before Reinvention and Observation Mode. Map labels → existing code homes.  
+2. **Constitution stack** — Spark Constitution v1 + Design Constitution (`08`) + Estate Constitution + Relationship Constitution + Spec 100. Keep **one authority order**: Estate Architectural Authority + Relationship/Friend DNA + Spec 100–131 win; library/product constitutions are aligned lenses, not peers.  
+3. **Triple conversation OS risk** — Reasoning Engine 12 stages ≈ Spec 107 state machine + Wisdom Loop + live frictionless pipeline. Do not add a fourth. Prefer wiring/consolidating existing.  
+4. **Build flow stage count** — Universal Build Engine’s 12 stages vs Phase 11’s 8 steps are the same journey at different granularity (assemble/polish/verify/implement expanded). Align conceptually inside `universalCreation`; don’t fork journeys.  
+5. **Knowledge Finger naming** — Catalog/engine docs use Fingers/Domains/Modules; repo has Chamber Member libraries + Estate Brain capabilities. Treat as the same knowledge activation problem under One Brain — not three knowledge systems.  
+6. **Implementation vs permission** — Implementation Intelligence may suggest Projects/Calendar/SOPs; Spec 106/110 still require permission before create/connect/schedule. Suggestions must stay invitations.  
+7. **Work-order vs freeze** — These docs describe Create/Business Development Studio ambition. Frozen conversation architecture + Observation Mode still limit prompt/feature churn from single examples; deepen payloads and orchestration first.
+
+### Reusable vs specific (engine layer)
+
+| Reusable orchestration | Specific knowledge selected by orchestration |
+|------------------------|-----------------------------------------------|
+| Reasoning stage order · Activation always-on rules · suppression · reuse preference order | Knowledge Domains/Modules / Chamber `XXX-*` content |
+| Universal Build stages · Free↔Guided switch · Light/Guided/Living | Build Type essential/expert/conditional areas & outputs |
+| Implementation suggestion patterns · evidence-of-completion questions | Type-specific next actions (e.g. workshop follow-up vs SOP training version) |
+| Spark Constitution / Reuse principle (governance) | Situation validations (MJ-*) · priority scores · matrix coverage rows |
 
 ---
 
@@ -356,10 +410,18 @@ Workshop ideas everywhere → first problem is **organization**, not Workshop pr
 
 | Question | Finding |
 |----------|---------|
-| Do these files demand new product architecture? | **No.** Catalog states it does not create another engine. Library Standard states MJ library is not runtime. Principles already live in Estate Constitution, Specs 100–131, `universalCreation`, Estate Brain. |
-| Biggest gap | Deepen Build-Type **knowledge payloads** inside existing plugins; harden recognition so organize-first journeys (MJ-001/002) are not misrouted into premature Build; keep readiness claims honest. |
-| Clearest reusable vs specific split | **Catalog Final Standard** — shared engine + Shari; Build Types supply only type knowledge. MJ files validate situations. Chamber files supply domain reasoning. |
-| Recommended stance under Observation Mode | Author/align Build Type knowledge against `universalCreation` + document profiles. Validate with MJ-001 as Gold Standard. Do not invent Universal Build Engine 2.0, `lib/memberJourney` runtime, or a second constitution. Log conversation misses under the Rule of Three. |
+| Do these files demand new product architecture? | **No.** Universal Build Engine and siblings explicitly coordinate existing capabilities. Reuse Before Reinvention forbids new layers when orchestration would suffice. Library/MJ docs are validation-only. |
+| Biggest gap | Orchestration and Build-Type **knowledge depth** on the live companion/`universalCreation` path; Reasoning Engine exists but is largely unwired; readiness honesty; organize-before-build routing (MJ-001/002). |
+| Clearest reusable vs specific split | **Shared orchestration** (reasoning · activation · build flow · implementation · reuse governance · Shari) vs **payloads** (Build Types · Chamber libraries · MJ situation knowledge). |
+| Recommended stance under Observation Mode | Map every new doc label to an existing home. Extend `universalCreation` + Estate Brain + conversation Specs. Do not invent parallel engines or peer constitutions. Validate with MJ-001 Gold Standard + acceptance/failure signals. Rule of Three before prompt/behavior change. |
+
+### Authority order (for future readers)
+
+1. Estate Architectural Authority (Constitution · Living · Bible)  
+2. Relationship Constitution · The Friend We All Deserve  
+3. Spec 100–103 · Frozen Specs 105–131 · Observation Mode  
+4. Reuse Before Reinvention · Build Type Catalog Final Standard  
+5. Spark Constitution / Design Constitution / Phase protocols / MJ Library — **aligned lenses**, not competing OS  
 
 ---
 
@@ -370,8 +432,9 @@ Workshop ideas everywhere → first problem is **organization**, not Workshop pr
 - `docs/SPARK_WISDOM_LAYER_FRAMEWORK.md` · Specs 120–131
 - `docs/UNIVERSAL_EXPERIENCE_STANDARDS_FRAMEWORK.md` · Spec 103
 - `docs/THE_FRIEND_WE_ALL_DESERVE.md` · Relationship Constitution
+- `docs/architecture/SPARK_INTELLIGENCE_BLUEPRINT.md` · One Brain
 - `docs/MEMBER_JOURNEY_ARCHITECTURE.md` · `docs/ENTREPRENEURIAL_RESILIENCE.md` (T-007)
-- Runtime: `lib/estateBrain/`, `lib/universalCreation/` (journey · registry · profiles · completion), `lib/sparkCoreIntelligence/`, `lib/sparkWisdom/`, Arrival / Plan My Day / Adapt My Day / friction-first continue paths
+- Runtime: `lib/estateBrain/`, `lib/universalCreation/`, `lib/sparkCoreIntelligence/` (incl. reasoningEngine), `lib/sparkWisdom/`, Arrival / Plan My Day / Adapt My Day / friction-first continue paths
 
 ---
 
