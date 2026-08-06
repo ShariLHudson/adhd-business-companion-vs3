@@ -46,6 +46,14 @@ export type WorkingMemoryFields = {
   ownershipContext?: string | null;
   /** Discovery question 3 ("will one person use this, or multiple?"). */
   intendedAudience?: string | null;
+  /**
+   * Universal Reasoning Journey — Create Journey Integration (2026-08-06).
+   * What's working against the member: deadline, budget, time, energy, or
+   * anything that has to stay the same. Carried into the workspace so the
+   * "hands" (Current Focus) never re-asks what the "brain" (the entrance
+   * conversation) already learned.
+   */
+  constraints?: string | null;
 };
 
 export const WORKING_MEMORY_FIELD_KEYS: readonly (keyof WorkingMemoryFields)[] =
@@ -62,6 +70,7 @@ export const WORKING_MEMORY_FIELD_KEYS: readonly (keyof WorkingMemoryFields)[] =
     "connectedAssets",
     "ownershipContext",
     "intendedAudience",
+    "constraints",
   ];
 
 /** Section ids treated as directly answering a Working Memory field, when present. */

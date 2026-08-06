@@ -86,10 +86,13 @@ export const DISCOVERY_QUESTIONS: Record<
       ],
     },
   ],
-  // Chat-First Reasoning Phase 1 — universal Create understanding, in the
-  // acceptance contract's Rule 2 order: outcome → why → who. create-goal is
+  // Universal Reasoning Journey — Create Journey Integration (2026-08-06):
+  // what → why → who → current situation → constraints. create-goal is
   // prefilled from the member's typed request when present; it is asked only
-  // on the guided path where nothing has been typed yet.
+  // on the guided path where nothing has been typed yet. "Missing
+  // information" (the sixth dimension) is not a question — it is Spark's own
+  // observation, surfaced honestly at confirm when a question was skipped
+  // (see missingInformationNoteFor in entranceUnderstanding.ts).
   create_general: [
     {
       id: "create-goal",
@@ -118,6 +121,24 @@ export const DISCOVERY_QUESTIONS: Record<
       prompt: "Who is this for?",
       signalPatterns: [
         /\b(?:for (?:my|our|new|existing) (?:clients?|customers?|team|va|assistant|audience|subscribers?|students?|members|readers)|for myself|just for me)\b/i,
+      ],
+    },
+    {
+      id: "create-existing",
+      slot: "context",
+      prompt:
+        "What's already in place — any notes, drafts, or past versions we can build from, or is this starting fresh?",
+      signalPatterns: [
+        /\b(?:from scratch|starting fresh|already have|written down|existing|documented|draft|previous version|notes)\b/i,
+      ],
+    },
+    {
+      id: "create-constraints",
+      slot: "obstacle",
+      prompt:
+        "Anything working against us here — a deadline, a budget, limited time or energy, something that has to stay the same?",
+      signalPatterns: [
+        /\b(?:deadline|budget|no time|limited time|energy|can'?t change|has to stay|no budget|by (?:friday|monday|tomorrow|next week))\b/i,
       ],
     },
   ],

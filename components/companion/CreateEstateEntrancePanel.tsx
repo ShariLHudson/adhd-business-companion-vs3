@@ -35,6 +35,7 @@ import {
   armEntranceUnderstandingHandoff,
   clearEntranceUnderstandingHandoff,
   startEntranceUnderstanding,
+  startEntranceUnderstandingForCatalogType,
   startGuidedEntranceUnderstanding,
   type EntranceUnderstandingSession,
   type EntranceUnderstandingStep,
@@ -52,7 +53,6 @@ import { queryExploreIdeas } from "@/lib/createEstate/exploreIdeas/search";
 import type { ExploreIdeaResult } from "@/lib/createEstate/exploreIdeas/types";
 import {
   confirmCreateBeginToOpen,
-  resolveCatalogCreateConfirm,
   resolveCreateBeginOutcome,
   switchCreateBeginConfirmType,
   type CreateBeginOutcome,
@@ -323,11 +323,10 @@ export function CreateEstateEntrancePanel({
       return;
     }
     if (outcome.kind === "confirm") {
-      showConfirm(
-        step.acknowledgment
-          ? { ...outcome, message: `${step.acknowledgment}\n\n${outcome.message}` }
-          : outcome,
-      );
+      // entranceUnderstanding.ts already composed the full message
+      // (acknowledgment + missing-information note + confirm question) —
+      // never re-prepend here.
+      showConfirm(outcome);
       return;
     }
     // Defensive — resolveCreateBeginOutcome no longer returns open.
@@ -350,20 +349,23 @@ export function CreateEstateEntrancePanel({
   }
 
   function requestCatalogConfirm(item: CreateCatalogItem) {
-    // A choice from suggested chips, search results, or Browse More /
-    // Help Me Choose all land here — the confirm gate never differs by path.
-    // A catalog pick is not an understanding conversation — never carry a
-    // stale one into its Working Memory handoff.
+    // Universal Reasoning Journey — Create Journey Integration (2026-08-06):
+    // a choice from suggested chips, search results, or Browse Categories
+    // still enters the SAME understanding conversation (why / who / current
+    // situation / constraints) before any workspace opens. The entrance is
+    // the only doorway — no path assumes an artifact type before the
+    // journey reaches it. The explicit type choice itself is honored, never
+    // reclassified (startEntranceUnderstandingForCatalogType routes to
+    // resolveCatalogCreateConfirm, not resolveCreateBeginOutcome).
     completedUnderstandingRef.current = null;
-    setUnderstanding(null);
     setUnderstandingGuided(false);
     setHelpMeChooseOpen(false);
     const resolved = resolveCreateLauncherType(item.label);
-    showConfirm(
-      resolveCatalogCreateConfirm({
-        label: resolved.catalogLabel,
-        requestText: prompt.trim() || null,
-      }),
+    applyUnderstandingStep(
+      startEntranceUnderstandingForCatalogType(
+        resolved.catalogLabel,
+        prompt.trim() || null,
+      ),
     );
   }
 

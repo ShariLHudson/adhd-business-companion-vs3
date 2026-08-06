@@ -128,11 +128,12 @@ describe("isWorkingMemoryEmpty", () => {
 });
 
 describe("WORKING_MEMORY_FIELD_KEYS", () => {
-  it("lists the approved 10 fields plus the 2 added for SOP discovery (Phase 2)", () => {
-    expect(WORKING_MEMORY_FIELD_KEYS).toHaveLength(12);
+  it("lists the approved 10 fields, the 2 added for SOP discovery (Phase 2), and constraints (Create Journey Integration)", () => {
+    expect(WORKING_MEMORY_FIELD_KEYS).toHaveLength(13);
     expect([...WORKING_MEMORY_FIELD_KEYS].sort()).toEqual(
       [
         "connectedAssets",
+        "constraints",
         "decisions",
         "dependencies",
         "desiredResult",

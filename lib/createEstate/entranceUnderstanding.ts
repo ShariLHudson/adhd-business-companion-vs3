@@ -26,6 +26,15 @@
  *
  * The 130 confirm gate is untouched: this module only ever returns the
  * classifier's own confirm/clarify outcomes — it cannot open Work.
+ *
+ * Create Journey Integration (2026-08-06) — the entrance is the ONLY
+ * doorway into a Create workspace: startEntranceUnderstandingForCatalogType
+ * routes catalog/category/search-result picks through this same
+ * conversation (why/who/current situation/constraints) instead of jumping
+ * straight to confirm, so no path ever assumes an artifact type before the
+ * journey reaches it honestly. "Missing information" — the conversation's
+ * sixth dimension — is Spark's own observation (missingInformationNoteFor),
+ * not a seventh question.
  */
 
 import {
@@ -34,6 +43,7 @@ import {
 } from "@/lib/estateBrain/discoveryRegistry";
 import type { DiscoveryQuestion } from "@/lib/estateBrain/discoveryTypes";
 import {
+  resolveCatalogCreateConfirm,
   resolveCreateBeginOutcome,
   type CreateBeginOutcome,
 } from "./resolveCreateBeginOutcome";
@@ -46,6 +56,15 @@ export type EntranceUnderstandingSession = {
   originalText: string;
   answers: Record<string, string>;
   skippedIds: string[];
+  /**
+   * Universal Reasoning Journey — Create Journey Integration (2026-08-06).
+   * Set only when the conversation started from an explicit catalog /
+   * category / search-result pick. The type is never reclassified from
+   * enriched text in that case — the member's explicit choice is honored —
+   * but understanding still runs before any workspace opens (AT-E2: the
+   * entrance is the only doorway; no early template assumption survives).
+   */
+  catalogTypeLabel: string | null;
 };
 
 export type EntranceUnderstandingStep =
@@ -78,6 +97,9 @@ const ANSWER_ACKNOWLEDGMENTS: Record<string, string> = {
     "That's a clear picture of what this should make possible.",
   "create-why": "That's the real reason we're doing this — worth holding onto.",
   "create-audience": "Good to know — that shapes how we write it.",
+  "create-existing": "That helps me know where we're starting from.",
+  "create-constraints":
+    "Good to know — I'll keep that in mind as we shape this.",
   "sop-audience-type": "Good to know — that changes how we shape it.",
   "sop-starting-point": "That helps me know where we're starting from.",
   "sop-audience-size": "That tells us the level of detail we need.",
@@ -114,12 +136,19 @@ function nextQuestion(
 function buildSession(
   topic: EntranceUnderstandingTopic,
   originalText: string,
+  catalogTypeLabel?: string | null,
 ): EntranceUnderstandingSession {
   const text = originalText.trim();
   const answers: Record<string, string> = {};
-  if (topic === "create_general" && text) {
-    // The typed request IS the goal — never ask what they already said.
-    answers["create-goal"] = text;
+  if (topic === "create_general") {
+    if (text) {
+      // The typed request IS the goal — never ask what they already said.
+      answers["create-goal"] = text;
+    } else if (catalogTypeLabel) {
+      // A catalog/category/search-result pick already answers "what" —
+      // never ask it again.
+      answers["create-goal"] = `Create a ${catalogTypeLabel}`;
+    }
   }
   // Same prefill rule as discoveryMode's extractPrefilledAnswers: a question
   // whose signals already appear in the request is already answered (AT-1.3).
@@ -129,7 +158,13 @@ function buildSession(
       answers[q.id] = text;
     }
   }
-  return { topic, originalText: text, answers, skippedIds: [] };
+  return {
+    topic,
+    originalText: text,
+    answers,
+    skippedIds: [],
+    catalogTypeLabel: catalogTypeLabel ?? null,
+  };
 }
 
 function memberText(session: EntranceUnderstandingSession): string {
@@ -145,21 +180,55 @@ function enrichedText(session: EntranceUnderstandingSession): string {
   return [base, ...extras].join(" ").trim();
 }
 
+/**
+ * Rule 2 step 5 — "identify missing information" is Spark's own honest
+ * observation, not another question. Surfaced once, at confirm, only when
+ * something was genuinely left unanswered — never a blocker.
+ */
+function missingInformationNoteFor(
+  session: EntranceUnderstandingSession,
+): string | null {
+  if (session.skippedIds.length === 0) return null;
+  return "A few things are still open — we'll figure those out together as we go.";
+}
+
 function classifyStep(
   session: EntranceUnderstandingSession,
   acknowledgment: string | null,
 ): EntranceUnderstandingStep {
-  const outcome = resolveCreateBeginOutcome(enrichedText(session));
+  // Universal Reasoning Journey — Create Journey Integration (2026-08-06):
+  // an explicit catalog/category pick is never reclassified from enriched
+  // text; the member's own choice is honored. Every other path still
+  // classifies from the full conversation, same as before.
+  const outcome = session.catalogTypeLabel
+    ? resolveCatalogCreateConfirm({
+        label: session.catalogTypeLabel,
+        requestText: memberText(session) || null,
+      })
+    : resolveCreateBeginOutcome(enrichedText(session));
+
   // Identity preservation — titles and originalRequest read outcome.text.
-  if (outcome.kind === "confirm" || outcome.kind === "open") {
-    return {
-      kind: "classify",
-      acknowledgment,
-      outcome: { ...outcome, text: memberText(session) },
-      session,
-    };
+  if (outcome.kind !== "confirm" && outcome.kind !== "open") {
+    return { kind: "classify", acknowledgment, outcome, session };
   }
-  return { kind: "classify", acknowledgment, outcome, session };
+  const withIdentity = { ...outcome, text: memberText(session) };
+  if (withIdentity.kind !== "confirm") {
+    return { kind: "classify", acknowledgment, outcome: withIdentity, session };
+  }
+  // Compose the confirm message once, here, so every caller (typed,
+  // guided, catalog) gets the same reflect-then-note-then-confirm shape
+  // without re-deriving it (Rule 4 / Rule 2 step 5).
+  const messageParts = [
+    acknowledgment,
+    missingInformationNoteFor(session),
+    withIdentity.message,
+  ].filter((part): part is string => Boolean(part));
+  return {
+    kind: "classify",
+    acknowledgment,
+    outcome: { ...withIdentity, message: messageParts.join("\n\n") },
+    session,
+  };
 }
 
 function stepFor(
@@ -198,6 +267,31 @@ export function startEntranceUnderstanding(
 /** Guided path — nothing typed yet; the conversation opens with the goal. */
 export function startGuidedEntranceUnderstanding(): EntranceUnderstandingStep {
   return stepFor(buildSession("create_general", ""), { first: true });
+}
+
+/**
+ * Catalog / category / search-result path — Universal Reasoning Journey,
+ * Create Journey Integration (2026-08-06). "The entrance must become the
+ * only doorway into Create workspaces": a member choosing a type from
+ * Browse Categories or search results still enters the same understanding
+ * conversation (why / who / current situation / constraints) before
+ * anything opens. The type itself is never re-guessed — it was an explicit
+ * choice — only classifyStep's outcome kind changes (resolveCatalogCreateConfirm
+ * instead of resolveCreateBeginOutcome); the question set, acknowledgments,
+ * skip handling, and Working Memory handoff are identical to every other
+ * path.
+ */
+export function startEntranceUnderstandingForCatalogType(
+  typeLabel: string,
+  requestTextHint?: string | null,
+): EntranceUnderstandingStep {
+  const topic: EntranceUnderstandingTopic = SOP_TEXT_RE.test(typeLabel)
+    ? "create_sop"
+    : "create_general";
+  return stepFor(
+    buildSession(topic, requestTextHint ?? "", typeLabel),
+    { first: true },
+  );
 }
 
 /**

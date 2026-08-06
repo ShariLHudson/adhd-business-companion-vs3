@@ -12578,7 +12578,7 @@ export default function CompanionPageClient() {
     setCreateBuilderSession(estateSession);
     createBuilderBootstrappedRef.current = true;
     beginCreationDestinationSession(workspaceId);
-    registerCreationDestinationWorkspace(workflow, {
+    const activeEntry = registerCreationDestinationWorkspace(workflow, {
       projectHomeId: createLinkedProjectHomeId,
     });
     syncCanonicalWorkFromCreateWorkflow({
@@ -12586,24 +12586,36 @@ export default function CompanionPageClient() {
       createWorkflowId: workflow.sessionId,
       projectHomeId: createLinkedProjectHomeId,
     });
-    // Chat-First Reasoning Phase 1 (2026-08-06) — the entrance understanding
-    // conversation's answers land in the record's discoveryAnswers + Working
-    // Memory through the same write path the SOP gate uses, so nothing is
-    // ever asked twice (Rule 5 / AT-B8). One-shot: consuming clears; no-op
-    // when no conversation preceded this open or the record isn't found.
+    // Universal Reasoning Journey — Create Journey Integration (2026-08-06):
+    // the entrance understanding conversation's answers land in the
+    // record's discoveryAnswers + Working Memory through the same write
+    // path the SOP gate uses, so nothing is ever asked twice (Rule 5 /
+    // AT-B8) and the workspace ("the hands") receives everything the
+    // conversation ("the brain") gathered. One-shot: consuming clears;
+    // no-op when no conversation preceded this open.
+    //
+    // Deliberately writes to activeEntry.runtimeCreationRecordId, NOT the
+    // `workspaceId` above — registerCreationDestinationWorkspace's own
+    // ensureRuntimeCreationRecord() prioritizes eventRecordId over
+    // sessionId, while `workspaceId` prioritizes sessionId first; for
+    // guided/event domains (bindEventRecord sets both to DIFFERENT values)
+    // those two ids diverge, and only the ensured id has a real record to
+    // write into. Verified live: without this, a guided Begin (e.g.
+    // Workshop) silently lost every entrance answer.
     const entranceUnderstanding = consumeEntranceUnderstandingHandoff();
     if (entranceUnderstanding) {
+      const recordId = activeEntry.runtimeCreationRecordId || workspaceId;
       for (const [questionId, answer] of Object.entries(
         entranceUnderstanding.answers,
       )) {
         applyDiscoveryAnswerToRuntimeCreationRecord(
-          workspaceId,
+          recordId,
           questionId,
           answer,
         );
       }
       for (const questionId of entranceUnderstanding.skippedIds) {
-        applyDiscoveryAnswerToRuntimeCreationRecord(workspaceId, questionId, "", {
+        applyDiscoveryAnswerToRuntimeCreationRecord(recordId, questionId, "", {
           skip: true,
         });
       }

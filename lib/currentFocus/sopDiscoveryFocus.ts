@@ -29,6 +29,7 @@ type SopDiscoveryFieldTarget = Extract<
   | "intendedAudience"
   | "desiredResult"
   | "whyItMatters"
+  | "constraints"
 >;
 
 /**
@@ -43,6 +44,8 @@ const SOP_DISCOVERY_FIELD_MAP: Record<string, SopDiscoveryFieldTarget> = {
   "sop-audience-size": "intendedAudience",
   "create-outcome": "desiredResult",
   "create-why": "whyItMatters",
+  "create-existing": "existingAssetsFound",
+  "create-constraints": "constraints",
   "create-audience": "intendedAudience",
 };
 

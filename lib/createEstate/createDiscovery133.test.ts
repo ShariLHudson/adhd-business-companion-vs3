@@ -72,7 +72,15 @@ describe("Create Simplification — Find Previous Work + Browse More replace Exp
     expect(panel).toContain("create-estate-intent-confirm");
     expect(panel).toContain("requestCatalogConfirm");
     expect(panel).toContain("onRequestCreate={requestCatalogConfirm}");
-    expect(panel).toContain("resolveCatalogCreateConfirm");
+    // Create Journey Integration (2026-08-06) — a catalog pick now enters
+    // the understanding conversation before confirm; resolveCatalogCreateConfirm
+    // moved into entranceUnderstanding.ts (still the only place that
+    // resolves a catalog pick to a confirm outcome).
+    expect(panel).toContain("startEntranceUnderstandingForCatalogType");
+    const entranceUnderstanding = read(
+      "lib/createEstate/entranceUnderstanding.ts",
+    );
+    expect(entranceUnderstanding).toContain("resolveCatalogCreateConfirm");
     expect(panel).toContain("confirmCreateBeginToOpen");
     expect(panel).toContain("data-max-decision-layers=");
     expect(SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS).toBe(3);

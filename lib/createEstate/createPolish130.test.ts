@@ -52,7 +52,14 @@ describe("Create polish 130 certification", () => {
 
   it("entrance wires catalog confirm from every discovery path + Cancel", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
-    expect(panel).toContain("resolveCatalogCreateConfirm");
+    // Create Journey Integration (2026-08-06) — resolveCatalogCreateConfirm
+    // now lives behind startEntranceUnderstandingForCatalogType in
+    // entranceUnderstanding.ts (the catalog path enters understanding
+    // first); the panel wires the entrance function instead.
+    expect(panel).toContain("startEntranceUnderstandingForCatalogType");
+    expect(
+      read("lib/createEstate/entranceUnderstanding.ts"),
+    ).toContain("resolveCatalogCreateConfirm");
     expect(panel).toContain("requestCatalogConfirm");
     expect(panel).toContain("onRequestCreate={requestCatalogConfirm}");
     expect(panel).not.toContain("requestFrameworkConfirm");
