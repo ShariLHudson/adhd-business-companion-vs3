@@ -680,15 +680,17 @@ This batch clarifies a critical distinction that earlier Finger/Build Type uploa
 
 ### Completed reasoning Fingers (Index) → example Build Types
 
-| Finger | Thinking job | Example Builds |
-|--------|--------------|----------------|
-| Capture & Transfer Expertise | Transfer head-knowledge so others succeed | SOP |
-| Design Transformation | Create change for others | Workshop |
+| Finger (prefer latest names) | Thinking job | Example Builds |
+|------------------------------|--------------|----------------|
+| **Process Transfer** (was Capture & Transfer Expertise) | Transfer head-knowledge so others succeed | SOP, Training, Delegation docs |
+| **Transformation Design** (was Design Transformation) | Create change for others | Workshop, Course, Learning event |
 | Relationship Communication | Trust over time | Newsletter, Social |
 | Strategic Decision Support | Uncertainty → confident choice | Marketing Plan, Financial Decisions |
 | Experience Design | Journey from another person’s view | Travel, Craft Fair, Online Store |
 | Execution Reliability | Reduce memory load / follow-through | Checklist, Inventory |
 | Alignment & Commitment | Shared understanding before commit | Proposal |
+
+Refined Ownership Map **Approval Gate:** do not expand Finger *files/runtime* until ownership boundaries are reviewed — authored drafts may exist; implementation still handoff-gated.
 
 ### New / Tier-1 Fingers in this upload
 
