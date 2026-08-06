@@ -38,6 +38,8 @@ Future Estate reasoning and experience standards (protocol + intelligence librar
 | Implementation Intelligence Framework v1 | After result: next action, Projects/Calendar, evidence of completion |
 | Reuse Before Reinvention Principle v1 | Mandatory: Reuse → Extend → Connect → Orchestrate → Create (last) |
 | Spark Constitution v1 | Foundational product beliefs/promise — subordinate to Estate + Relationship + Spec 100 authorities |
+| Context · Systems · Stakeholder · Dependency Intelligence Frameworks v1 | Reusable orchestration intelligences named by Reasoning Engine / Activation Matrix |
+| Event Operations Knowledge Modules v1 | Run of Show · Hospitality/Green Room · Venue · AV — **domain payloads** under Event Operations |
 | *(not uploaded)* Library `01` · `02` | Named in library README; Spec 103 / Library Standard stand in |
 
 Runtime mirrors already present for many phases under `lib/estate/sparkEstate*.ts` and `lib/universalCreation/` — treated as **partial encoding**, not as proof of full companion-path wiring.
@@ -422,6 +424,61 @@ These six files describe **how existing capabilities work together**. Several op
 3. Spec 100–103 · Frozen Specs 105–131 · Observation Mode  
 4. Reuse Before Reinvention · Build Type Catalog Final Standard  
 5. Spark Constitution / Design Constitution / Phase protocols / MJ Library — **aligned lenses**, not competing OS  
+
+---
+
+## 9. Cross-cutting intelligence frameworks + Event Operations knowledge modules
+
+Activation Matrix / Reasoning Engine stages name several “intelligences.” These eight uploads clarify which are **reusable orchestration** vs **domain knowledge payloads**.
+
+### Reusable orchestration frameworks (activate across Builds)
+
+| Framework | Question it answers | Behavior required |
+|-----------|---------------------|-------------------|
+| **Context Intelligence** | What is true right now? | Don’t re-ask; restore leave-off point; adapt depth; next meaningful step; states (stuck, returning, waiting, finishing…) |
+| **Systems Intelligence** | What larger system is this part of? | Reason across strategy/ops/CX/calendar/etc.; surface only important impacts (e.g. workshop date move) |
+| **Stakeholder Intelligence** | Who is affected and what do they need? | Hidden stakeholder matrix; needs/responsibilities/comms/risks — reusable across every Guided Build |
+| **Dependency Intelligence** | What ripple effects matter? | Time/people/resources/info/ops dependencies; surface only material ripples; what can stay unchanged |
+
+These belong in the **shared reasoning/activation layer** — not inside a single Build Type or Event module.
+
+### Existing systems that already approximate them
+
+| Framework | Existing support |
+|-----------|------------------|
+| Context | Spec 112/117 memory · session/continue · Arrival · `conversationSession` · create resume · frictionless context hints |
+| Systems | Estate Brain capability routing · Chamber collaboration · Business Brain connections · Systems Intelligence Chamber library (`SYS-*`) as domain content |
+| Stakeholder | Build Type “stakeholders” fields · proposal/onboarding/workshop profiles · expert registries |
+| Dependency | Adaptation / Adapt My Day · project lifecycle docs · event ripple examples in Dependency framework itself |
+
+None requires a new parallel “Context Engine” package if orchestration can extend Estate Brain + conversation context + `universalCreation` session state.
+
+### Domain knowledge modules (Event Operations) — Build-/domain-specific
+
+| Module | Parent | Role |
+|--------|--------|------|
+| Run of Show & Live Event Management | Event Operations | Live lifecycle, ROS columns, transitions, contingencies |
+| Hospitality & Green Room Management | Event Operations | Guest care logistics (speakers/VIPs/attendees) — **not** Spec 111 Spark Hospitality™ |
+| Venue & Facility Management | Event Operations | Requirements → contract → layout → teardown |
+| AV & Technology Management | Event Operations | Tech lifecycle, equipment, presenter readiness, backups |
+
+These are **payloads** selected when Event Operations / Workshop-Living / event Builds activate — same class as Chamber `XXX-*` libraries and Build Type expert areas.
+
+### Conflicts / naming traps
+
+1. **“Hospitality” collision** — Spec 111 Spark Hospitality™ = emotional companion OS. Event “Hospitality & Green Room” = venue guest logistics. Never merge into one system; keep names disambiguated in implementation notes.  
+2. **Systems Intelligence Framework vs `SYS-*` Chamber library** — Framework = cross-cutting orchestration; Chamber Systems Intelligence = domain expertise library. Same word, two layers (orchestrator vs payload).  
+3. **Do not turn four frameworks into four products** — Reuse Before Reinvention: extend Activation/Reasoning orchestration; store Event modules as knowledge, not new rooms/engines.  
+4. **Overwhelm risk** — Systems + Dependency examples (workshop delay → 10 ripples) must obey Activation suppression and one-question / few-choices rules; surface only what matters now.  
+5. **Event modules vs Workshop Build Type** — Workshop Build Type may *activate* these modules when living/event-deep; modules must not invent a separate Workshop OS.
+
+### Updated split
+
+| Reusable architecture | Specific knowledge |
+|-----------------------|--------------------|
+| Context · Systems · Stakeholder · Dependency thinking models (orchestration) | Event Ops modules (ROS, Green Room, Venue, AV) |
+| When/whether to activate them (Activation Matrix) | Conditional expert areas inside Workshop / event Builds |
+| How results connect to Projects/Calendar (Implementation) | Checklists, ROS templates, equipment lists, dietary matrices |
 
 ---
 
