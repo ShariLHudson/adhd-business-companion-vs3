@@ -26,7 +26,7 @@ describe("Create Simplification — Find Previous Work + Browse More replace Exp
     expect(panel).not.toContain('data-testid="create-estate-explore-ideas"');
     expect(panel).toContain("create-estate-find-previous-work");
     // Entrance Cleanup (2026-08) — renamed from "Browse More", now the
-    // single category-picker mount nested in Start With Guidance.
+    // single category-picker mount, reached only through the understanding conversation's examples fallback (never a first-screen choice).
     expect(panel).toContain("create-estate-browse-categories");
     expect(panel).not.toContain("create-estate-guided-frameworks");
     expect(panel).not.toContain("UniversalBlueprintInterface");
@@ -53,7 +53,7 @@ describe("Create Simplification — Find Previous Work + Browse More replace Exp
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     const prevAt = panel.indexOf('data-testid="create-estate-find-previous-work"');
     // Entrance Cleanup (2026-08) — Browse Categories now nests inside the
-    // composer section (under Start With Guidance), ahead of Find Previous
+    // composer section (behind the examples fallback), ahead of Find Previous
     // Work, instead of following it as a separate page section.
     const browseAt = panel.indexOf(
       'data-testid="create-estate-browse-categories"',

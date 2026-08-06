@@ -56,16 +56,37 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
       "Tell me what you're thinking about, even if it's not fully formed yet...",
     );
 
-    // Phase 0 (Create Entrance Copy and Path Relabel) — Start Freely /
-    // Start With Guidance primary action labels; same underlying handlers.
+    // Universal Reasoning Journey Build Order Step 1 (Founder, 2026-08-06) —
+    // one front door, one primary action; no Start Freely / Start With
+    // Guidance choice labels.
     expect(
       container.querySelector("[data-testid='create-estate-start-creating']")
         ?.textContent,
-    ).toContain("I know where I want to begin");
+    ).toContain("Let's begin");
     expect(
       container.querySelector("[data-testid='create-estate-help-me-choose']")
         ?.textContent,
     ).toContain("Help me figure this out");
+  });
+
+  it("Universal Reasoning Journey Build Order Step 1 — the front door is one question, no Start Freely / Start With Guidance choice", () => {
+    renderPanel();
+    const heading = container.querySelector(
+      "#create-estate-composer-heading",
+    );
+    expect(heading?.textContent).toBe(
+      "What would you like to create, plan, develop, or build?",
+    );
+    expect(
+      container.querySelector("[data-testid='create-estate-start-freely']"),
+    ).toBeNull();
+    expect(
+      container.querySelector("[data-testid='create-estate-start-with-guidance']"),
+    ).toBeNull();
+    // Categories are never a first-screen click target.
+    expect(
+      container.querySelector("[data-testid='create-estate-browse-categories']"),
+    ).toBeNull();
   });
 
   it("Entrance Cleanup (2026-08) — never shows artifact-specific quick-choice chips", () => {
@@ -201,15 +222,16 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
     ).toBeTruthy();
   });
 
-  it("Entrance Cleanup (2026-08) — Start Freely engagement narrows to a focused writing surface", () => {
+  it("Entrance engagement narrows to a focused writing surface (Universal Reasoning Journey Build Order Step 1)", () => {
     renderPanel();
     const input = container.querySelector<HTMLTextAreaElement>(
       "[data-testid='create-estate-nl-input']",
     )!;
 
-    // Before engagement — both paths visible.
+    // Before engagement — the secondary "help me figure this out" link and
+    // Find Previous Work are both visible.
     expect(
-      container.querySelector("[data-testid='create-estate-start-with-guidance']"),
+      container.querySelector("[data-testid='create-estate-help-me-choose']"),
     ).toBeTruthy();
     expect(
       container.querySelector("[data-testid='create-estate-find-previous-work']"),
@@ -224,10 +246,10 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
       input.dispatchEvent(new Event("input", { bubbles: true }));
     });
 
-    // Engaged — the alternate path and secondary navigation step aside;
-    // the input and its own Begin button remain.
+    // Engaged — the secondary link and Find Previous Work step aside; the
+    // input and its own Begin button remain.
     expect(
-      container.querySelector("[data-testid='create-estate-start-with-guidance']"),
+      container.querySelector("[data-testid='create-estate-help-me-choose']"),
     ).toBeNull();
     expect(
       container.querySelector("[data-testid='create-estate-find-previous-work']"),
@@ -246,9 +268,9 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
       input.blur();
     });
 
-    // Cleared and blurred — reverts to showing both paths again.
+    // Cleared and blurred — reverts to showing the secondary link again.
     expect(
-      container.querySelector("[data-testid='create-estate-start-with-guidance']"),
+      container.querySelector("[data-testid='create-estate-help-me-choose']"),
     ).toBeTruthy();
   });
 

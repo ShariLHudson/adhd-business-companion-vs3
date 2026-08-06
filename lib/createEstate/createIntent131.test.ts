@@ -84,7 +84,7 @@ describe("Spec 131 — Create intent intelligence", () => {
     expect(panel).toContain("create-estate-also-considered");
     expect(panel).toContain("switchCreateBeginConfirmType");
     // Entrance Cleanup (2026-08) — renamed from "Browse More", now the
-    // single category-picker mount nested in Start With Guidance.
+    // single category-picker mount, reached only through the understanding conversation's examples fallback (never a first-screen choice).
     expect(panel).toContain("create-estate-browse-categories");
     expect(panel).toContain("data-max-decision-layers=");
     expect(SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS).toBe(3);

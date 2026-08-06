@@ -138,12 +138,15 @@ export const CREATE_ESTATE_PREVIOUS_WORK_EMPTY =
 export const CREATE_ESTATE_UNDO_CREATE_LABEL = "Undo create";
 
 /**
- * Create Simplification & Category Evaluation — simplified default screen.
- * Replaces the composer/Begin framing with "What would you like to create?"
- * so the default screen answers one question before any browsing happens.
+ * Universal Reasoning Journey Build Order Step 1 (Founder, 2026-08-06) —
+ * "plan, develop, or build" included: many meaningful member goals are
+ * experiences, processes, or outcomes, not just artifacts. The user
+ * answers; Spark determines the journey. This is the entire front door —
+ * no Start Freely / Start With Guidance / Categories choice precedes it.
+ * @see docs/create-experience/UNIVERSAL_REASONING_JOURNEY_ACCEPTANCE_TESTS.md
  */
 export const CREATE_ESTATE_WHAT_WOULD_YOU_LIKE_HEADING =
-  "What would you like to create?";
+  "What would you like to create, plan, develop, or build?";
 
 /**
  * Phase 0 follow-up (Start Freely empty-state UX) — conversational, not a
@@ -163,11 +166,12 @@ export const CREATE_ESTATE_UNDERSTANDING_EXAMPLES_LABEL =
   "Prefer to look at examples instead?";
 
 /**
- * Phase 0 (Create Entrance Copy and Path Relabel) — primary action for the
- * Start Freely path. Still the existing free-text Begin behavior; only the
- * label changed.
+ * Universal Reasoning Journey Build Order Step 1 (2026-08-06) — one
+ * primary action for the one front door. Previously "I know where I want
+ * to begin" (a Start Freely / Start With Guidance choice label); that
+ * choice no longer exists.
  */
-export const CREATE_ESTATE_START_CREATING_LABEL = "I know where I want to begin";
+export const CREATE_ESTATE_START_CREATING_LABEL = "Let's begin";
 
 /**
  * Phase 0 — primary action for the Start With Guidance path. Still the
@@ -186,12 +190,19 @@ export const CREATE_ESTATE_ENTRANCE_INVITATION =
   "Tell me what you're working on, and we'll figure out the best way forward together.";
 
 /** Start Freely — reuses the existing free-text Begin path (Phase 0). */
+/**
+ * @deprecated Universal Reasoning Journey Build Order Step 1 (2026-08-06) —
+ * the entrance no longer offers Start Freely / Start With Guidance as a
+ * choice; one question is the front door. Kept for string history only.
+ */
 export const CREATE_ESTATE_START_FREELY_HEADING = "Start Freely";
 export const CREATE_ESTATE_START_FREELY_DESCRIPTION =
   "Begin anywhere. Shari can help you organize your thoughts, research ideas, improve your work, or add structure whenever it becomes helpful.";
 
 /** Start With Guidance — reuses the existing Help Me Choose path (Phase 0). */
+/** @deprecated see CREATE_ESTATE_START_FREELY_HEADING. */
 export const CREATE_ESTATE_START_WITH_GUIDANCE_HEADING = "Start With Guidance";
+/** @deprecated see CREATE_ESTATE_START_FREELY_HEADING. */
 export const CREATE_ESTATE_START_WITH_GUIDANCE_DESCRIPTION =
   "Shari helps you think it through, notices what may be missing, researches when helpful, and builds the result with you one step at a time.";
 

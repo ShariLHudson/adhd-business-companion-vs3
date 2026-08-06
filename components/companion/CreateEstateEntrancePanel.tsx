@@ -21,12 +21,8 @@ import {
   CREATE_ESTATE_NO_SEARCH_RESULTS_MESSAGE,
   CREATE_ESTATE_OPEN_FAILED_MESSAGE,
   CREATE_ESTATE_START_CREATING_LABEL,
-  CREATE_ESTATE_START_FREELY_DESCRIPTION,
-  CREATE_ESTATE_START_FREELY_HEADING,
   CREATE_ESTATE_START_NEW_LABEL,
   CREATE_ESTATE_START_NEW_READY_MESSAGE,
-  CREATE_ESTATE_START_WITH_GUIDANCE_DESCRIPTION,
-  CREATE_ESTATE_START_WITH_GUIDANCE_HEADING,
   CREATE_ESTATE_UNDERSTANDING_CONTINUE_LABEL,
   CREATE_ESTATE_UNDERSTANDING_EXAMPLES_LABEL,
   CREATE_ESTATE_UNDERSTANDING_PLACEHOLDER,
@@ -785,100 +781,71 @@ export function CreateEstateEntrancePanel({
           ) : null}
 
           <div className="flex flex-col items-start gap-3">
-            {/* Phase 0 — Start Freely / Start With Guidance both reuse the
-                existing free-text Begin and Help Me Choose paths below;
-                only the framing copy and grouping are new. */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <div
-                className="flex max-w-sm flex-col gap-2 rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
-                data-testid="create-estate-start-freely"
+            {/* Universal Reasoning Journey Build Order Step 1 (Founder,
+                2026-08-06) — the front door is one question and one action.
+                No Start Freely / Start With Guidance / Categories choice
+                precedes it (removed). "Help me figure this out" starts the
+                SAME understanding conversation as typing (entry-path
+                consistency) — it does not open a competing surface. The
+                category browser is reachable only from inside that
+                conversation's own examples fallback (cancelUnderstandingToExamples),
+                never as a first-screen choice. */}
+            <div className="flex flex-wrap items-center gap-4">
+              <button
+                type="button"
+                onClick={submitPrompt}
+                disabled={beginBusy}
+                aria-busy={beginBusy}
+                className="self-start rounded-xl bg-[#3d3429] px-6 py-3 text-base font-semibold text-[#f7f2ea] transition enabled:hover:bg-[#2c241c] disabled:cursor-wait disabled:opacity-70"
+                data-testid="create-estate-start-creating"
+                data-primary-action="begin"
               >
-                <h3 className="text-base font-semibold text-[#1f1c19]">
-                  {CREATE_ESTATE_START_FREELY_HEADING}
-                </h3>
-                <p className="text-sm leading-relaxed text-[#6b635a]">
-                  {CREATE_ESTATE_START_FREELY_DESCRIPTION}
-                </p>
+                {beginBusy
+                  ? "Beginning…"
+                  : understanding
+                    ? CREATE_ESTATE_UNDERSTANDING_CONTINUE_LABEL
+                    : CREATE_ESTATE_START_CREATING_LABEL}
+              </button>
+
+              {!composerEngaged && !understanding ? (
                 <button
                   type="button"
-                  onClick={submitPrompt}
                   disabled={beginBusy}
-                  aria-busy={beginBusy}
-                  className="self-start rounded-xl bg-[#3d3429] px-6 py-3 text-base font-semibold text-[#f7f2ea] transition enabled:hover:bg-[#2c241c] disabled:cursor-wait disabled:opacity-70"
-                  data-testid="create-estate-start-creating"
-                  data-primary-action="begin"
+                  onClick={() => {
+                    completedUnderstandingRef.current = null;
+                    setUnderstandingGuided(true);
+                    applyUnderstandingStep(startGuidedEntranceUnderstanding());
+                  }}
+                  className="text-base font-semibold text-[#1e4f4f] transition hover:underline disabled:opacity-70"
+                  data-testid="create-estate-help-me-choose"
                 >
-                  {beginBusy
-                    ? "Beginning…"
-                    : understanding
-                      ? CREATE_ESTATE_UNDERSTANDING_CONTINUE_LABEL
-                      : CREATE_ESTATE_START_CREATING_LABEL}
+                  {CREATE_ESTATE_HELP_ME_CHOOSE_LABEL}
                 </button>
-              </div>
-
-              {/* Entrance Cleanup (2026-08) — once Start Freely is engaged
-                  (input focused or has text), the alternate path and
-                  secondary navigation step aside; the input + its own Begin
-                  button remain the primary focus. Nothing about routing,
-                  the confirm gate, or Start With Guidance's own logic changes
-                  — only whether this card and the items below it render. */}
-              {!composerEngaged ? (
-                <div
-                  className="flex max-w-sm flex-col gap-2 rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
-                  data-testid="create-estate-start-with-guidance"
-                >
-                  <h3 className="text-base font-semibold text-[#1f1c19]">
-                    {CREATE_ESTATE_START_WITH_GUIDANCE_HEADING}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-[#6b635a]">
-                    {CREATE_ESTATE_START_WITH_GUIDANCE_DESCRIPTION}
-                  </p>
-                  {/* Chat-First Phase 1 (AT-E2) — guidance starts the same
-                      understanding conversation as typing (entry-path
-                      consistency); the category panel below is reachable only
-                      through the conversation's own examples fallback. */}
-                  <button
-                    type="button"
-                    disabled={beginBusy}
-                    aria-pressed={helpMeChooseOpen}
-                    onClick={() => {
-                      setHelpMeChooseOpen(false);
-                      completedUnderstandingRef.current = null;
-                      setUnderstandingGuided(true);
-                      applyUnderstandingStep(startGuidedEntranceUnderstanding());
-                    }}
-                    className="self-start rounded-xl border border-[#cfc6b8] bg-white px-5 py-2.5 text-base font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0] disabled:opacity-70"
-                    data-testid="create-estate-help-me-choose"
-                  >
-                    {CREATE_ESTATE_HELP_ME_CHOOSE_LABEL}
-                  </button>
-
-                  {/* Part 9 — Help Me Choose is one guided question at a
-                      time. Renamed from the separate "Browse More" section
-                      (2026-08 Entrance Cleanup) — same CreateBrowseCategoriesPanel,
-                      same requestCatalogConfirm gate, now the single mount
-                      point instead of a second, duplicate one further down
-                      the page. */}
-                  {helpMeChooseOpen ? (
-                    <div
-                      className="mt-2 rounded-2xl border border-[#e7dfd4] bg-white/80 px-4 py-3"
-                      data-testid="create-estate-browse-categories"
-                      data-max-decision-layers={SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS}
-                    >
-                      <h4 className="text-sm font-semibold text-[#1f1c19]">
-                        {CREATE_ESTATE_BROWSE_CATEGORIES_HEADING}
-                      </h4>
-                      <div className="mt-2">
-                        <CreateBrowseCategoriesPanel
-                          mode="guided"
-                          onRequestCreate={requestCatalogConfirm}
-                        />
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
               ) : null}
             </div>
+
+            {/* Categories only appear when the member doesn't know what they
+                need or explicitly asks for examples — reached solely via the
+                understanding conversation's own fallback, never a first-screen
+                click target. Same CreateBrowseCategoriesPanel / requestCatalogConfirm
+                gate as before; only its trigger moved. */}
+            {helpMeChooseOpen ? (
+              <div
+                className="max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/80 px-4 py-3"
+                data-testid="create-estate-browse-categories"
+                data-max-decision-layers={SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS}
+              >
+                <h4 className="text-sm font-semibold text-[#1f1c19]">
+                  {CREATE_ESTATE_BROWSE_CATEGORIES_HEADING}
+                </h4>
+                <div className="mt-2">
+                  <CreateBrowseCategoriesPanel
+                    mode="guided"
+                    onRequestCreate={requestCatalogConfirm}
+                  />
+                </div>
+              </div>
+            ) : null}
 
             {!composerEngaged && hasWorkspaces ? (
               <div className="flex flex-wrap items-center gap-3">

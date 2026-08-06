@@ -61,7 +61,7 @@ describe("Build → Create navigation (116 / 149)", () => {
     expect(panel).toContain("create-estate-intent-confirm");
     expect(panel).toContain("create-estate-find-previous-work");
     // Entrance Cleanup (2026-08) — renamed from "Browse More", now the
-    // single category-picker mount nested in Start With Guidance.
+    // single category-picker mount, reached only through the understanding conversation's examples fallback (never a first-screen choice).
     expect(panel).toContain("create-estate-browse-categories");
     expect(panel).toContain("CreateFindPreviousWorkPanel");
     expect(panel).toContain("CreateBrowseCategoriesPanel");

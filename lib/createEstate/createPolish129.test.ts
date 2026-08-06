@@ -44,7 +44,7 @@ describe("Create polish 129 certification", () => {
       "components/companion/CreateFindPreviousWorkPanel.tsx",
     );
     // Entrance Cleanup (2026-08) — Browse Categories is now the single
-    // category-picker mount, nested inside Start With Guidance instead of
+    // category-picker mount, reached only through the understanding conversation's examples fallback instead of
     // a separately-mounted "Browse More" section.
     expect(panel).toContain("create-estate-browse-categories");
     expect(panel).toContain("create-estate-find-previous-work");
@@ -103,7 +103,7 @@ describe("Create polish 129 certification", () => {
     const continueAt = panel.indexOf('data-testid="create-estate-continue"');
     const startAt = panel.indexOf('data-testid="create-estate-composer"');
     // Entrance Cleanup (2026-08) — Browse Categories now nests inside the
-    // composer section (under Start With Guidance) rather than following it
+    // composer section (behind the examples fallback) rather than following it
     // as a separate page section.
     const browseAt = panel.indexOf(
       'data-testid="create-estate-browse-categories"',
