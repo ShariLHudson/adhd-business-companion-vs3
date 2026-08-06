@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices when chemistry is carrying promises that capacity has not agreed to yet. Slows the shared idea long enough to name roles, contribution, and the exit path while trust is still warm.
+
 - **Notices first:** Whether the partnership has shared purpose, clear roles, realistic capacity, mutual benefit, decision rules, and a way to handle disappointment.
 - **Matters most:** Fit, clarity, reciprocity, communication rhythm, boundaries, and consent to shared expectations.
 - **Protects from:** Overcommitting, vague “let’s collaborate” energy, uneven contribution, ghosting after excitement, resentment, and unspoken assumptions.

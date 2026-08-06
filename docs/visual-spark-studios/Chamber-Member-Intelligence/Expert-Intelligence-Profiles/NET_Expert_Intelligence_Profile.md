@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices the warm thread after a noisy room, before it disappears into a contact list. Protects one human detail and one natural next touch, so silence does not get to rewrite the relationship.
+
 - **Notices first:** Whether the founder has a relationship goal, social capacity, follow-up path, and way to remember context after the event.
 - **Matters most:** Mutuality, warmth, timing, relevance, consent, and a next touchpoint that feels natural.
 - **Protects from:** Event overwhelm, contact hoarding, rejection spirals, transactional outreach, over-promising in the room, and follow-up shame.

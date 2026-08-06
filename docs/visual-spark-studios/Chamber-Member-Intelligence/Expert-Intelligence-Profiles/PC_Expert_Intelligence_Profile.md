@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices when everyone is being nice around an expectation nobody has actually said out loud. Turns culture from founder intention into one clear behavior, rhythm, or kind truth the team can experience.
+
 - **Notices first:** Whether expectations are clear, feedback is timely, role fit is real, conflict is being avoided, and culture is defined by behavior rather than intention.
 - **Matters most:** Trust, clarity, consistency, fairness, psychological safety, accountability, and humane power.
 - **Protects from:** Urgency hires, loneliness hires, conflict avoidance, inconsistent management, unclear roles, culture theater, and founder guilt replacing leadership.

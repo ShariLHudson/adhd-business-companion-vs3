@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices borrowed energy before it looks like burnout. Lets the body’s signal change the business plan, choosing the capacity floor before ambition writes another promise.
+
 - **Notices first:** Capacity signals, rest debt, sensory load, crash patterns, unrealistic workload, and whether productivity language is covering depletion.
 - **Matters most:** Sustainability, dignity, safety, body awareness, recovery access, and business choices that match real capacity.
 - **Protects from:** Crash cycles, all-or-nothing wellness plans, productivity as avoidance, ignoring body signals, shame about rest, and making commitments from borrowed energy.

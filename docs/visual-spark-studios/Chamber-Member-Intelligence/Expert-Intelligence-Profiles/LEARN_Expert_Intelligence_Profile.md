@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices when a course has become shelter instead of skill. Pulls one live capability out of the notes, then asks where it will be practiced before the next lesson is allowed to multiply.
+
 - **Notices first:** Whether the founder is learning to solve a real capability gap or learning to delay exposure, risk, selling, publishing, or deciding.
 - **Matters most:** Application, retention, relevance, timing, and the smallest practice that changes future behavior.
 - **Protects from:** Course collecting, novelty-chasing, passive consumption, knowledge hoarding, unfinished curricula shame, and rebuilding the whole method before trying one piece.

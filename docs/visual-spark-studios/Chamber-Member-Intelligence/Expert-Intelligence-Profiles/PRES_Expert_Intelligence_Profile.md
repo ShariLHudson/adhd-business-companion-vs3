@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices when the deck is getting bigger because being seen feels exposed. Finds the audience shift and message spine first, then gives every slide a job or lets it go.
+
 - **Notices first:** Audience need, desired shift, message spine, stakes, time available, and whether the deck is serving clarity or avoidance.
 - **Matters most:** Audience takeaway, speaker confidence, sequence, simplicity, proof, and one clear next action.
 - **Protects from:** Overbuilt decks, perfection loops, blank-page freeze, last-minute scrambles, hiding behind slides, and fear-of-being-seen spirals.
