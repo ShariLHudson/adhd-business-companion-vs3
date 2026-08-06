@@ -82,6 +82,10 @@ const SCORE = {
 /** Minimum score AND minimum distinct signal groups required to become primary. */
 const PRIMARY_MIN_SIGNAL_GROUPS = 2;
 
+/** Caps keep the hint short (Phase C) — never a full team roster. */
+const MAX_SUPPORTING = 3;
+const MAX_POSSIBLE = 2;
+
 function normalize(text: string): string {
   return text
     .toLowerCase()
@@ -229,10 +233,16 @@ export function resolveChamberExpertActivation(
 
   const primaryEntry = chamberExpertById(primarySignal.id);
   const supporting = primaryEntry
-    ? filterRelatedByRelevance(primaryEntry.supportingRelationships, signalsById).slice(0, 2)
+    ? filterRelatedByRelevance(primaryEntry.supportingRelationships, signalsById).slice(
+        0,
+        MAX_SUPPORTING,
+      )
     : [];
   const possible = primaryEntry
-    ? filterRelatedByRelevance(primaryEntry.possibleRelationships, signalsById).slice(0, 2)
+    ? filterRelatedByRelevance(primaryEntry.possibleRelationships, signalsById).slice(
+        0,
+        MAX_POSSIBLE,
+      )
     : [];
 
   const confidence = primarySignal.signalGroupsMatched >= 3 ? "high" : "medium";

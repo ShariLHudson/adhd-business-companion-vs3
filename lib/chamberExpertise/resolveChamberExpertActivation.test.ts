@@ -40,6 +40,45 @@ describe("resolveChamberExpertActivation — worked examples", () => {
   });
 });
 
+describe("resolveChamberExpertActivation — Phase C preflight scenarios", () => {
+  it("client retention question → Client Relationships primary, Strategy + Marketing supporting", () => {
+    const result = resolveChamberExpertActivation({
+      userText: "I need help figuring out why clients are not staying engaged.",
+      intentCategory: "understand",
+      estateCategory: "business",
+    });
+
+    expect(result.primary).toBe("CR");
+    expect(result.supporting).toContain("STR");
+    expect(result.supporting).toContain("MKT");
+  });
+
+  it("organize AI documentation → Knowledge Management primary, AI & Technology + Systems supporting", () => {
+    const result = resolveChamberExpertActivation({
+      userText: "I want to organize my AI documentation.",
+      intentCategory: "organize",
+      estateCategory: "business",
+    });
+
+    expect(result.primary).toBe("KMG");
+    expect(result.supporting).toContain("AI");
+    expect(result.supporting).toContain("SYS");
+  });
+
+  it("build a business strategy → Strategy primary, Systems + Finance + Marketing supporting", () => {
+    const result = resolveChamberExpertActivation({
+      userText: "I want to build a business strategy.",
+      intentCategory: "build",
+      estateCategory: "business",
+    });
+
+    expect(result.primary).toBe("STR");
+    expect(result.supporting).toContain("SYS");
+    expect(result.supporting).toContain("FIN");
+    expect(result.supporting).toContain("MKT");
+  });
+});
+
 describe("resolveChamberExpertActivation — anti-single-keyword rule", () => {
   it("does not activate a primary from userText alone, with no intent or estate signal", () => {
     const result = resolveChamberExpertActivation({
