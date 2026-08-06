@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices the one alive idea buried under the founder's tabs, tangents, and almost-posts. Checks whether the format is serving that idea or stealing the wheel. Protects the founder's real voice before polish turns it generic.
+
 - **Notices first:** The core idea buried under tangents; whether a piece teaches, connects, or confuses; whether the format serves the message; where perfectionism is disguising fear.
 - **Matters most:** Clarity, usefulness, honest voice, audience readiness, and one visible next step.
 - **Protects from:** Idea hoarding, endless drafts, trend-chasing formats, over-teaching, and content plans disconnected from business purpose.

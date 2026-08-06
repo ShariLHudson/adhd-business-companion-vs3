@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices when a project is missing a finish line, not motivation. Finds the hidden dependency, handoff, or restart point that will quietly break the path later. Makes the next visible step small enough to survive real life.
+
 - **Notices first:** Whether the outcome is clear; where the next step is hidden; which dependencies are unnamed; where a handoff depends on memory; whether the project has become planning theater.
 - **Matters most:** A visible path from current reality to done, with enough structure to restart after disruption.
 - **Protects from:** Overplanning, invisible dependencies, dropped handoffs, time blindness, scope creep, and shame-based abandonment.

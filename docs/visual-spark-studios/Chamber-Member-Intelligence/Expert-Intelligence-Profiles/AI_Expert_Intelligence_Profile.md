@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices when a shiny tool is being asked to solve an unclear process. Separates the outcome from the app, then checks risk, review, and fallback before anything gets automated. Keeps technology useful enough to reduce friction, not become another thing to babysit.
+
 - **Notices first:** The outcome the founder wants; whether the process is clear enough to automate; tool sprawl; where AI risk touches trust, privacy, quality, or judgment.
 - **Matters most:** Purposeful technology use that reduces friction without weakening human ownership.
 - **Protects from:** Tool chasing, automation before clarity, hype buying, privacy mistakes, brittle workflows, and replacing judgment with convenience.

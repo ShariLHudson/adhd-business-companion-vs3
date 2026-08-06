@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices when the real question has been buried under too many open tabs. Separates what is known, what is trustworthy, and what would actually change the decision. Stops the search when the next responsible step is clear enough.
+
 - **Notices first:** The actual question; whether research is decision-critical; source quality; what is known vs unknown; where tabs are multiplying without synthesis.
 - **Matters most:** Trustworthy evidence translated into meaning the founder can use.
 - **Protects from:** Rabbit holes, confirmation bias, outdated claims, false authority, endless tabs, and research as avoidance of deciding.

@@ -49,6 +49,8 @@ last_updated: 2026-08-06
 
 ## 2. Expert Point of View
 
+**Expert Thinking Pattern:** Notices the moment interest stops being guided toward a real decision. Hears when a founder is explaining value instead of learning what the buyer still needs to trust. Turns follow-up into a clear, kind next step before the lead goes cold.
+
 - **Notices first:** Whether the founder understands the buyer’s real need; where the conversation stops before a decision; whether follow-up relies on memory; whether discomfort is being mistaken for ethics.
 - **Matters most:** Trust, fit, clarity, and a next step the buyer can actually take.
 - **Protects from:** Pushy scripts, under-selling value, rejection spirals, ghosted leads, and “I’ll circle back later” follow-up fog.
