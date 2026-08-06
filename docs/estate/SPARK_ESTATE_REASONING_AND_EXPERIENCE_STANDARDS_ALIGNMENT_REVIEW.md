@@ -28,7 +28,11 @@ Future Estate reasoning and experience standards (protocol + intelligence librar
 | Spec 103 / T-003 Universal Experience Standards | Existing frozen ecosystem experience canon (cross-check) |
 | MJ-002 … MJ-007 Member Journey validations | Foundational ADHD founder situations — validate experience, not new features |
 | Member Journey Library `00`, `03`–`08` | Library README, prioritization, template, validation guide, capability matrix, experience validation, Design Constitution |
-| *(not uploaded)* `01` Universal Experience Principles · `02` Member Journey Standard | Named in library README; treat as missing until provided |
+| Member Journey Library Standard (Draft 1) | Confirms library is validation-only — not a runtime/feature layer; names MJ-001 as Gold Standard |
+| MJ-001 My Workshop Ideas Are Everywhere | Gold Standard journey — organize before produce; reference quality for all later MJs |
+| Build Type Catalog & Behavior Standard v1 | **Canonical split:** shared engine vs Build-Type knowledge only |
+| Build Type specs v1 | Workshop · Marketing Plan · Offer · Proposal · Client Onboarding (plus catalog stubs for SOP · Checklist · Email) |
+| *(not uploaded)* Library `01` · `02` | Named in library README; Spec 103 / Library Standard stand in |
 
 Runtime mirrors already present for many phases under `lib/estate/sparkEstate*.ts` and `lib/universalCreation/` — treated as **partial encoding**, not as proof of full companion-path wiring.
 
@@ -147,52 +151,50 @@ Phase protocols describe expansive future Estate operating systems (dashboards, 
 
 ## 4. Reusable architecture vs Build-Type-specific knowledge
 
-This is the central separation already named in Phase 11 Step 4 and encoded as `CreationArchetype` + `CREATION_ARCHETYPE_BUILD_FIELDS`.
+**Canonical source:** Build Type Catalog & Behavior Standard v1 — *“This specification does not create another engine.”*
 
-### Reusable architecture (one system for every room / every create)
+Final catalog standard:
 
-Keep as shared OS — do **not** fork per room or per deliverable type:
+> The engine remains shared. Each Build Type supplies only the knowledge needed to create that specific useful result. The user experiences one consistent relationship with Shari, while Spark adapts the depth, questions, outputs, and implementation support to the work in front of them.
 
-| Layer | Owns |
-|-------|------|
-| Companion identity & voice | Shari traits, hospitality, human voice, banned software language |
-| Conversation flow | Connect → Clarify → Guide → Create → Review → Continue |
-| Creation journey phases | Understand → Discover → Define → **Build** → Review → Improve → Complete → Remember |
-| State / confidence / permission | Listen/clarify before create; permission before review surfaces; overwhelm/stuck patterns |
-| Routing shell | Intent → need/state/context → capability → expert → experience (member never manages this) |
-| Memory & certainty | What happened · where it lives · can I find it; quiet remember after completion |
-| Environment rules | Conversation travels; room optional; same capability everywhere |
-| Governance | One owner per concept; no duplicate intelligence; quality checklist |
-| Experience standards | Spec 103 feelings/principles; EF-first; max choices; one primary next step |
+Also named in Phase 11 Step 4 and partially encoded as `CreationArchetype` + `CREATION_ARCHETYPE_BUILD_FIELDS` + `documentRegistry` / `documentCreationProfiles`.
 
-These should converge on **existing** homes (`estateBrain`, `universalCreation`, conversation Spec packages / engines already in-repo) — not new parallel OS packages.
+### Reusable architecture (shared engine — never forked per type)
 
-### Build-Type-specific knowledge (only varies at Build — and in expert libraries)
+| Layer | Owns | Must not live in a Build Type |
+|-------|------|-------------------------------|
+| Shari voice / conversation | Identity, one-question flow, hospitality | Per-type personalities |
+| Universal creation journey | Understand → Discover → Define → Build → Review → Improve → Complete → Remember | Per-type alternate journeys |
+| Recognition & confidence | High → begin; Medium → name the type; Low → one clarifying question | Forced catalog browsing as only entrance |
+| Depth model | Light · Guided · Living (adapt as complexity grows) | Hard-coded “always full expert” |
+| Save / Projects / Calendar / Research / Visual Thinking / Chamber / Board | Shared capabilities | Duplicate infra per type |
+| Reclassification | Shape can change without restart or duplicate work | Throw-away and rebuild |
+| Cross-build linking | Related outputs stay connected to parent | Orphan secondary builds |
+| Routing / memory / environment / governance | Estate Brain + Specs 105–113 | New OS per Sell/Teach/Plan category |
 
-Vary **content and structure**, not process:
+Map catalog names (“Universal Build Engine”, “Guided Creation Engine”, “Reasoning Engine”) onto **existing** `universalCreation`, conversation/reasoning packages, and Estate Brain — do not invent parallel engines because the catalog uses those labels.
 
-| Kind | Examples | Stays out of |
-|------|----------|--------------|
-| **Creation archetypes (Build fields)** | Project → goal/milestones/tasks/next actions; Email → purpose/audience/message/CTA; Funnel → journey/stages/messaging; Strategy → objective/approach/measurement; etc. (`CreationArchetype`) | Understand / Discover / Define / Review / Complete phases |
-| **Chamber / domain reasoning** | Decision’s 10-stage process; Momentum’s nine lenses; EF demand/conditions model; Marketing messaging frameworks | Companion voice; universal journey; memory ownership; final decisions (member owns) |
-| **Room expertise flavor** | Chamber of Momentum → progress/next steps; Marketing room → campaigns; Content room → writing | Separate personalities; separate creation workflows; separate completion menus |
-| **Expert collaboration contributions** | What Momentum vs Strategy vs Research contributes when coached together | Member-facing “team management”; conflicting advice systems |
+### Build-Type-specific knowledge (definition payload only)
 
-**Rule of thumb already in the files:**
+Each Build Type may define (catalog §6): success shape · who uses it · essential/expert/conditional areas · question bank · research triggers · outputs · visual options · stakeholders · dependencies · connections · assemble/polish rules · completion criteria · template behavior · version priority · Spark thinking prompts.
 
-> The room changes the expertise. The journey remains the same.  
-> Technology stays behind the experience.  
-> Specialized intelligence supports Spark — it does not replace Spark.
+V1 catalog (keep small and deep):
+
+| Category | Build Types | Default depth |
+|----------|-------------|---------------|
+| Organize & Systemize | SOP · Checklist | Guided / Light–Guided |
+| Write & Communicate | Email | Light |
+| Sell & Serve | Proposal · Offer · Client Onboarding | Guided (Onboarding → Living) |
+| Teach & Facilitate | Workshop | Guided → Living |
+| Plan & Grow | Marketing Plan | Living |
+
+Also Build-Type-specific: Chamber `XXX-006` reasoning and room expertise flavor — still **not** voice, journey, or memory systems.
 
 ### What must not become Build-Type-specific
 
-- New conversation engines per Chamber Member  
-- New creation journeys per room  
-- New completion/export toolbars per archetype  
-- New companion personalities per expertise  
-- New memory systems per domain  
+- Conversation engines · creation journeys · completion toolbars · companion personalities · memory systems · research infrastructure · Project/Calendar stacks  
 
-Those belong in reusable architecture; domain files supply **reasoning content and boundaries** only.
+Refine the **shared** engine only when behavior is truly common across types (catalog §15).
 
 ---
 
@@ -218,6 +220,7 @@ Spark difference repeated in every file: general AI generates or restarts; Spark
 
 | Journey | Required behavior | Existing support | Conflict / gap |
 |---------|-------------------|------------------|----------------|
+| **MJ-001** Workshop ideas everywhere (**Gold Standard**) | Organize before produce; capture → group → themes → one next step; never jump to slides; preserve every idea | Clear My Mind / organize paths, workshop document plugin + profiles, Projects continuity, universal creation | Jumping straight into Workshop Build Type production would fail this journey; organize ≠ Workshop Living Build yet |
 | **MJ-002** Too many ideas | Prioritize existing ideas; don’t brainstorm more; top 3 → one start; save the rest | Overwhelm / idea-overload routing, Clear My Mind, Decision Compass, ADHD situation atlas, capability registry | Documented: `"too many ideas"` can miss Clear My Mind and compete with Visual Thinking / mind-map paths |
 | **MJ-003** Away for weeks | No judgment; restore where they left off; one next step; no start-over | Arrival Intelligence (`long_absence` / gentle return), companion-led continue, T-007 resilience canon | Copy risk: “Welcome back” / day-count vs T-007; must not run first-time intro |
 | **MJ-004** Only 15 minutes | One time-fitting action; block scope creep; record progress | Timed focus / Do It Now fragments, effort estimates, Chamber “limited time” signals, prompt rules | No end-to-end short-window journey; no dedicated capability phrase for this ask |
@@ -294,16 +297,69 @@ These files define **how Spark Estate decides what deserves to exist** and how j
 
 **Final library rule (echoed):** No new architectural capability until existing ones cannot be extended. That is the same rule as Intelligence Blueprint / Phase 21 / Observation Mode.
 
+Library Standard (Draft 1) is explicit: the Member Journey Library is **not** a runtime feature, intelligence layer, or member-facing system. Next library step named there: refine Gold Standard MJ-001 before expanding.
+
+---
+
+## 7. Build Type Catalog + reference Build Types + MJ-001
+
+### Behaviors required
+
+**Catalog**
+
+- Member begins by intent — catalog browse is optional, never the only door  
+- Recognize build type from words/outcome/context; confidence gates (high / medium / low)  
+- Shared engine for all types; Build Type only supplies domain knowledge  
+- Depth adapts: Light · Guided · Living  
+- User may add/rename/remove/reorder sections and save My Template (not auto-promoted to system catalog)  
+- Reclassify without restart; related builds stay linked to parent  
+- Completion = real-world usability (not “document generated”)  
+- Catalog stays small until each type is deep and reliable  
+
+**Per-type specs (Workshop, Marketing Plan, Offer, Proposal, Client Onboarding)**  
+Each adds: business outcome, typical language, essential/expert/conditional areas, Spark thinking, research triggers, outputs, completion criteria — without owning voice or infrastructure.
+
+**MJ-001 (Gold Standard)**  
+Workshop ideas everywhere → first problem is **organization**, not Workshop production. Capture, group, themes, reassure, one clarifying question, preserve continuity. Failing = slides/outline before clarity.
+
+### Existing systems that already support this
+
+| Catalog concept | Existing home |
+|-----------------|---------------|
+| Shared creation journey | `lib/universalCreation/` (orchestrator, phases, creation journey, completion) |
+| Document/type plugins | `documentRegistry.ts`, `documentCreationProfiles.ts` (email, sop, proposal, workshop, checklist, marketing_plan/funnel, …) |
+| Archetype Build fields | `CREATION_ARCHETYPE_BUILD_FIELDS` in `sparkEstateCreationJourney.ts` |
+| Recognition from language | `detectUniversalDocumentType` / create fast path / frictionless create routing |
+| Parallel Create UI | `createWorkflow` / Create panels — must stay subordinate to universal journey |
+| Organize-before-build (MJ-001) | Clear My Mind / overwhelm organize paths — before Workshop plugin |
+
+### Conflicts
+
+1. **Label ≠ new engine** — Catalog names Universal Build Engine, Knowledge Fingers, Intelligence Activation Matrix. Treat as requirements on existing spines; Observation Mode forbids spawning those as new systems.  
+2. **Catalog depth vs current plugins** — Full Build Type specs (essential/expert/conditional/completion/cross-build) are richer than today’s profiles; gap is **knowledge payload depth**, not a missing framework.  
+3. **Archetype coverage** — Runtime archetypes/plugins cover SOP, Checklist, Email, Proposal, Workshop, Marketing Plan-ish paths; Offer and Client Onboarding are thinner or folded into other types — extend plugins, don’t fork engines.  
+4. **MJ-001 vs Workshop Build Type** — Activating Workshop Build immediately on “ideas are everywhere” violates the Gold Standard. Recognition must choose **organize/prioritize** first; Workshop Build Type after clarity. Same pattern as MJ-002.  
+5. **Work-order temptation** — Catalog §15 lists SOP→…→Marketing Plan design order. Under Observation Mode / architecture freeze, that is a **knowledge-authoring sequence**, not a mandate to redesign Create or add features.  
+6. **Multiple create stacks** — Still a structural conflict (earlier §3C): Build-Type knowledge must land in one shared journey path.
+
+### Reusable vs Build-Type (restated with catalog authority)
+
+| Reusable | Build-Type-specific |
+|----------|---------------------|
+| Engine, voice, journey, depth model, recognition confidence, reclassification, cross-build linking, Projects/Calendar/Research/Chamber connections as shared services | Essential/expert/conditional areas, question banks, research triggers, output sets, completion criteria, Spark thinking prompts, template defaults |
+| MJ Library validation process | Per-journey situation knowledge (MJ-001…007) |
+| Chamber collaboration under one companion | Domain reasoning libraries (`XXX-006`) |
+
 ---
 
 ## Alignment verdict (understanding only)
 
 | Question | Finding |
 |----------|---------|
-| Do these files demand new product architecture? | **No.** Phase protocols, Chamber reasoning, MJ-002…007, and Library `00`/`03`–`08` restate principles already in Estate Constitution, Specs 100–131, T-007, and partially encoded runtimes. |
-| Biggest gap | Live companion path vs designed engines — plus honest capability readiness and phrase/routing consistency so Priority 1 journeys hit the right spine. |
-| Clearest reusable vs specific split | Journey + voice + routing + memory + validation gates = architecture; Build fields + Chamber `XXX-006` = domain knowledge; MJ bodies + library priority/matrix rows = validation knowledge. |
-| Recommended stance under Observation Mode | Use Design Constitution + Experience Validation + MJ acceptance/failure signals when reviewing conversations. Do not spawn duplicate systems or a second constitution. Prefer consistent wiring of Clear My Mind, Plan My Day, Adapt My Day, Arrival, and session resume — log misses under the Rule of Three. Update Capability Matrix readiness only when journeys prove it. |
+| Do these files demand new product architecture? | **No.** Catalog states it does not create another engine. Library Standard states MJ library is not runtime. Principles already live in Estate Constitution, Specs 100–131, `universalCreation`, Estate Brain. |
+| Biggest gap | Deepen Build-Type **knowledge payloads** inside existing plugins; harden recognition so organize-first journeys (MJ-001/002) are not misrouted into premature Build; keep readiness claims honest. |
+| Clearest reusable vs specific split | **Catalog Final Standard** — shared engine + Shari; Build Types supply only type knowledge. MJ files validate situations. Chamber files supply domain reasoning. |
+| Recommended stance under Observation Mode | Author/align Build Type knowledge against `universalCreation` + document profiles. Validate with MJ-001 as Gold Standard. Do not invent Universal Build Engine 2.0, `lib/memberJourney` runtime, or a second constitution. Log conversation misses under the Rule of Three. |
 
 ---
 
@@ -315,7 +371,7 @@ These files define **how Spark Estate decides what deserves to exist** and how j
 - `docs/UNIVERSAL_EXPERIENCE_STANDARDS_FRAMEWORK.md` · Spec 103
 - `docs/THE_FRIEND_WE_ALL_DESERVE.md` · Relationship Constitution
 - `docs/MEMBER_JOURNEY_ARCHITECTURE.md` · `docs/ENTREPRENEURIAL_RESILIENCE.md` (T-007)
-- Runtime: `lib/estateBrain/`, `lib/universalCreation/`, `lib/sparkCoreIntelligence/`, `lib/sparkWisdom/`, Arrival / Plan My Day / Adapt My Day / friction-first continue paths
+- Runtime: `lib/estateBrain/`, `lib/universalCreation/` (journey · registry · profiles · completion), `lib/sparkCoreIntelligence/`, `lib/sparkWisdom/`, Arrival / Plan My Day / Adapt My Day / friction-first continue paths
 
 ---
 
