@@ -39,7 +39,9 @@ Future Estate reasoning and experience standards (protocol + intelligence librar
 | Reuse Before Reinvention Principle v1 | Mandatory: Reuse → Extend → Connect → Orchestrate → Create (last) |
 | Spark Constitution v1 | Foundational product beliefs/promise — subordinate to Estate + Relationship + Spec 100 authorities |
 | Context · Systems · Stakeholder · Dependency Intelligence Frameworks v1 | Reusable orchestration intelligences named by Reasoning Engine / Activation Matrix |
-| Event Operations Knowledge Modules v1 | Run of Show · Hospitality/Green Room · Venue · AV — **domain payloads** under Event Operations |
+| Event Operations Knowledge Domain Master v1 | Parent domain for event/workshop/conference expertise; lifecycle + module map |
+| Event Operations Knowledge Modules v1 | ROS · Hospitality/Green Room · Venue · AV · Speaker/VIP · Volunteer · Registration/Check-In · Book & Product Sales |
+| Knowledge Domain Foundations v1 | Strategy · Communication · Customer Experience — cross-Build domain libraries (payloads) |
 | *(not uploaded)* Library `01` · `02` | Named in library README; Spec 103 / Library Standard stand in |
 
 Runtime mirrors already present for many phases under `lib/estate/sparkEstate*.ts` and `lib/universalCreation/` — treated as **partial encoding**, not as proof of full companion-path wiring.
@@ -414,8 +416,8 @@ These six files describe **how existing capabilities work together**. Several op
 |----------|---------|
 | Do these files demand new product architecture? | **No.** Universal Build Engine and siblings explicitly coordinate existing capabilities. Reuse Before Reinvention forbids new layers when orchestration would suffice. Library/MJ docs are validation-only. |
 | Biggest gap | Orchestration and Build-Type **knowledge depth** on the live companion/`universalCreation` path; Reasoning Engine exists but is largely unwired; readiness honesty; organize-before-build routing (MJ-001/002). |
-| Clearest reusable vs specific split | **Shared orchestration** (reasoning · activation · build flow · implementation · reuse governance · Shari) vs **payloads** (Build Types · Chamber libraries · MJ situation knowledge). |
-| Recommended stance under Observation Mode | Map every new doc label to an existing home. Extend `universalCreation` + Estate Brain + conversation Specs. Do not invent parallel engines or peer constitutions. Validate with MJ-001 Gold Standard + acceptance/failure signals. Rule of Three before prompt/behavior change. |
+| Clearest reusable vs specific split | **Shared orchestration** (reasoning · activation · context/systems/stakeholder/dependency · build flow · implementation · reuse governance · Shari) vs **payloads** (Build Types · Chamber libraries · Event Ops modules · MJ situation knowledge). |
+| Recommended stance under Observation Mode | Map every new doc label to an existing home. Extend `universalCreation` + Estate Brain + conversation Specs. Store Event modules as knowledge, not new engines. Disambiguate Event hospitality vs Spec 111. Validate with MJ-001 + acceptance/failure signals. Rule of Three before prompt/behavior change. |
 
 ### Authority order (for future readers)
 
@@ -427,58 +429,77 @@ These six files describe **how existing capabilities work together**. Several op
 
 ---
 
-## 9. Cross-cutting intelligence frameworks + Event Operations knowledge modules
+## 9. Intelligence frameworks · Knowledge Domains · Event Operations modules
 
-Activation Matrix / Reasoning Engine stages name several “intelligences.” These eight uploads clarify which are **reusable orchestration** vs **domain knowledge payloads**.
+Three layers of knowledge/intelligence docs — do not flatten into one product each.
 
-### Reusable orchestration frameworks (activate across Builds)
+```
+Orchestration (reusable)
+  Context · Systems · Stakeholder · Dependency
+  (+ Reasoning · Activation · Build · Implementation)
+        ↓ selects
+Knowledge Domains (payload libraries)
+  Strategy · Communication · Customer Experience · Event Operations · …
+        ↓ contain
+Knowledge Modules (deep payloads)
+  e.g. under Event Ops: ROS · Venue · AV · Speaker/VIP · …
+        ↓ used by
+Build Types / Guided Builds / MJ validations
+```
 
-| Framework | Question it answers | Behavior required |
-|-----------|---------------------|-------------------|
-| **Context Intelligence** | What is true right now? | Don’t re-ask; restore leave-off point; adapt depth; next meaningful step; states (stuck, returning, waiting, finishing…) |
-| **Systems Intelligence** | What larger system is this part of? | Reason across strategy/ops/CX/calendar/etc.; surface only important impacts (e.g. workshop date move) |
-| **Stakeholder Intelligence** | Who is affected and what do they need? | Hidden stakeholder matrix; needs/responsibilities/comms/risks — reusable across every Guided Build |
-| **Dependency Intelligence** | What ripple effects matter? | Time/people/resources/info/ops dependencies; surface only material ripples; what can stay unchanged |
+### A. Reusable orchestration frameworks
 
-These belong in the **shared reasoning/activation layer** — not inside a single Build Type or Event module.
+| Framework | Question | Behavior |
+|-----------|----------|----------|
+| **Context** | What is true right now? | Don’t re-ask; restore leave-off; adapt depth; next step |
+| **Systems** | What larger system is this part of? | Cross-domain ripples; surface only what matters |
+| **Stakeholder** | Who is affected? | Hidden matrix of needs/responsibilities/risks |
+| **Dependency** | What ripple effects matter? | Time/people/resources/info/ops; what can stay unchanged |
 
-### Existing systems that already approximate them
+**Existing homes:** Spec 112/117 · session/continue/Arrival · Estate Brain · Chamber collaboration · Adapt My Day · Build Type stakeholder fields. Extend these — don’t ship four new engines.
 
-| Framework | Existing support |
-|-----------|------------------|
-| Context | Spec 112/117 memory · session/continue · Arrival · `conversationSession` · create resume · frictionless context hints |
-| Systems | Estate Brain capability routing · Chamber collaboration · Business Brain connections · Systems Intelligence Chamber library (`SYS-*`) as domain content |
-| Stakeholder | Build Type “stakeholders” fields · proposal/onboarding/workshop profiles · expert registries |
-| Dependency | Adaptation / Adapt My Day · project lifecycle docs · event ripple examples in Dependency framework itself |
+### B. Knowledge Domain foundations (cross-Build payloads)
 
-None requires a new parallel “Context Engine” package if orchestration can extend Estate Brain + conversation context + `universalCreation` session state.
+| Domain | Supports (examples) | Maps toward existing |
+|--------|---------------------|----------------------|
+| **Strategy** | Plans, offers, pricing, priorities, decisions, Guided Builds | Strategy Intelligence Chamber (`STR-*`) · Decision Intelligence · Marketing Plan / Offer Builds |
+| **Communication** | Email, proposal, onboarding, workshop, support, sales copy | Content / Presentations Chamber libraries · Email/Proposal Builds · Shari voice (delivery only) |
+| **Customer Experience** | Onboarding, support, workshops, events, retention, referrals | Client Relationships Chamber · Client Onboarding Build · Spec 111 is **companion** hospitality, not CX domain |
+| **Event Operations (Master)** | Workshops, conferences, retreats, trade shows, signings, speaking | Events Intelligence Chamber (`EVT-*`) · Workshop Build Type (Living) · all Event modules below |
 
-### Domain knowledge modules (Event Operations) — Build-/domain-specific
+Domains are **libraries Activation selects** — not separate companions, rooms, or conversation engines.
 
-| Module | Parent | Role |
-|--------|--------|------|
-| Run of Show & Live Event Management | Event Operations | Live lifecycle, ROS columns, transitions, contingencies |
-| Hospitality & Green Room Management | Event Operations | Guest care logistics (speakers/VIPs/attendees) — **not** Spec 111 Spark Hospitality™ |
-| Venue & Facility Management | Event Operations | Requirements → contract → layout → teardown |
-| AV & Technology Management | Event Operations | Tech lifecycle, equipment, presenter readiness, backups |
+### C. Event Operations modules (deep payloads under Event Ops)
 
-These are **payloads** selected when Event Operations / Workshop-Living / event Builds activate — same class as Chamber `XXX-*` libraries and Build Type expert areas.
+| Module | Role |
+|--------|------|
+| Run of Show & Live Event | Live heartbeat, transitions, contingencies |
+| Hospitality & Green Room | Guest logistics — **≠ Spec 111 Spark Hospitality™** |
+| Venue & Facility | Requirements → contract → layout → teardown |
+| AV & Technology | Tech lifecycle, backups, presenter readiness |
+| Speaker & VIP Management | Invite → travel → stage → follow-up |
+| Volunteer Management | Recruit → train → support → recognize |
+| Registration & Check-In | First live attendee experience |
+| Book & Product Sales | Table ops, inventory, payments, signing flow |
+
+Event Ops Master defines the lifecycle (vision → follow-up/lessons) and which modules apply. Workshop Build Type / Living event work **activates** modules as needed; modules do not own the Build journey.
 
 ### Conflicts / naming traps
 
-1. **“Hospitality” collision** — Spec 111 Spark Hospitality™ = emotional companion OS. Event “Hospitality & Green Room” = venue guest logistics. Never merge into one system; keep names disambiguated in implementation notes.  
-2. **Systems Intelligence Framework vs `SYS-*` Chamber library** — Framework = cross-cutting orchestration; Chamber Systems Intelligence = domain expertise library. Same word, two layers (orchestrator vs payload).  
-3. **Do not turn four frameworks into four products** — Reuse Before Reinvention: extend Activation/Reasoning orchestration; store Event modules as knowledge, not new rooms/engines.  
-4. **Overwhelm risk** — Systems + Dependency examples (workshop delay → 10 ripples) must obey Activation suppression and one-question / few-choices rules; surface only what matters now.  
-5. **Event modules vs Workshop Build Type** — Workshop Build Type may *activate* these modules when living/event-deep; modules must not invent a separate Workshop OS.
+1. **Hospitality collision** — Spec 111 (companion emotional OS) ≠ Event Green Room logistics ≠ CX “feel welcomed.” Three meanings; one Spec 111 brand — disambiguate the other two in docs/code comments.  
+2. **Systems orchestration vs `SYS-*` Chamber** — orchestrator vs domain library.  
+3. **Domain Foundations vs Chamber Member libraries** — Strategy/Communication/CX/Events Foundations overlap `STR-*`, Content/Presentations, Client Relationships, `EVT-*`. Prefer **one library home per domain** (Chamber Member Intelligence Library / Estate knowledge), not a second parallel “Knowledge Domain” filesystem.  
+4. **Domain ≠ companion personality** — Activation loads expertise; Shari remains the only voice (Phase 33 / Catalog).  
+5. **Module sprawl** — Event Ops already eight modules; Reuse Before Reinvention: deepen and connect under Event Ops Master before inventing Event rooms or Event engines.  
+6. **Overwhelm** — Domain/module richness must stay behind Activation suppression + one-question rules; member sees progress, not a domain catalog.
 
 ### Updated split
 
 | Reusable architecture | Specific knowledge |
 |-----------------------|--------------------|
-| Context · Systems · Stakeholder · Dependency thinking models (orchestration) | Event Ops modules (ROS, Green Room, Venue, AV) |
-| When/whether to activate them (Activation Matrix) | Conditional expert areas inside Workshop / event Builds |
-| How results connect to Projects/Calendar (Implementation) | Checklists, ROS templates, equipment lists, dietary matrices |
+| Context · Systems · Stakeholder · Dependency (+ Reasoning/Activation/Build/Implementation) | Knowledge Domains: Strategy · Communication · CX · Event Ops Master |
+| When modules activate; Free↔Guided; Light/Guided/Living | Event modules (ROS, Venue, AV, Speaker/VIP, Volunteer, Registration, Sales, Green Room) |
+| Shari voice · permission · memory · Projects/Calendar connections | Build Type areas/outputs · Chamber `XXX-*` · MJ situation knowledge |
 
 ---
 
