@@ -203,3 +203,48 @@ describe("Create Begin — always one of two outcomes", () => {
     expect(client).toContain("Never call Estate open without artifactType");
   });
 });
+
+/**
+ * Create Reasoning-First Migration, Phase 1A (2026-08-05) — regression lock,
+ * not a behavior change. Confirmed by tracing the code that the member's
+ * typed words already survive a category-click confirm identically to a
+ * free-text confirm; this proves it and keeps it true.
+ * @see docs/create-experience/CREATE_REASONING_FIRST_MIGRATION_IMPLEMENTATION_PLAN.md#1a
+ */
+describe("Entry-path intent preservation (Phase 1A)", () => {
+  it("free-text Start Freely preserves the member's exact words through to open", () => {
+    const outcome = resolveCreateBeginOutcome(
+      "I need an SOP for onboarding clients",
+    );
+    expect(outcome.kind).toBe("confirm");
+    if (outcome.kind !== "confirm") return;
+    expect(outcome.text).toBe("I need an SOP for onboarding clients");
+    const open = confirmCreateBeginToOpen(outcome);
+    expect(open.text).toBe("I need an SOP for onboarding clients");
+  });
+
+  it("a category click WITH prior typed text preserves those words identically", () => {
+    const confirm = resolveCatalogCreateConfirm({
+      label: "SOP",
+      requestText: "I need an SOP for onboarding clients",
+    });
+    expect(confirm.text).toBe("I need an SOP for onboarding clients");
+    const open = confirmCreateBeginToOpen(confirm);
+    expect(open.text).toBe("I need an SOP for onboarding clients");
+  });
+
+  it("a category click with NO typed text degrades to a plain type label, never a blank or a lie", () => {
+    const confirm = resolveCatalogCreateConfirm({ label: "SOP" });
+    expect(confirm.text).toBe("Create a SOP");
+    expect(confirm.text.trim().length).toBeGreaterThan(0);
+  });
+
+  it("both entry paths produce the same artifactType and confirm message shape for the same intent", () => {
+    const fromText = resolveCreateBeginOutcome("SOP");
+    const fromCategory = resolveCatalogCreateConfirm({ label: "SOP" });
+    expect(fromText.kind).toBe("confirm");
+    if (fromText.kind !== "confirm") return;
+    expect(fromText.artifactType).toBe(fromCategory.artifactType);
+    expect(fromText.message).toBe(fromCategory.message);
+  });
+});

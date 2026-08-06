@@ -21,6 +21,43 @@ import {
 } from "./creationRecord";
 import type { CanonicalCurrentFocus } from "./types";
 
+/**
+ * Create Reasoning-First Migration, Phase 1B (2026-08-05) — acknowledge the
+ * member's own opening words on the first question, instead of asking a
+ * cold, generic prompt as if nothing had been said. Build-Type-agnostic:
+ * reads whatever originalRequest holds for any Build Type, nothing
+ * SOP-specific. Mechanical only — no extraction, no classification, no new
+ * discovery logic. Degrades to the plain authored/derived purpose line when
+ * originalRequest is absent or is just an auto-generated placeholder like
+ * "Create a SOP" (the fallback resolveCatalogCreateConfirm uses when the
+ * member typed nothing).
+ * @see docs/create-experience/CREATE_REASONING_FIRST_MIGRATION_IMPLEMENTATION_PLAN.md#1b
+ */
+function isGenuineOriginalRequest(
+  originalRequest: string | null | undefined,
+  typeLabel: string,
+): boolean {
+  const trimmed = originalRequest?.trim();
+  if (!trimmed) return false;
+  const stripped = trimmed
+    .toLowerCase()
+    .replace(/^create\s+(a\s+|an\s+)?/i, "")
+    .replace(/[.!?]+$/, "")
+    .trim();
+  // "Create a SOP" / "Create SOP" / "SOP" alone carry no real intent — they
+  // are auto-generated placeholders, not something the member actually said.
+  return stripped !== typeLabel.trim().toLowerCase();
+}
+
+function acknowledgeOriginalRequest(
+  originalRequest: string,
+  purposeLine: string,
+): string {
+  const trimmed = originalRequest.trim();
+  const lead = `You said: "${trimmed}".`;
+  return purposeLine ? `${lead} ${purposeLine}` : lead;
+}
+
 /** Destination-specific noun for Focus copy (retreat / workshop / event). */
 function eventDestinationNoun(record: {
   eventTypeLabel?: string | null;
@@ -153,6 +190,9 @@ function focusFromRuntimeRecord(
   const version =
     contextVersion ?? (Date.parse(record.updatedAt) || 1);
   const knownContext = record.knownFacts.slice(0, 8);
+  // Phase 1B — only the genuinely first question: nothing captured on any
+  // section yet. Naturally stops repeating once the member answers anything.
+  const isFirstQuestion = sections.every((s) => !s.content.trim());
 
   if (!next) {
     return {
@@ -175,14 +215,22 @@ function focusFromRuntimeRecord(
     };
   }
 
+  const derivedPurpose =
+    next.why ?? `Let's shape ${next.label.toLowerCase()} for your ${typeLabel}.`;
+  const purpose =
+    isFirstQuestion && isGenuineOriginalRequest(record.originalRequest, typeLabel)
+      ? acknowledgeOriginalRequest(record.originalRequest!, derivedPurpose)
+      : derivedPurpose;
+
   return {
     focusId: `section:${next.id}`,
     creationId: record.id,
     title: next.label,
     // Phase 1 — a Build Definition may author its own question and reason.
     // Falling back keeps every existing template's behavior unchanged.
-    purpose:
-      next.why ?? `Let's shape ${next.label.toLowerCase()} for your ${typeLabel}.`,
+    // Phase 1B — on the first question only, acknowledge what the member
+    // already said instead of asking cold. See isGenuineOriginalRequest.
+    purpose,
     prompt: next.prompt ?? `What belongs in ${next.label}? A rough phrase is plenty.`,
     responseType: "multiline",
     knownContext,
