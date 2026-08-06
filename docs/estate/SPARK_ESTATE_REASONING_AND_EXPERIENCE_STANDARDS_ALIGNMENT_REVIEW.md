@@ -59,9 +59,11 @@ Future Estate reasoning and experience standards (protocol + intelligence librar
 | Projects vs Business Build Architecture Review v1.4.0 | **Founder-approved:** keep Projects / My Business Estate / Business Strategy Builder separate; retire “Business Build” name |
 | Business naming & registry cleanup handoff | Planning only — inventory/plan; **does not authorize implementation** |
 | Knowledge Finger Library Index · Architecture Map · Coverage Gap Analysis | Reasoning-pattern catalog; founder-journey map; gaps vs “leave to existing systems” |
+| Knowledge Finger Quality Acceptance Standard · Priority Roadmap · Ownership Map | What a Finger is/isn’t; smallest high-value set; ownership boundaries |
+| Knowledge Finger Build Type Activation Matrix · Capability Orchestration Rules | Language → need → Finger → Build Type → capabilities (no tool-first thinking) |
 | Knowledge Finger Implementation Review Handoff | Review ownership/duplication **before** any Finger implementation |
-| Knowledge Fingers (reasoning patterns) | Customer Discovery · Sales & Client Acquisition · Product Development · Operations Management · Leadership & Delegation · Innovation & Improvement |
-| *(not uploaded)* Library `01` · `02` · Finger Quality Standard · Priority Roadmap | Named in Finger handoff; not in this upload set |
+| Knowledge Fingers (reasoning patterns) | Capture & Transfer · Design Transformation · Relationship Communication · Strategic Decision Support · Experience Design · Execution Reliability · Alignment & Commitment · Customer Discovery · Sales · Product Development · Ops · Leadership · Innovation |
+| *(not uploaded)* Library `01` · `02` | Named in MJ library README |
 
 Runtime mirrors already present for many phases under `lib/estate/sparkEstate*.ts` and `lib/universalCreation/` — treated as **partial encoding**, not as proof of full companion-path wiring.
 
@@ -435,8 +437,8 @@ These six files describe **how existing capabilities work together**. Several op
 |----------|---------|
 | Do these files demand new product architecture? | **No.** Builds orchestrate; expertise lives in one Business Knowledge Library (map to Chamber libraries). Reuse Before Reinvention forbids parallel engines/trees. MJ library is validation-only. |
 | Biggest gap | Knowledge **depth** (Fingers/Domains) on the live `universalCreation` path; EI situation→path routing vs keyword heuristics; Reasoning Engine largely unwired; organize-before-build (MJ-001/002). |
-| Clearest reusable vs specific split | **Orchestration** (reasoning · activation · EI routing · context/systems/stakeholder/dependency · build · implementation) → **Domains** → **Fingers/Modules** → **Build Types**; MJ validates situations. |
-| Recommended stance under Observation Mode | Prefer **Wire** over Build. One library home. One creation/UWE runtime. Honor founder decision: Projects ≠ My Business Estate ≠ Strategy Builder; retire “Business Build.” Pocket constitutions = checklists only. Create section bugs = Wire under handoff. Validate with MJ-001. Rule of Three. |
+| Clearest reusable vs specific split | **Orchestration** → **Domains** → **Knowledge Fingers (= reasoning patterns)** → **Build Types / modules**; MJ validates situations. Fingers answer “what thinking?” — Builds answer “what artifact?” |
+| Recommended stance under Observation Mode | Prefer **Wire** over Build. Reconcile Finger vocabulary (reasoning vs Build payload). One library home. One creation runtime. Separate Projects / Business Estate / Strategy Builder. Finger Implementation Review before any Finger code. Validate with MJ-001. Rule of Three. |
 
 ### Authority order (for future readers)
 
@@ -754,6 +756,77 @@ Required answers: ownership · no duplication of Constitution / MJ / Build Defin
 | Finger = reasoning pattern · Architecture Map journey stages · Gap “leave to existing systems” rules · Review handoff gates | Individual Finger files (Discovery, Sales, Ops, …) |
 | Activation via situation/intent (EI Routing) | Which Finger fits which moment |
 | Build Types remain the creation structure | Build Type ↔ Finger influence links in the Index |
+
+---
+
+## 14. Finger Quality · Ownership · Activation Matrix · Capability Orchestration · Roadmap
+
+Foundation docs that complete the Finger library design (still **not** a runtime build mandate).
+
+### Quality Acceptance Standard
+
+Finger succeeds if it improves **how Spark helps the member think**.
+
+Must include: Purpose · Activation Signals · Expert Considerations · Questions · Risks · Capability Triggers · Continuity / Working Memory needs · Evidence standards · Examples · Possible outcomes.
+
+Must **not** be: template · workflow engine · capability manual · personality/voice file.
+
+### Ownership Map (one source of truth)
+
+| Owns | References only |
+|------|-----------------|
+| Expert reasoning · domain questions · risks · evidence standards · domain Working Memory *needs* | Spark Constitution/voice · MJ principles · Build Type structure · Conversation architecture · Working Memory *storage* · Research *activation rules* |
+
+Fingers must not replace Chamber reasoning, Build Definitions, Member Journey, or shared capabilities — they **reference** those systems.
+
+**Residual tension:** Ownership Map also says Fingers own “domain expertise,” while Chamber/`XXX-*` Domains own deep libraries. Align as: Finger = *situation reasoning pattern* that *selects/points into* Domain/Chamber knowledge — not a second copy of the library.
+
+### Build Type Activation Matrix
+
+```
+Member language → Underlying need → Reasoning pattern → Knowledge Finger(s)
+  → Possible Build Type(s) → Capabilities → Outcome
+```
+
+Examples: “I need an SOP” → Capture & Transfer (not “emit SOP template”); “workshop ideas everywhere” → may need Capture/organize **before** Design Transformation Build (supports MJ-001).
+
+Primary + supporting Fingers per Build; multiple outputs allowed. Member never manages the matrix.
+
+### Capability Orchestration Rules
+
+```
+Situation → Understanding → Reasoning pattern → Finger → Helpful capability → Outcome
+```
+
+Not “which tool?” Capabilities (Working Memory, Research, Projects, Calendar, Documents, …) activate when they serve reasoning. Explicitly: **do not create separate engines** — coordinate existing ones. Aligns with Implementation Intelligence + Activation Matrix + Reuse Before Reinvention.
+
+### Priority Roadmap
+
+Smallest set of high-value reasoning patterns — not the largest library. Pilot Fingers complete (Capture & Transfer through Alignment & Commitment); Tier-1 expansion (Leadership, Discovery, Product, Sales, Ops, Innovation) already authored in uploads. Further Fingers only when Gap Analysis + uniqueness tests pass.
+
+### Existing systems
+
+| Foundation doc | Maps to |
+|----------------|---------|
+| Quality Standard | Finger Authoring Framework · Finger Standard (§10–11) |
+| Ownership Map | Spec 106/112 boundaries · Chamber ownership · Build Type Catalog |
+| Activation Matrix | EI Routing · Build Type Catalog recognition · `detectUniversalDocumentType` (must grow beyond keywords) |
+| Capability Orchestration | Estate Brain · Implementation Intelligence · Spec 118 hidden work · completion/Projects attach |
+| Priority Roadmap | Build Type Catalog V1 small catalog · MJ prioritization · Reuse Before Reinvention |
+
+### Conflicts
+
+1. **Domain expertise ownership** — Finger vs Chamber/Domain library: resolve by pointer/selection, not duplication.  
+2. **Activation Matrix vs live keyword routing** — Matrix requires need-first; live Create often document-first — Wire recognition toward Matrix.  
+3. **Roadmap completeness vs Observation Mode** — Authored Fingers are knowledge assets; runtime wiring waits on Implementation Review answers + approved handoff.  
+4. **“Working Memory” naming** — Finger docs’ Estate Working Memory ≈ Spec 112/117 / session memory — map labels, don’t invent a fourth memory OS.
+
+### Split
+
+| Reusable | Specific |
+|----------|----------|
+| Quality gates · Ownership table · Activation pipeline · Capability orchestration sequence · Roadmap discipline | Per-Finger content · per-Build primary/supporting Finger rows |
+| Shared capabilities as services | When a Finger triggers Research vs Projects vs Memory |
 
 ---
 
