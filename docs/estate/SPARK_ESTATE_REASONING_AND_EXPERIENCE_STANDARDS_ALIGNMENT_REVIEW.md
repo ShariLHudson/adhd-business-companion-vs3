@@ -47,6 +47,11 @@ Future Estate reasoning and experience standards (protocol + intelligence librar
 | SOP · Checklist Knowledge Finger Full Specs v1 | Version-1 essential Fingers (SOP uploaded twice — identical duplicates) |
 | Business Knowledge Acquisition System v1 | Evidence → candidate → validation → library; living knowledge, not static dump |
 | Experience Intelligence Routing Standard + Addendum v1 | Member words → situation → response mode → support path; companion-first; add routing fields without rewrite |
+| Spark Estate Experience Constitution v1 | Create/experience philosophy — Shari as interface; Invisible Estate; conversation before creation |
+| Create / Business Development Studio Experience Spec v1 | Create entrance: Start Freely ↔ Start With Guidance; not a catalog |
+| Spark Guided Creation Engine v1 | One engine, many Fingers; adaptive journey; assemble/polish/verify |
+| Spark Knowledge Finger Standard v1 | Finger definition + required structure (overlaps Finger Authoring Framework) |
+| Product Decision Framework | So what? · Shari · cognitive load · continuity · trust · Build/Wire/Hide/Remove |
 | *(not uploaded)* Library `01` · `02` | Named in library README; Spec 103 / Library Standard stand in |
 
 Runtime mirrors already present for many phases under `lib/estate/sparkEstate*.ts` and `lib/universalCreation/` — treated as **partial encoding**, not as proof of full companion-path wiring.
@@ -430,7 +435,7 @@ These six files describe **how existing capabilities work together**. Several op
 2. Relationship Constitution · The Friend We All Deserve  
 3. Spec 100–103 · Frozen Specs 105–131 · Observation Mode  
 4. Reuse Before Reinvention · Build Type Catalog Final Standard  
-5. Spark Constitution / Design Constitution / Phase protocols / MJ Library — **aligned lenses**, not competing OS  
+5. Spark Constitution / Design Constitution / Experience Constitution / Phase protocols / MJ Library — **aligned lenses**, not competing OS  
 
 ---
 
@@ -501,7 +506,7 @@ Event Ops Master defines the lifecycle (vision → follow-up/lessons) and which 
 
 1. **Hospitality collision** — Spec 111 (companion emotional OS) ≠ Event Green Room logistics ≠ CX “feel welcomed.” Three meanings; one Spec 111 brand — disambiguate the other two in docs/code comments.  
 2. **Systems orchestration vs `SYS-*` Chamber** — orchestrator vs domain library.  
-3. **Domain Foundations vs Chamber Member libraries** — Strategy/Communication/CX/Events Foundations overlap `STR-*`, Content/Presentations, Client Relationships, `EVT-*`. Prefer **one library home per domain** (Chamber Member Intelligence Library / Estate knowledge), not a second parallel “Knowledge Domain” filesystem.  
+3. **Domain Foundations vs Chamber Member libraries** — Strategy/Marketing/Sales/Ops/Communication/CX/Events Foundations overlap `STR-*`, `MKT-*`, `SALES-*`, Ops/Systems/PM, Content/Presentations, Client Relationships, `EVT-*`. Prefer **one library home per domain**, not a parallel Knowledge Domain filesystem.  
 4. **Domain ≠ companion personality** — Activation loads expertise; Shari remains the only voice (Phase 33 / Catalog).  
 5. **Module sprawl** — Event Ops already eight modules; Reuse Before Reinvention: deepen and connect under Event Ops Master before inventing Event rooms or Event engines.  
 6. **Overwhelm** — Domain/module richness must stay behind Activation suppression + one-question rules; member sees progress, not a domain catalog.
@@ -547,6 +552,48 @@ Event Ops Master defines the lifecycle (vision → follow-up/lessons) and which 
 4. **Acquisition vs Spec 112/117** — Global “improve Spark for every user” still needs trust/permission + validation levels; no silent promote from one chat.  
 5. **EI Routing vs keyword heuristics** — Standard forbids keyword-only routing; live path still has heuristic branches (e.g. MJ-002). Target: situation → mode → path.  
 6. **Board / Strategy paths** — Perspective under One Companion (Phase 33), not separate personalities.
+
+---
+
+## 11. Experience Constitution · Create Studio · Guided Creation Engine · Finger Standard · Product Decision Framework
+
+These five docs describe the **Create / Business Development Studio experience layer** and how product decisions are approved.
+
+### Behaviors required
+
+| Document | Requires |
+|----------|----------|
+| **Experience Constitution** | Trusted companion, not chatbot/dashboard/tool kit. Invisible Estate — user talks to Shari; systems stay submerged. Conversation before creation (Understand → … → Deliver). Guided Builds = conversations, not forms. Settings change *how* Shari helps, never *who* she is. So what? · reduce cognitive load · protect ownership. |
+| **Create / BD Studio Spec** | Entrance: “Tell me what you’re working on…”. Start Freely ↔ Start With Guidance (same work, switch without loss). Entrance is **not** a catalog; browse secondary. Lower page: Continue → My Studio Work → Browse Guided Builds → My Templates. Light/Guided/Living adapted by Spark. One section at a time; research available both paths. |
+| **Guided Creation Engine** | One engine, many Fingers. Audience early. Essential / Expert / Edge Cases. Anticipatory review. Non-linear; assemble → polish → verify → deliver → exact continuation. |
+| **Knowledge Finger Standard** | Finger = expertise activated by engine — not chatbot/personality/form. Required structure (purpose, situations, essential/expert/edge, conditionals, research, outputs, connections, completion). |
+| **Product Decision Framework** | Problem first (not feature). So what? · Shari test · cognitive load · continuity · trust. Scorecard. Version 1 Essential / If time / Later / Remove. Verdict: **Build · Wire · Hide · Remove**. Architecture test: shared system first. |
+
+### Existing systems
+
+| Concept | Home |
+|---------|------|
+| Experience Constitution principles | Estate Constitution · Living · Bible · Relationship Constitution · Specs 105–113 · Spec 118 iceberg |
+| Create entrance / Free↔Guided | Create UI + `universalCreation` · Universal Build Engine (same contract) |
+| Guided Creation Engine | `universalCreation` orchestrator/phases/journey/completion — **not** a second engine to invent |
+| Finger Standard | Same as Finger Authoring Framework + SOP/Checklist Finger specs → payloads for document plugins |
+| Product Decision / Wire vs Build | Reuse Before Reinvention · Observation Mode · Capability Matrix · our review finding that orchestration often needs **Wire**, not Build |
+
+### Conflicts
+
+1. **“Highest-level design authority” claim** — Experience Constitution asserts supremacy when features conflict. **Estate Architectural Authority** (Estate Constitution · Living · Bible) remains binding for places/Estate; Relationship Constitution / Friend DNA for voice; Specs 100–131 frozen for conversation OS. Treat Experience Constitution as the **Create/experience lens** aligned to those — not a replacement peer.  
+2. **Guided Creation Engine = Universal Build Engine** — Same shared engine described twice. One runtime home: `universalCreation`.  
+3. **Finger Standard ≈ Finger Authoring Framework** — Merge conceptually; don’t maintain two competing Finger schemas.  
+4. **Create Studio UI ambition** — Continue cards, My Studio Work, Browse Guided Builds may already partially exist in Create panels; Product Framework says prefer **Wire** over Build when capability exists. Avoid a parallel Create OS.  
+5. **Catalog temptation** — Studio Spec forbids wall-of-templates entrance; Align with Build Type Catalog §9 (browse secondary).
+
+### Split
+
+| Reusable | Specific |
+|----------|----------|
+| Experience Constitution principles · Product Decision gates (Wire/Hide/Remove) | Studio page copy, Continue card shapes, Guided Build browse labels |
+| One Guided Creation / Universal Build engine | Finger payloads activated for SOP, Checklist, Workshop, … |
+| Free↔Guided · Light/Guided/Living · one-section default | Section questions & outputs per Finger/Build Type |
 
 ---
 
