@@ -510,6 +510,7 @@ import {
   shouldDeferToolsFromIntelligence,
 } from "@/lib/companionIntelligence";
 import { appFeatureKnowledgeHintForChat } from "@/lib/appFeatureKnowledge";
+import { chamberExpertiseHintForChat } from "@/lib/chamberExpertise";
 import {
   assistantSuggestedAction,
   assistedActionHintForChat,
@@ -14855,6 +14856,10 @@ export default function CompanionPageClient() {
                     })
                   : null,
                 intentRoutingHintForChat(turnIntentRouting),
+                chamberExpertiseHintForChat({
+                  userText: trimmed,
+                  intentCategory: turnIntentRouting.category,
+                }),
                 menuContinuation.active
                   ? menuContinuationHintForChat(
                       menuContinuation,

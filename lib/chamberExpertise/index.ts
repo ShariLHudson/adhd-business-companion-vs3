@@ -20,3 +20,4 @@ export {
   resolveLegacyExpertIds,
 } from "./legacyExpertAliasMap";
 export { resolveChamberExpertActivation } from "./resolveChamberExpertActivation";
+export { chamberExpertiseHintForChat } from "./chamberExpertiseHintForChat";
