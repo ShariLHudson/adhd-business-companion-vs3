@@ -124,7 +124,10 @@ import {
   saveDiscoverySession,
   shouldEnterDiscoveryMode,
 } from "./estateBrain/discoveryMode";
-import { resolveWorkRecognitionFallthrough } from "./estateBrain/workRecognitionFallthrough";
+import {
+  resolveWorkRecognitionNewRecognition,
+  resolveWorkRecognitionResumption,
+} from "./estateBrain/workRecognitionFallthrough";
 import {
   syncUniversalCreationHandoffToSession,
 } from "./conversationSession";
@@ -2082,19 +2085,10 @@ function tryUniversalCreationFlow(
  * Never opens a workspace (Step 2, explicitly deferred). See
  * docs/create-experience/UNIVERSAL_WORK_RECOGNITION_ARCHITECTURE_ANALYSIS.md.
  */
-function tryWorkRecognitionFallthrough(
-  input: FrictionlessActionInput,
+function buildWorkRecognitionDecision(
+  result: NonNullable<ReturnType<typeof resolveWorkRecognitionResumption>>,
   routing: IntentRoutingDecision,
-): FrictionlessActionDecision | null {
-  const userText = input.userText.trim();
-  if (!userText) return null;
-
-  const result = resolveWorkRecognitionFallthrough(
-    userText,
-    input.lastAssistantText,
-  );
-  if (!result) return null;
-
+): FrictionlessActionDecision {
   return {
     category: "estate_discovery",
     suppressRelationship: true,
@@ -2110,6 +2104,43 @@ function tryWorkRecognitionFallthrough(
     workspaceOffer: null,
     intentRouting: routing,
   };
+}
+
+/**
+ * Priority fix (2026-08-06) — an active Work Recognition journey retains
+ * ownership of the conversation. Called EARLY (see the call site right
+ * after yesContinuation), before goal classification / capability routing
+ * get a chance to hijack a reply that belongs to an in-flight journey.
+ * Returns null immediately unless a session is genuinely already open, so
+ * a message with no active journey is entirely unaffected. See
+ * resolveWorkRecognitionResumption's own doc comment for the full
+ * reasoning and the AT-5.7 (Research Inside Creation) fix it addresses.
+ */
+function tryWorkRecognitionResumption(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  if (!userText) return null;
+
+  const result = resolveWorkRecognitionResumption(
+    userText,
+    input.lastAssistantText,
+  );
+  if (!result) return null;
+  return buildWorkRecognitionDecision(result, routing);
+}
+
+function tryWorkRecognitionFallthrough(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  if (!userText) return null;
+
+  const result = resolveWorkRecognitionNewRecognition(userText);
+  if (!result) return null;
+  return buildWorkRecognitionDecision(result, routing);
 }
 
 function tryDiscoveryFlow(
@@ -4049,6 +4080,19 @@ function resolveFrictionlessActionImpl(
   if (yesContinuation) {
     return finish(yesContinuation);
   }
+
+  // Universal Work Recognition — priority fix (2026-08-06, AT-5.7). Must run
+  // BEFORE goal classification / executeEstateIntelligence below — those
+  // already independently match a plain "research" (or "create", etc.)
+  // reply and would otherwise hijack a message that actually belongs to an
+  // in-flight Work Recognition journey. Returns null immediately unless a
+  // session is genuinely already open, so this is a no-op for every message
+  // without an active journey behind it.
+  const workRecognitionResumption = tryWorkRecognitionResumption(
+    input,
+    routing,
+  );
+  if (workRecognitionResumption) return finish(workRecognitionResumption);
 
   routingPipeline = runConversationRoutingPipeline(
     {

@@ -1,9 +1,12 @@
 /**
- * Universal Work Recognition — Step 1 (2026-08-06). The additive fallthrough
- * seam.
+ * Universal Work Recognition (2026-08-06). Step 1 (the additive fallthrough
+ * seam) plus the priority fix (AT-5.7 — Research Inside Creation): an active
+ * journey retains ownership of the conversation over standalone intent
+ * detection, unless the member explicitly requests a different direction.
  *
  * @vitest-environment jsdom
  * @see docs/create-experience/UNIVERSAL_WORK_RECOGNITION_ARCHITECTURE_ANALYSIS.md
+ * @see docs/create-experience/UNIVERSAL_REASONING_JOURNEY_ACCEPTANCE_TESTS.md (AT-5.7)
  */
 
 import { beforeEach, describe, expect, it } from "vitest";
@@ -12,7 +15,8 @@ import {
   detectWorkRecognitionShape,
   isWorkRecognitionMessage,
   resetWorkRecognitionSessionForTests,
-  resolveWorkRecognitionFallthrough,
+  resolveWorkRecognitionNewRecognition,
+  resolveWorkRecognitionResumption,
 } from "./workRecognitionFallthrough";
 import { resetEntranceUnderstandingForTests } from "@/lib/createEstate/entranceUnderstanding";
 import { clearRuntimeCreationRecordsForTests } from "@/lib/currentFocus/creationRecord";
@@ -26,7 +30,7 @@ beforeEach(() => {
 });
 
 describe("detectWorkRecognitionShape — the founder's three shapes", () => {
-  it("Test 1 — 'I need to know how to X' recognizes develop, not a factual question", () => {
+  it("'I need to know how to X' recognizes develop, not a factual question", () => {
     const match = detectWorkRecognitionShape(
       "I need to know how to record a Loom video and upload it to YouTube.",
     );
@@ -59,7 +63,7 @@ describe("detectWorkRecognitionShape — the founder's three shapes", () => {
   });
 });
 
-describe("Test 2 — explicit develop/build/improve verbs (recognized nowhere else today)", () => {
+describe("explicit develop/build/improve verbs (recognized nowhere else today)", () => {
   it("'I want to build a strategy for organizing my filing system' recognizes build", () => {
     const match = detectWorkRecognitionShape(
       "I want to build a strategy for organizing my filing system.",
@@ -99,9 +103,9 @@ describe("factual questions are never recognized as work", () => {
   });
 });
 
-describe("the seam — recognition without opening a workspace", () => {
+describe("new recognition (late fallthrough) — recognition without opening a workspace", () => {
   it("turn 1: recognizes work, asks the first question, saves a session", () => {
-    const result = resolveWorkRecognitionFallthrough(
+    const result = resolveWorkRecognitionNewRecognition(
       "I need to know how to record a Loom video and upload it to YouTube.",
     );
     expect(result?.kind).toBe("question");
@@ -112,7 +116,7 @@ describe("the seam — recognition without opening a workspace", () => {
   });
 
   it("never a generic instructional list for the Loom example (AT-1)", () => {
-    const result = resolveWorkRecognitionFallthrough(
+    const result = resolveWorkRecognitionNewRecognition(
       "I need to know how to record a Loom video and upload it to YouTube.",
     );
     expect(result?.kind).toBe("question");
@@ -122,41 +126,14 @@ describe("the seam — recognition without opening a workspace", () => {
   });
 
   it("unrecognized text returns null — current behavior continues unchanged", () => {
+    expect(resolveWorkRecognitionNewRecognition("What is Loom?")).toBeNull();
     expect(
-      resolveWorkRecognitionFallthrough("What is Loom?"),
+      resolveWorkRecognitionNewRecognition("How are you today?"),
     ).toBeNull();
-    expect(resolveWorkRecognitionFallthrough("How are you today?")).toBeNull();
-  });
-
-  it("turn 2 resumes the SAME conversation via the saved session + marker", () => {
-    const first = resolveWorkRecognitionFallthrough(
-      "I need to know how to record a Loom video and upload it to YouTube.",
-    );
-    if (first?.kind !== "question") throw new Error("expected a question");
-    expect(isWorkRecognitionMessage(first.message)).toBe(true);
-
-    const second = resolveWorkRecognitionFallthrough(
-      "So my assistant can do it without asking me every time",
-      first.message,
-    );
-    expect(second?.kind).toBe("question");
-    if (second?.kind !== "question") return;
-    // Progressed to the next question — never the same one repeated (Rule 5).
-    expect(second.message).not.toBe(first.message);
-  });
-
-  it("a message unrelated to the in-flight session, sent while one is stored, still requires its own shape match", () => {
-    const first = resolveWorkRecognitionFallthrough(
-      "I need help organizing my client files.",
-    );
-    if (first?.kind !== "question") throw new Error("expected a question");
-    // lastAssistantText NOT passed — this simulates a fresh turn where the
-    // caller (frictionlessActionLayer) didn't consider it a continuation.
-    expect(resolveWorkRecognitionFallthrough("What is Loom?")).toBeNull();
   });
 
   it("completion never opens a workspace — no side effect beyond the closing message", () => {
-    let step = resolveWorkRecognitionFallthrough(
+    let step = resolveWorkRecognitionNewRecognition(
       "I need help organizing my client files.",
     );
     if (step?.kind !== "question") throw new Error("expected a question");
@@ -164,7 +141,7 @@ describe("the seam — recognition without opening a workspace", () => {
 
     // Walk to completion by answering every remaining question.
     for (let i = 0; i < 6 && step?.kind === "question"; i++) {
-      const next = resolveWorkRecognitionFallthrough(
+      const next = resolveWorkRecognitionResumption(
         "A clear folder structure everyone follows",
         lastMessage,
       );
@@ -180,18 +157,118 @@ describe("the seam — recognition without opening a workspace", () => {
     // workspace side effect (Step 2 is explicitly deferred).
     expect(localStorage.getItem("spark.runtimeCreationRecords.v1")).toBeNull();
   });
+});
+
+describe("resumption (early priority) — an active journey retains ownership (AT-5.7)", () => {
+  it("turn 2 resumes the SAME conversation via the saved session + marker", () => {
+    const first = resolveWorkRecognitionNewRecognition(
+      "I need to know how to record a Loom video and upload it to YouTube.",
+    );
+    if (first?.kind !== "question") throw new Error("expected a question");
+    expect(isWorkRecognitionMessage(first.message)).toBe(true);
+
+    const second = resolveWorkRecognitionResumption(
+      "So my assistant can do it without asking me every time",
+      first.message,
+    );
+    expect(second?.kind).toBe("question");
+    if (second?.kind !== "question") return;
+    // Progressed to the next question — never the same one repeated (Rule 5).
+    expect(second.message).not.toBe(first.message);
+  });
+
+  it("Founder Test 1 — active newsletter journey + a reply mentioning research continues the journey, never redirects", () => {
+    // "I need help organizing" is one of this module's own recognized
+    // shapes (build) — standing in for the founder's illustrative "I need
+    // help writing a newsletter" opener, which is a plain create-shaped
+    // request handled by the existing, separate "create" goal path (out of
+    // this module's scope; see AT-6.4/Step 2). What's under test here is
+    // resumption priority, not which opener starts the journey.
+    const first = resolveWorkRecognitionNewRecognition(
+      "I need help organizing my newsletter content.",
+    );
+    if (first?.kind !== "question") throw new Error("expected a question");
+
+    // Before the fix, this reply matched isResearchIntent's literal
+    // "research" pattern and would have been hijacked by goal
+    // classification long before this module ever saw it.
+    const second = resolveWorkRecognitionResumption(
+      "No but need help with some research.",
+      first.message,
+    );
+    expect(second).not.toBeNull();
+    expect(second?.kind === "question" || second?.kind === "understood").toBe(
+      true,
+    );
+  });
+
+  it("Founder Test 2 — a standalone research question is untouched when no journey is active", () => {
+    // No active session at all — must be a no-op, letting existing
+    // research routing (isResearchIntent, etc.) handle it exactly as
+    // before this fix.
+    expect(
+      resolveWorkRecognitionResumption("What are current newsletter trends?"),
+    ).toBeNull();
+    // Nor does it get mistakenly recognized as brand-new work — it's a
+    // factual/trend question, not a work-shaped request.
+    expect(
+      detectWorkRecognitionShape("What are current newsletter trends?"),
+    ).toBeNull();
+  });
+
+  it("Founder Test 2b — a stored session doesn't leak into an unrelated reply", () => {
+    // A journey is active, but this particular assistant turn was NOT one
+    // of the journey's own questions — the reply must not be swallowed.
+    resolveWorkRecognitionNewRecognition(
+      "I need help organizing my newsletter content.",
+    );
+    expect(
+      resolveWorkRecognitionResumption(
+        "What are current newsletter trends?",
+        "Here's a quick summary of your day so far.",
+      ),
+    ).toBeNull();
+  });
+
+  it("Founder Test 3 — a casual past-tense mention of research is never recognized as work", () => {
+    expect(
+      detectWorkRecognitionShape("I was researching something yesterday"),
+    ).toBeNull();
+    expect(
+      resolveWorkRecognitionNewRecognition(
+        "I was researching something yesterday",
+      ),
+    ).toBeNull();
+  });
+
+  it("explicit redirect wins over an active journey — the member's own request for a different direction is honored", () => {
+    const first = resolveWorkRecognitionNewRecognition(
+      "I need help organizing my newsletter content.",
+    );
+    if (first?.kind !== "question") throw new Error("expected a question");
+
+    // An explicit navigation signal — the founder's own carve-out ("unless
+    // they explicitly request a different direction").
+    expect(
+      resolveWorkRecognitionResumption(
+        "Actually, take me to the Boardroom",
+        first.message,
+      ),
+    ).toBeNull();
+  });
+
+  it("a message unrelated to any in-flight session, with no session stored, still requires its own shape match", () => {
+    expect(resolveWorkRecognitionResumption("What is Loom?")).toBeNull();
+  });
 
   it("clearWorkRecognitionSession ends an in-flight conversation cleanly", () => {
-    const first = resolveWorkRecognitionFallthrough(
+    const first = resolveWorkRecognitionNewRecognition(
       "I need a better way to keep track of client follow-ups.",
     );
     if (first?.kind !== "question") throw new Error("expected a question");
     clearWorkRecognitionSession();
-    // With the session cleared, the same reply text (which matches no
-    // shape on its own) is correctly treated as unrecognized, not a
-    // continuation of the cleared session.
     expect(
-      resolveWorkRecognitionFallthrough("a reminder every Friday", first.message),
+      resolveWorkRecognitionResumption("a reminder every Friday", first.message),
     ).toBeNull();
   });
 });

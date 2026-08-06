@@ -1,19 +1,28 @@
 /**
- * Universal Work Recognition — the additive fallthrough seam (2026-08-06).
+ * Universal Work Recognition (2026-08-06). Two entry points, called from two
+ * different priorities in resolveFrictionlessActionImpl
+ * (lib/frictionlessActionLayer.ts):
+ *
+ * - resolveWorkRecognitionResumption — called EARLY, right after the
+ *   highest-priority structural checks (pending choices, casual updates)
+ *   and before goal classification / capability routing run. "If the
+ *   member is already inside an active reasoning journey, their response
+ *   belongs to that journey unless they explicitly request a different
+ *   direction" (AT-5.7 fix). Returns null immediately unless a session is
+ *   genuinely already open — a message with no active journey is entirely
+ *   unaffected and falls through to every existing detector unchanged.
+ * - resolveWorkRecognitionNewRecognition — called LATE, at the final
+ *   fallthrough, only after every other recognizer (including the early
+ *   resumption call above) has already failed to match. This is the
+ *   original Step 1 seam: by construction it can never preempt or regress
+ *   a currently-working route.
  *
  * Analysis: docs/create-experience/UNIVERSAL_WORK_RECOGNITION_ARCHITECTURE_ANALYSIS.md
- * Approved scope: Step 1 only. Recognition + the understanding conversation.
- * Never opens a workspace (that convergence is explicitly Step 2, deferred).
- *
- * This module is called from exactly ONE place: the final fallthrough in
- * resolveFrictionlessActionImpl (lib/frictionlessActionLayer.ts), immediately
- * before it gives up and returns category: "none". By construction, every
- * other recognizer (goal classification, discoveryMode's 4 topics,
- * capabilityRegistry, universal creation, coaching, navigation, emotional
- * support, …) has already run and failed to match by the time this fires —
- * so this can never preempt or regress a currently-working route. handleSend
- * is not modified; Chamber inherits this for free because it shares
- * handleSend's pipeline verbatim (verified in the architecture analysis).
+ * Approved scope: recognition + the understanding conversation only. Never
+ * opens a workspace (that convergence is explicitly Step 2, deferred).
+ * handleSend is not modified in either case; Chamber inherits both for free
+ * because it shares handleSend's pipeline verbatim (verified in the
+ * architecture analysis).
  *
  * No new conversation engine: the actual multi-turn walk reuses
  * lib/createEstate/entranceUnderstanding.ts's exact exported functions —
@@ -35,6 +44,7 @@ import {
   type EntranceUnderstandingStep,
 } from "@/lib/createEstate/entranceUnderstanding";
 import { DISCOVERY_QUESTIONS } from "@/lib/estateBrain/discoveryRegistry";
+import { isExplicitNavigationIntent } from "@/lib/conversationStabilization/goalClassifier";
 
 // ---------------------------------------------------------------------------
 // Shape detection — request shapes, not keywords.
@@ -258,25 +268,65 @@ function applyStep(
 }
 
 /**
- * The one function frictionlessActionLayer.ts calls, and only at the final
- * fallthrough. Returns null for anything not recognized as work OR not a
- * continuation of an in-flight recognition conversation — callers should
- * treat null exactly like "no match, continue current behavior."
+ * Priority fix (2026-08-06) — "if the member is already inside an active
+ * reasoning journey, their response belongs to that journey unless they
+ * explicitly request a different direction." Call this EARLY — before goal
+ * classification / capability routing get a chance to hijack the reply
+ * (frictionlessActionLayer.ts's insertion point sits right after the
+ * highest-priority structural checks — pending choices, casual updates —
+ * and before routingPipeline/executeEstateIntelligence run). This is the
+ * fix for AT-5.7 (Research Inside Creation): "No but need help with some
+ * research" mid-newsletter-journey previously matched isResearchIntent's
+ * literal "research" pattern before this module ever got a chance to see
+ * it was a continuation.
+ *
+ * Deliberately narrow: returns non-null ONLY when a session is genuinely
+ * already open (isWorkRecognitionMessage(lastAssistantText) AND a stored
+ * session) — a message with no active journey behind it always returns
+ * null here, unaffected, and falls through to every existing detector
+ * exactly as before (research routing included). Explicit redirects
+ * (isExplicitNavigationIntent) are honored — the member's own "take me
+ * to…" wins over an in-flight journey, exactly as instructed.
+ *
+ * Scope, exactly as approved: priority only. No research choices, no
+ * research execution, no new UI — the member's reply is recorded through
+ * entranceUnderstanding.ts's own existing answer/skip logic, unchanged.
  */
-export function resolveWorkRecognitionFallthrough(
+export function resolveWorkRecognitionResumption(
   userText: string,
   lastAssistantText?: string | null,
 ): WorkRecognitionTurnResult | null {
   const text = userText.trim();
   if (!text) return null;
-
-  if (lastAssistantText && isWorkRecognitionMessage(lastAssistantText)) {
-    const stored = loadWorkRecognitionSession();
-    if (stored) {
-      const step = advanceEntranceUnderstanding(stored, text);
-      return applyStep(step, null);
-    }
+  if (!lastAssistantText || !isWorkRecognitionMessage(lastAssistantText)) {
+    return null;
   }
+  const stored = loadWorkRecognitionSession();
+  if (!stored) return null;
+
+  // "Unless they explicitly request a different direction" — an explicit
+  // navigation signal wins; let normal routing handle it this turn. The
+  // session is left in place (not cleared) — a genuine redirect, not a
+  // reason to lose the journey's gathered context.
+  if (isExplicitNavigationIntent(text)) return null;
+
+  const step = advanceEntranceUnderstanding(stored, text);
+  return applyStep(step, null);
+}
+
+/**
+ * New-recognition only — called from the LATE fallthrough, after every
+ * existing recognizer (including resolveWorkRecognitionResumption's own
+ * early call — session continuation never reaches here, it already
+ * returned) has failed to match. Unchanged from Step 1 except that
+ * continuation logic now lives in resolveWorkRecognitionResumption instead
+ * of being duplicated here.
+ */
+export function resolveWorkRecognitionNewRecognition(
+  userText: string,
+): WorkRecognitionTurnResult | null {
+  const text = userText.trim();
+  if (!text) return null;
 
   const shape = detectWorkRecognitionShape(text);
   if (!shape) return null;
