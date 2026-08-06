@@ -58,7 +58,10 @@ Future Estate reasoning and experience standards (protocol + intelligence librar
 | 098 Create section navigation & document assembly prompt | UWE/Create: one authoritative active section; Complete It Now assembles full work |
 | Projects vs Business Build Architecture Review v1.4.0 | **Founder-approved:** keep Projects / My Business Estate / Business Strategy Builder separate; retire “Business Build” name |
 | Business naming & registry cleanup handoff | Planning only — inventory/plan; **does not authorize implementation** |
-| *(not uploaded)* Library `01` · `02` | Named in library README; Spec 103 / Library Standard stand in |
+| Knowledge Finger Library Index · Architecture Map · Coverage Gap Analysis | Reasoning-pattern catalog; founder-journey map; gaps vs “leave to existing systems” |
+| Knowledge Finger Implementation Review Handoff | Review ownership/duplication **before** any Finger implementation |
+| Knowledge Fingers (reasoning patterns) | Customer Discovery · Sales & Client Acquisition · Product Development · Operations Management · Leadership & Delegation · Innovation & Improvement |
+| *(not uploaded)* Library `01` · `02` · Finger Quality Standard · Priority Roadmap | Named in Finger handoff; not in this upload set |
 
 Runtime mirrors already present for many phases under `lib/estate/sparkEstate*.ts` and `lib/universalCreation/` — treated as **partial encoding**, not as proof of full companion-path wiring.
 
@@ -433,7 +436,7 @@ These six files describe **how existing capabilities work together**. Several op
 | Do these files demand new product architecture? | **No.** Builds orchestrate; expertise lives in one Business Knowledge Library (map to Chamber libraries). Reuse Before Reinvention forbids parallel engines/trees. MJ library is validation-only. |
 | Biggest gap | Knowledge **depth** (Fingers/Domains) on the live `universalCreation` path; EI situation→path routing vs keyword heuristics; Reasoning Engine largely unwired; organize-before-build (MJ-001/002). |
 | Clearest reusable vs specific split | **Orchestration** (reasoning · activation · EI routing · context/systems/stakeholder/dependency · build · implementation) → **Domains** → **Fingers/Modules** → **Build Types**; MJ validates situations. |
-| Recommended stance under Observation Mode | Prefer **Wire** over Build (Product Decision Framework). One library home (Chamber). One creation engine (`universalCreation`). Fingers deepen plugins. Companion-first EI routing. Experience Constitution aligns under Estate + Relationship + Spec authorities — not a peer OS. Validate with MJ-001. Rule of Three. |
+| Recommended stance under Observation Mode | Prefer **Wire** over Build. One library home. One creation/UWE runtime. Honor founder decision: Projects ≠ My Business Estate ≠ Strategy Builder; retire “Business Build.” Pocket constitutions = checklists only. Create section bugs = Wire under handoff. Validate with MJ-001. Rule of Three. |
 
 ### Authority order (for future readers)
 
@@ -656,6 +659,101 @@ Requires:
 | One work/section runtime · assemble-on-complete · principle checklists | Marketing Campaign / Workshop Map section packages |
 | Separate Projects · My Business Estate · Strategy Builder boundaries | V2 typed Project→business-context link |
 | Naming clarity (“Business Build” retired) | Inventory + phased cleanup commits (handoff-gated) |
+
+---
+
+## 13. Knowledge Finger library as reasoning patterns (not templates)
+
+This batch clarifies a critical distinction that earlier Finger/Build Type uploads can blur.
+
+### Definition (Library Index + Implementation Handoff)
+
+| Layer | Defines | Is not |
+|-------|---------|--------|
+| **Knowledge Finger** | Reasoning pattern — how an expert thinks; questions, risks, research triggers, Working Memory needs | Template · workflow · Build Definition · feature · capability doc · chatbot |
+| **Build Type** | What the member creates; experience structure; save/resume | Where expertise “lives” |
+| **Capability** | What Spark can use (Research, Projects, Calendar, Documents, Working Memory) | A Finger |
+
+**Architecture Map core question:** *What kind of thinking does this person need right now?* — not *What document are they creating?*
+
+### Completed reasoning Fingers (Index) → example Build Types
+
+| Finger | Thinking job | Example Builds |
+|--------|--------------|----------------|
+| Capture & Transfer Expertise | Transfer head-knowledge so others succeed | SOP |
+| Design Transformation | Create change for others | Workshop |
+| Relationship Communication | Trust over time | Newsletter, Social |
+| Strategic Decision Support | Uncertainty → confident choice | Marketing Plan, Financial Decisions |
+| Experience Design | Journey from another person’s view | Travel, Craft Fair, Online Store |
+| Execution Reliability | Reduce memory load / follow-through | Checklist, Inventory |
+| Alignment & Commitment | Shared understanding before commit | Proposal |
+
+### New / Tier-1 Fingers in this upload
+
+| Finger | Thinking job | Related domains / Builds |
+|--------|--------------|--------------------------|
+| Customer Discovery | Understand people before solutions | CX · Offer · Marketing · Research |
+| Product Development | Idea → valuable usable solution | Offer · Product · Programs |
+| Sales & Client Acquisition | Ethical fit and informed decisions | Sales Domain · Proposal · Follow-up |
+| Operations Management | Clarity/consistency as complexity grows | Ops Domain · SOP · Checklist · Workflows |
+| Leadership & Delegation | Conditions for others to succeed | Leadership · Training · Roles |
+| Innovation & Improvement | Better ways without chasing every idea | Experiments · Process redesign |
+
+### Founder journey (Architecture Map) — reusable sequencing, not a rigid workflow
+
+1. Understand opportunity → Customer Discovery · Innovation & Improvement  
+2. Decide what to create → Product Development · Experience Design  
+3. Communicate value → Relationship Communication · Strategic Decision Support  
+4. (Further map stages) Execution · Alignment · Leadership · Operations · Sales  
+
+Spark selects thinking mode; member still sees one Shari conversation.
+
+### Coverage Gap Analysis — what must **not** become new Fingers
+
+| Potential gap | Gap Analysis guidance |
+|---------------|----------------------|
+| Time & Priority Management | Avoid duplicating ADHD / Plan My Day / EF supports already owned elsewhere |
+| Financial Growth Planning | Monitor; don’t fork Finance domain carelessly |
+| Operations Management | Was “monitor before separate Finger” — now authored; still must not replace SOP/Checklist Fingers or Ops Domain |
+| Generic “support” situations | Leave to Companion First / MJ validations / Spec 114 modes |
+
+### Implementation Review Handoff (before any build)
+
+Required answers: ownership · no duplication of Constitution / MJ / Build Definitions / Chamber reasoning / conversation architecture / Working Memory · activation without keywords only · conversation influence without rigid interviews.
+
+**Status:** review handoff — **not** authorization to implement Finger runtime.
+
+### Naming collision to resolve in docs (not by building twice)
+
+| Earlier upload language | This library’s language | Alignment |
+|-------------------------|-------------------------|-----------|
+| “SOP Knowledge Finger Full Spec” | Capture & Transfer Expertise Finger **influences** SOP Build Type | Prefer: **reasoning Finger** + **Build Type / document plugin payload**; SOP Full Spec = Build-Type expert payload under Capture & Transfer, not a second Finger OS |
+| Finger Authoring / Finger Standard | Same authoring bar for reasoning Fingers | One authoring standard; two content kinds if needed: *reasoning Finger* vs *Build Type knowledge package* — name them differently in future docs |
+
+### Existing systems
+
+| Finger concern | Home |
+|----------------|------|
+| Reasoning pattern selection | EI Routing · Activation Matrix · Spec 114 modes · Wisdom Loop · Estate Brain |
+| Domain expertise | Chamber libraries · Knowledge Domains (§9–10) |
+| Build structure | Build Type Catalog · `universalCreation` plugins |
+| Continuity / Working Memory | Spec 112/117 · session/continue |
+| ADHD / priorities | Plan My Day · Adapt My Day · Clear My Mind · EF — **not** a new Finger by default (Gap Analysis) |
+
+### Conflicts
+
+1. **Finger-as-document vs Finger-as-reasoning** — Reconcile vocabulary; do not ship two Finger runtimes.  
+2. **Finger sprawl** — Gap Analysis + Reuse Before Reinvention: expand library only for uncovered *thinking* jobs; keep V1 Build Type catalog small.  
+3. **Duplicate Chamber reasoning** — Customer Discovery / Sales / Ops Fingers overlap Chamber `XXX-006` and Domain Foundations; Finger = activation-facing reasoning pattern; Chamber/Domain = deep library — one consumption path.  
+4. **Handoff vs Observation Mode** — Aligns: review ownership before implementation; no immediate Finger feature build from this pass.
+
+### Split
+
+| Reusable | Specific |
+|----------|----------|
+| Finger = reasoning pattern · Architecture Map journey stages · Gap “leave to existing systems” rules · Review handoff gates | Individual Finger files (Discovery, Sales, Ops, …) |
+| Activation via situation/intent (EI Routing) | Which Finger fits which moment |
+| Build Types remain the creation structure | Build Type ↔ Finger influence links in the Index |
 
 ---
 
