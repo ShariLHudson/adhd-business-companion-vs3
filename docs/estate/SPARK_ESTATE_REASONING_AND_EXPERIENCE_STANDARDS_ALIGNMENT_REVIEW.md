@@ -52,6 +52,12 @@ Future Estate reasoning and experience standards (protocol + intelligence librar
 | Spark Guided Creation Engine v1 | One engine, many Fingers; adaptive journey; assemble/polish/verify |
 | Spark Knowledge Finger Standard v1 | Finger definition + required structure (overlaps Finger Authoring Framework) |
 | Product Decision Framework | So what? · Shari · cognitive load · continuity · trust · Build/Wire/Hide/Remove |
+| Spark Estate Constitution (pocket) · Experience Principles · Design Decision Test | Compact principle cards — same tests as Experience Constitution / Spec 103 |
+| AI Implementation Principles (×2 identical) | Reuse · no duplicates · one change · stop if larger architecture issue |
+| Experience Constitution v1 (re-upload) | Duplicate of prior Experience Constitution upload |
+| 098 Create section navigation & document assembly prompt | UWE/Create: one authoritative active section; Complete It Now assembles full work |
+| Projects vs Business Build Architecture Review v1.4.0 | **Founder-approved:** keep Projects / My Business Estate / Business Strategy Builder separate; retire “Business Build” name |
+| Business naming & registry cleanup handoff | Planning only — inventory/plan; **does not authorize implementation** |
 | *(not uploaded)* Library `01` · `02` | Named in library README; Spec 103 / Library Standard stand in |
 
 Runtime mirrors already present for many phases under `lib/estate/sparkEstate*.ts` and `lib/universalCreation/` — treated as **partial encoding**, not as proof of full companion-path wiring.
@@ -427,7 +433,7 @@ These six files describe **how existing capabilities work together**. Several op
 | Do these files demand new product architecture? | **No.** Builds orchestrate; expertise lives in one Business Knowledge Library (map to Chamber libraries). Reuse Before Reinvention forbids parallel engines/trees. MJ library is validation-only. |
 | Biggest gap | Knowledge **depth** (Fingers/Domains) on the live `universalCreation` path; EI situation→path routing vs keyword heuristics; Reasoning Engine largely unwired; organize-before-build (MJ-001/002). |
 | Clearest reusable vs specific split | **Orchestration** (reasoning · activation · EI routing · context/systems/stakeholder/dependency · build · implementation) → **Domains** → **Fingers/Modules** → **Build Types**; MJ validates situations. |
-| Recommended stance under Observation Mode | One library home per domain (Chamber). Fingers deepen SOP/Checklist/etc. inside existing plugins. Companion-first EI routing. No third Knowledge Library tree. Validate with MJ-001. Rule of Three / Acquisition validation levels before global learning. |
+| Recommended stance under Observation Mode | Prefer **Wire** over Build (Product Decision Framework). One library home (Chamber). One creation engine (`universalCreation`). Fingers deepen plugins. Companion-first EI routing. Experience Constitution aligns under Estate + Relationship + Spec authorities — not a peer OS. Validate with MJ-001. Rule of Three. |
 
 ### Authority order (for future readers)
 
@@ -594,6 +600,62 @@ These five docs describe the **Create / Business Development Studio experience l
 | Experience Constitution principles · Product Decision gates (Wire/Hide/Remove) | Studio page copy, Continue card shapes, Guided Build browse labels |
 | One Guided Creation / Universal Build engine | Finger payloads activated for SOP, Checklist, Workshop, … |
 | Free↔Guided · Light/Guided/Living · one-section default | Section questions & outputs per Finger/Build Type |
+
+---
+
+## 12. Pocket principles · UWE section runtime · Projects vs business systems (approved)
+
+### Pocket principle cards (not new authorities)
+
+| Upload | Role |
+|--------|------|
+| Spark Estate Constitution (short) | Pocket list of permanent principles |
+| Experience Principles | Eight experience bullets |
+| Design Decision Test | Six YES gates before implementation |
+| AI Implementation Principles (duplicate pair) | Agent/dev hygiene: reuse, no duplicates, one change, stop on architecture surprises |
+| Experience Constitution (re-upload) | Same as §11 Experience Constitution |
+
+These compress Spec 103 / Experience Constitution / Reuse Before Reinvention. Keep as checklists — do not multiply peer constitutions.
+
+### 098 — Create section navigation & assembly (Wire, not new engine)
+
+Requires:
+
+- One authoritative **active section** (map · Current Focus · editor · save · Projects all agree)
+- Sections own stable ID, content, status, autosave, completion
+- **Complete It Now** assembles schema-ordered full document
+- Universal Work Engine (UWE) as source of truth — no parallel Create-only / Projects-only section store
+
+**Alignment:** Same “one engine” rule as Universal Build / Guided Creation → map UWE naming onto existing Create/`universalCreation`/work-section runtime; **Wire** competing `currentFocus` / `activeSection` fields. This upload is an implementation prompt for a concrete bug — Observation Mode: execute only under an approved implementation handoff, not from alignment review alone.
+
+### Projects vs Business Build (Founder-approved 2026-08-05)
+
+| System | Role | Store |
+|--------|------|-------|
+| **Projects** (+ Project Homes view) | Source of truth for outcome-based work | `companion-projects-v1` |
+| **My Business Estate** | Structured business-building environment | Own profile store |
+| **Business Strategy Builder** | Conversation-based strategy workflow | Ephemeral (no persistence) |
+
+**Approved direction:** remain **separate**; **no** Project↔business link in v1; **retire “Business Build”** as an official system name (naming collision). Typed link = V2 only after naming/types/registries/persistence consolidate.
+
+**Cleanup handoff:** planning/inventory only — **does not authorize** deletion, migration, renames, or registry consolidation. Evidence report (`docs/reviews/projects-business-build-evidence-report.md`) was untracked at review time — not found in repo yet.
+
+**Alignment with Reuse Before Reinvention / Product Decision Framework:** combining three stores would be high-risk Create without member payoff → reject merge; prefer naming hygiene (**Wire**/label cleanup) over integration **Build**.
+
+### Conflicts
+
+1. **Constitution proliferation** — Pocket Constitution + Experience Constitution + Spark Constitution v1 + Design Constitution + Estate Constitution. Authority order in §8 still stands; pocket cards are checklists.  
+2. **UWE vs Universal Build vs Guided Creation vs `universalCreation`** — Four names, one creation/work orchestration job. Consolidate labels in docs; one runtime.  
+3. **“Business Build” / “Business Building” strings** — Still appear in SIOS docs and estateBrain knowledge labels; cleanup is Class A/B work under the planning handoff, not a new business OS.  
+4. **098 prompt vs Observation Mode** — Concrete Create bug fix is **Wire**; do not use the prompt to invent a second section store or expand scope into Projects redesign.
+
+### Split
+
+| Reusable | Specific / deferred |
+|----------|---------------------|
+| One work/section runtime · assemble-on-complete · principle checklists | Marketing Campaign / Workshop Map section packages |
+| Separate Projects · My Business Estate · Strategy Builder boundaries | V2 typed Project→business-context link |
+| Naming clarity (“Business Build” retired) | Inventory + phased cleanup commits (handoff-gated) |
 
 ---
 
