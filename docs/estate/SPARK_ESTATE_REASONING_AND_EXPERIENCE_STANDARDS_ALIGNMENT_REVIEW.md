@@ -26,8 +26,11 @@ Future Estate reasoning and experience standards (protocol + intelligence librar
 | Chamber Library Standard / MEMBER_INDEX | Required member file shape; AI & Technology as expansion reference |
 | SPARK-159 Companion Experience Standards | Listen · understand · remember · personalize · reduce overwhelm |
 | Spec 103 / T-003 Universal Experience Standards | Existing frozen ecosystem experience canon (cross-check) |
+| MJ-002 … MJ-007 Member Journey validations | Foundational ADHD founder situations — validate experience, not new features |
 
 Runtime mirrors already present for many phases under `lib/estate/sparkEstate*.ts` and `lib/universalCreation/` — treated as **partial encoding**, not as proof of full companion-path wiring.
+
+Member Journey layer status: `docs/MEMBER_JOURNEY_ARCHITECTURE.md` is **binding architecture, implementation deferred**; `lib/memberJourney/` is proposed / not present. MJ-002…007 are validation scenarios — they exercise reusable conversation/EF systems, not a separate product surface.
 
 ---
 
@@ -189,14 +192,59 @@ Those belong in reusable architecture; domain files supply **reasoning content a
 
 ---
 
+## 5. Member Journey validations (MJ-002 … MJ-007)
+
+Uploaded foundational journeys. All Priority 1 / “Ready Now.” They validate that Spark behaves like Spark under real ADHD founder pressure — **not** that a new Member Journey product exists.
+
+### Shared behaviors every MJ requires
+
+Across all six:
+
+1. **Reuse context** — never re-ask what Spark should already know  
+2. **One recommendation** — not lists of equal options  
+3. **Preserve work** — ideas, plans, unfinished threads stay safe  
+4. **Smallest meaningful progress** — minutes, not planning sessions  
+5. **Correct problem class** — prioritization ≠ idea generation; return ≠ absence shame; 15 minutes ≠ full plan; interruption ≠ amnesia  
+6. **Estate connects only when helpful** — Projects, Chamber, Library, Evidence Vault — never as a menu dump  
+7. **Emotional outcomes** — relief, focus, welcome, control — over productivity theater  
+
+Spark difference repeated in every file: general AI generates or restarts; Spark organizes, remembers, recommends, and protects continuity.
+
+### Per-journey behavior + existing support + conflicts
+
+| Journey | Required behavior | Existing support | Conflict / gap |
+|---------|-------------------|------------------|----------------|
+| **MJ-002** Too many ideas | Prioritize existing ideas; don’t brainstorm more; top 3 → one start; save the rest | Overwhelm / idea-overload routing, Clear My Mind, Decision Compass, ADHD situation atlas, capability registry | Documented: `"too many ideas"` can miss Clear My Mind and compete with Visual Thinking / mind-map paths |
+| **MJ-003** Away for weeks | No judgment; restore where they left off; one next step; no start-over | Arrival Intelligence (`long_absence` / gentle return), companion-led continue, T-007 resilience canon | Copy risk: “Welcome back” / day-count vs T-007; must not run first-time intro |
+| **MJ-004** Only 15 minutes | One time-fitting action; block scope creep; record progress | Timed focus / Do It Now fragments, effort estimates, Chamber “limited time” signals, prompt rules | No end-to-end short-window journey; no dedicated capability phrase for this ask |
+| **MJ-005** What next? | One next action with why; start together | Plan My Day, action recovery (“what should I work on”), day-designer, board advisor overlap | Competing next-action surfaces; overlaps MJ-002/006; create/decide routing bugs can steal the turn |
+| **MJ-006** Priorities changed | Adapt, don’t scrap the day; keep what still matters; one revised focus | Adapt My Day / Today’s Reality, adapt chat routing, Plan My Day adapt UI | Phrase coverage leans energy/“today changed,” not “priorities changed”; risk of full replan |
+| **MJ-007** Lost train of thought | Restore context in ~1 minute; resume thread; don’t ask “what were we doing?” | Friction-first attention-wander replies, continue/resume, session/workflow continuation | Phrase gap for literal “lost my train of thought”; documented Continue-can-restart failures |
+
+### Reusable architecture vs MJ-specific knowledge
+
+| Reusable (do not fork per MJ) | Journey-specific knowledge only |
+|-------------------------------|----------------------------------|
+| Context reuse / memory before questions | Trigger phrases & situation labels (idea overload, long absence, time box, priority shift, attention wander) |
+| One primary recommendation | Ideal 5-minute (or 1-minute) progress shape per situation |
+| Preserve / defer work without loss | Acceptance tests & failure signals per journey |
+| Overwhelm / return / adapt / resume hospitality patterns (Specs 106–112, T-007) | Connected Estate opportunities *when* they help — not new rooms |
+| Prioritization & next-step routing (Plan My Day, Adapt My Day, Clear My Mind as capabilities under one companion) | Emotional outcome language for that moment |
+
+**Do not create:** six separate workflows, six Member Journey engines, or a parallel `lib/memberJourney` product to satisfy these files. They are **validation lenses** on the existing companion spine.
+
+`MEMBER_JOURNEY_ARCHITECTURE.md` remains the longitudinal layer (wins, keys, gallery, belonging over time). These MJ files are **situation validations** that feed that relationship — they are not the longitudinal layer itself.
+
+---
+
 ## Alignment verdict (understanding only)
 
 | Question | Finding |
 |----------|---------|
-| Do these files demand new product architecture? | **No.** They restate and extend principles already in Estate Constitution, Specs 105–131, Spec 103, and partially encoded Phase runtimes. |
-| Biggest gap | Live companion path vs designed engines (conversation/reasoning/wisdom/memory Specs) — consolidation and consistent enforcement, not greenfield systems. |
-| Clearest reusable vs specific split | Universal journey + voice + routing + memory = architecture; `CreationArchetype` Build fields + Chamber `XXX-006` reasoning = type/domain knowledge. |
-| Recommended stance under Observation Mode | Use this review when validating conversations and mapping knowledge. Do not spawn duplicate systems or redesign from these Phase docs alone. Prefer wiring existing spines and deepening Chamber reasoning where stubs block equal expertise. |
+| Do these files demand new product architecture? | **No.** Phase/reasoning docs and MJ-002…007 restate principles already in Estate Constitution, Specs 105–131, Spec 103, T-007, and partially encoded runtimes. |
+| Biggest gap | Live companion path vs designed engines — plus phrase/routing consistency so foundational situations hit the right capability first time. |
+| Clearest reusable vs specific split | Journey + voice + routing + memory = architecture; Build fields + Chamber `XXX-006` = domain knowledge; MJ files = situation validation knowledge on top of reusable EF/conversation patterns. |
+| Recommended stance under Observation Mode | Use Phase docs + MJ acceptance/failure signals when validating conversations. Do not spawn duplicate systems. Prefer consistent wiring of Clear My Mind, Plan My Day, Adapt My Day, Arrival, and session resume — then log misses under the Rule of Three. |
 
 ---
 
@@ -207,7 +255,8 @@ Those belong in reusable architecture; domain files supply **reasoning content a
 - `docs/SPARK_WISDOM_LAYER_FRAMEWORK.md` · Specs 120–131
 - `docs/UNIVERSAL_EXPERIENCE_STANDARDS_FRAMEWORK.md` · Spec 103
 - `docs/THE_FRIEND_WE_ALL_DESERVE.md` · Relationship Constitution
-- Runtime: `lib/estateBrain/`, `lib/universalCreation/`, `lib/sparkCoreIntelligence/`, `lib/sparkWisdom/`
+- `docs/MEMBER_JOURNEY_ARCHITECTURE.md` · `docs/ENTREPRENEURIAL_RESILIENCE.md` (T-007)
+- Runtime: `lib/estateBrain/`, `lib/universalCreation/`, `lib/sparkCoreIntelligence/`, `lib/sparkWisdom/`, Arrival / Plan My Day / Adapt My Day / friction-first continue paths
 
 ---
 
