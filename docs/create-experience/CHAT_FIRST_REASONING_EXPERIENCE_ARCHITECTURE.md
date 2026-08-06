@@ -39,6 +39,14 @@ the appropriate discovery journey. When intent is unclear, Spark still moves
 forward — it acknowledges what was shared and asks a new question that
 advances understanding, never "tell me again."
 
+**The four words are four ways of thinking** (Founder, 2026-08-06), and any
+examples shown demonstrate reasoning patterns, not product categories:
+
+- **Create** → build communication or content that connects
+- **Plan** → design meaningful experiences
+- **Develop** → create repeatable systems and processes
+- **Build** → turn ideas into business assets or growth opportunities
+
 ## The canonical reasoning journey (Rules doc, Rule 2)
 
 Whatever the member wants to create, plan, develop, or build, Spark follows

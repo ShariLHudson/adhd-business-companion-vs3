@@ -4,8 +4,8 @@ import { useState } from "react";
 import {
   answerCurrentQuestion,
   isJourneyComplete,
-  JOURNEY_CHIP_EXAMPLES,
   journeyFor,
+  REASONING_PATTERN_EXAMPLES,
   OPENING_QUESTION,
   OPENING_SUPPORT,
   PREVIEW_BOUNDARY_REPLY,
@@ -302,17 +302,27 @@ export function ChatFirstReasoningPreviewPage() {
 
       {journeyState === null && messages.length === 0 ? (
         <div className="flex flex-col gap-2">
-          <p className="text-sm text-[#9a8f82]">Try one of these:</p>
-          <div className="flex flex-wrap gap-2">
-            {JOURNEY_CHIP_EXAMPLES.map((example) => (
+          <p className="text-sm text-[#9a8f82]">
+            Four ways we can think together — try one:
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {REASONING_PATTERN_EXAMPLES.map((p) => (
               <button
-                key={example}
+                key={p.verb}
                 type="button"
-                onClick={() => send(example)}
-                className="rounded-full border border-[#e7dfd4] bg-white px-4 py-2 text-sm text-[#3d3429] transition hover:bg-[#f3ebe0]"
+                onClick={() => send(p.example)}
+                className="rounded-2xl border border-[#e7dfd4] bg-white px-4 py-3 text-left transition hover:bg-[#f3ebe0]"
                 data-testid="preview-example-chip"
               >
-                {example}
+                <span className="block text-xs font-semibold uppercase tracking-wide text-[#9a8f82]">
+                  {p.verb}
+                </span>
+                <span className="mt-0.5 block text-xs text-[#9a8f82]">
+                  {p.pattern}
+                </span>
+                <span className="mt-1.5 block text-sm text-[#3d3429]">
+                  &ldquo;{p.example}&rdquo;
+                </span>
               </button>
             ))}
           </div>

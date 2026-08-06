@@ -14,9 +14,9 @@ import {
   currentQuestion,
   detectJourney,
   isJourneyComplete,
-  JOURNEY_CHIP_EXAMPLES,
   journeyAcknowledgment,
   journeyFor,
+  REASONING_PATTERN_EXAMPLES,
   OPENING_QUESTION,
   OPENING_SUPPORT,
   RESEARCH_DECLINE_LINE,
@@ -66,16 +66,24 @@ describe("opening", () => {
     );
   });
 
-  it("detects each of the five example chips", () => {
-    expect(JOURNEY_CHIP_EXAMPLES).toHaveLength(5);
-    const detected = JOURNEY_CHIP_EXAMPLES.map((chip) => detectJourney(chip));
-    expect(detected).toEqual([
-      "sop",
-      "workshop",
-      "event",
-      "newsletter",
-      "marketing",
+  it("the examples demonstrate the four core ways of thinking, each starting a journey", () => {
+    expect(REASONING_PATTERN_EXAMPLES.map((p) => p.verb)).toEqual([
+      "Create",
+      "Plan",
+      "Develop",
+      "Build",
     ]);
+    expect(REASONING_PATTERN_EXAMPLES.map((p) => p.pattern)).toEqual([
+      "Build communication or content that connects",
+      "Design meaningful experiences",
+      "Create repeatable systems and processes",
+      "Turn ideas into business assets or growth opportunities",
+    ]);
+    // Reasoning patterns, not product categories — but each example still
+    // lands in the journey that carries its pattern.
+    expect(
+      REASONING_PATTERN_EXAMPLES.map((p) => detectJourney(p.example)),
+    ).toEqual(["newsletter", "event", "sop", "marketing"]);
   });
 
   it("recognizes planning goals — experiences and events, not just artifacts", () => {

@@ -370,9 +370,39 @@ const JOURNEYS: Record<JourneyId, BuildJourney> = {
   },
 };
 
-export const JOURNEY_CHIP_EXAMPLES: readonly string[] = (
-  ["sop", "workshop", "event", "newsletter", "marketing"] as const
-).map((id) => JOURNEYS[id].chipExample);
+/**
+ * The four core ways Spark helps founders think (Founder, 2026-08-06).
+ * Each example demonstrates a reasoning pattern — not a product category —
+ * and starts the journey that carries that pattern.
+ */
+export type ReasoningPatternExample = {
+  verb: "Create" | "Plan" | "Develop" | "Build";
+  pattern: string;
+  example: string;
+};
+
+export const REASONING_PATTERN_EXAMPLES: readonly ReasoningPatternExample[] = [
+  {
+    verb: "Create",
+    pattern: "Build communication or content that connects",
+    example: "I need a newsletter my clients actually read.",
+  },
+  {
+    verb: "Plan",
+    pattern: "Design meaningful experiences",
+    example: "I want to plan a retreat for my clients.",
+  },
+  {
+    verb: "Develop",
+    pattern: "Create repeatable systems and processes",
+    example: "I need an SOP for onboarding clients.",
+  },
+  {
+    verb: "Build",
+    pattern: "Turn ideas into business assets or growth opportunities",
+    example: "I want a marketing strategy that grows my business.",
+  },
+];
 
 export function journeyFor(id: JourneyId): BuildJourney {
   return JOURNEYS[id];
