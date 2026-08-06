@@ -147,6 +147,58 @@ the exact question or decision they paused on.
 **PROTOTYPE** (test-locked). The runtime `researchThis.ts` handoff moves
 research *toward* creation but has no return contract.
 
+**AT-5.7 — Research Inside Creation Test** (Founder, 2026-08-06). The
+member is mid-journey: *"I need help writing a newsletter"* → Spark gathers
+purpose, audience, desired feeling, tone. Mid-conversation the member says
+*"No but need help with some research."* Spark should understand research
+is **supporting the newsletter creation already in progress** — ask what
+research would help decide, offer relevant research choices, conduct the
+research if requested, and **return to the newsletter creation exactly
+where it paused.** Spark must **not** suggest Estate rooms, redirect
+navigation, or treat research as a destination.
+
+This is the cleanest available test of the difference between a normal
+assistant and Spark: a normal assistant answers the request in front of it;
+Spark understands the work already being created and brings in whatever
+capability is needed without making the member manage the handoff. The
+future rule this test enforces: **research is a capability, not a
+destination — the same must eventually be true of Chamber, Knowledge, and
+every room.** The member should never have to leave the conversation to get
+help.
+
+**GAP — and the Work Recognition seam (Step 1, `54623f4c`) does not pass
+it, confirmed by tracing the actual pipeline, not assumed:**
+`isResearchIntent`'s pattern (`lib/estateBrain/researchRouting.ts:7-8`)
+matches the literal word "research" — *"No but need help with some
+research"* matches it. That feeds `classifyConversationGoal`'s `research`
+branch (`goalClassifier.ts:197`), which fires **early** in the pipeline,
+long before Step 1's fallthrough seam is ever reached. Step 1's own
+in-journey resumption check (`isWorkRecognitionMessage` + the saved
+session) is correctly built but is wired in at the **wrong priority** — it
+only runs from the last-chance fallthrough, so a reply that any earlier
+detector also matches gets intercepted before Step 1's resumption logic
+ever sees it. Concretely: today, that reply would very likely surface a
+research/Estate-room offer instead of continuing the newsletter
+conversation — exactly the "research is a place" behavior this test exists
+to catch.
+
+Two distinct fixes, not one, and they should not be built together without
+explicit sign-off:
+1. **Resumption priority (small, correctness-only).** An in-flight Work
+   Recognition session's next reply must be checked *before* goal
+   classification / research routing get a chance to hijack it — the same
+   position `tryDiscoveryFlow` already occupies for its own four topics
+   (`frictionlessActionLayer.ts:4237`), not the late fallthrough. This does
+   not touch `handleSend`, adds no new engine, and only ever fires when a
+   Work Recognition session is genuinely already open — zero risk to any
+   message that isn't already mid-journey.
+2. **Research-inside-the-journey itself (larger, new capability).** Offer
+   research choices, conduct research, persist the decision, and return to
+   the exact paused question — this is AT-5.1/5.2/5.3/5.5/5.6 above, all
+   already graced GAP/PROTOTYPE for production, now scoped concretely to
+   the Work Recognition journey specifically rather than Create's entrance
+   alone.
+
 ### Stage 6 — Create the Right Outcome
 
 **AT-6.1** Nothing is ever created without the member's explicit yes — from
