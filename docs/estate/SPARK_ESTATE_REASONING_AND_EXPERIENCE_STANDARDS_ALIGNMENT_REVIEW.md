@@ -27,10 +27,14 @@ Future Estate reasoning and experience standards (protocol + intelligence librar
 | SPARK-159 Companion Experience Standards | Listen · understand · remember · personalize · reduce overwhelm |
 | Spec 103 / T-003 Universal Experience Standards | Existing frozen ecosystem experience canon (cross-check) |
 | MJ-002 … MJ-007 Member Journey validations | Foundational ADHD founder situations — validate experience, not new features |
+| Member Journey Library `00`, `03`–`08` | Library README, prioritization, template, validation guide, capability matrix, experience validation, Design Constitution |
+| *(not uploaded)* `01` Universal Experience Principles · `02` Member Journey Standard | Named in library README; treat as missing until provided |
 
 Runtime mirrors already present for many phases under `lib/estate/sparkEstate*.ts` and `lib/universalCreation/` — treated as **partial encoding**, not as proof of full companion-path wiring.
 
 Member Journey layer status: `docs/MEMBER_JOURNEY_ARCHITECTURE.md` is **binding architecture, implementation deferred**; `lib/memberJourney/` is proposed / not present. MJ-002…007 are validation scenarios — they exercise reusable conversation/EF systems, not a separate product surface.
+
+**Authority note:** Library Design Constitution (`08`) and Experience Validation (`07`) align with — and must **not replace** — Estate Constitution, Relationship Constitution, Spec 103, Specs 105–131, or Observation Mode. On conflict, those frozen authorities win.
 
 ---
 
@@ -237,20 +241,75 @@ Spark difference repeated in every file: general AI generates or restarts; Spark
 
 ---
 
+## 6. Member Journey Library governance (`00`, `03`–`08`)
+
+These files define **how Spark Estate decides what deserves to exist** and how journeys validate architecture — not a second product OS.
+
+### Behaviors required
+
+| Document | Requires of Spark / of builders |
+|----------|----------------------------------|
+| **00 README** | Library = canonical validation set. Every journey/feature must pass the Universal Test (so what · business forward · friction · decision fatigue · momentum · clarity · trust · connect · adapt · uniquely Spark). |
+| **03 Prioritization** | Build journeys that make real life easier first — not interesting ideas. Score impact, friction, fatigue, momentum, frequency, emotion, architecture leverage, Spark difference, trust risk, readiness. First-20 mix must not be creation-only (include return, overwhelm, decision, celebration). |
+| **04 Template** | Journeys validate experience: real words → real need → context to reuse → smallest progress → Spark difference → permission before create/connect/schedule → acceptance + failure signals. |
+| **05 Validation & Architecture Guide** | Every journey must cover experience **and** architecture exercised **and** implementation reuse **and** regression risks. Final bar: glad they used Spark vs a general AI. |
+| **06 Capability Matrix** | Map capabilities ↔ journeys. No new capability until: extend existing? member value? friction↓? multi-journey? uniquely Spark? |
+| **07 Experience Validation** | Gate is “Should it exist?” not “Can we build it?” Architecture review + experience review before approval. |
+| **08 Design Constitution** | Ten enduring principles: understand before generate · relationship before features · progress before productivity · reduce thinking · recommend don’t control · preserve momentum · connect don’t duplicate · one Estate · trust first · adapt to the member. Never become a feature catalog or generic AI with prettier screens. |
+
+### Existing systems that already embody this
+
+| Library idea | Already in Spark |
+|--------------|------------------|
+| Universal Test / “Should it exist?” | Spec 103 review checklist · Spec 100 seven design questions · Spec 119 eight QA gates · Observation Mode / Conversation Coach |
+| Design Constitution principles | Specs 105–113 · Relationship Constitution · The Friend We All Deserve · T-007 · Spec 106 permission · Spec 118 iceberg |
+| Capability inventory / no duplicates | Estate Brain capability + expert registries · Intelligence Blueprint One Brain · Phase 21 governance · `legacyWorkspaceMap` |
+| Journey template fields | Spec 114 need/mode · Spec 121 hidden intent · Spec 112 memory · Spec 110/113 completion certainty · MJ-002…007 bodies |
+| Prioritize high-leverage continuity | Arrival, continue/resume, Adapt My Day, Plan My Day, Clear My Mind, session continuity — same spines MJ section named |
+| First-20 balance (not build-only) | Aligns with frozen conversation architecture: companion ≠ creation factory |
+
+### Conflicts / honesty gaps
+
+1. **Capability Matrix “Ready” vs runtime reality** — Inventory marks Estate Working Memory, Conversation Continuity, Chamber Orchestration, Adaptive Guidance, Personal Library, Project Awareness, Business Estate Context as **Ready**. Prior sections of this review found Spec memory/continuity packages largely types-only, memory fragmented, and Chamber/orchestration partially demo-wired. **Readiness labels in `06` should be treated as aspirational until journey-proven on the live companion path** — the library’s own rule (“status should be honest”) applies here.
+
+2. **Naming drift** — Matrix names (Evidence Vault, Discovery Key, Research Council, Estate Working Memory) exist in Estate/Bible/Momentum Institute lore; they must map to existing registries (`estateBrain`, place IDs, Spec packages) — not become parallel capability systems with new names.
+
+3. **Competing constitutions risk** — `08` Design Constitution overlaps Estate Constitution + Relationship Constitution + Spec 100/103. Keep it as a **journey-library lens** subordinate to Estate architectural authority and frozen Specs. Do not maintain two equal “constitutions” in code prompts.
+
+4. **Missing library files** — `01` Universal Experience Principles and `02` Member Journey Standard are listed in `00` but were not in this upload. Until present, Spec 103 / T-003 and `MEMBER_JOURNEY_ARCHITECTURE.md` remain the stand-ins.
+
+5. **Coverage matrix incomplete** — `06` shows MJ-001 checked for memory/continuity; MJ-002…007 (already studied) are not yet filled in the uploaded matrix. Filling the matrix is documentation work against existing capabilities — not new architecture.
+
+6. **Observation Mode alignment** — Library says journeys validate before implementation and forbid duplicate architecture. That matches Observation Mode. Danger is interpreting Priority 1 “Ready Now” journeys as a mandate to build `lib/memberJourney/` or new rooms; they mandate **validating and tightening existing spines**.
+
+### Reusable architecture vs library-/journey-specific knowledge
+
+| Reusable architecture (one Estate) | Library / journey-specific knowledge |
+|------------------------------------|--------------------------------------|
+| Design principles already frozen (understand · permission · momentum · one companion) | Journey IDs, categories, priority scores, readiness honesty |
+| Capability homes already in Estate Brain / conversation / creation / arrival | Capability↔MJ coverage matrix rows |
+| Experience validation gates (Spec 103 / 119) | Per-journey acceptance tests, failure signals, regression lists |
+| Shared EF patterns: restore context, one next step, defer safely | Situation profiles, member words, smallest-progress shapes |
+| “Connect don’t duplicate” as governance | Decision records for why a journey was Priority 1 vs 4 |
+
+**Final library rule (echoed):** No new architectural capability until existing ones cannot be extended. That is the same rule as Intelligence Blueprint / Phase 21 / Observation Mode.
+
+---
+
 ## Alignment verdict (understanding only)
 
 | Question | Finding |
 |----------|---------|
-| Do these files demand new product architecture? | **No.** Phase/reasoning docs and MJ-002…007 restate principles already in Estate Constitution, Specs 105–131, Spec 103, T-007, and partially encoded runtimes. |
-| Biggest gap | Live companion path vs designed engines — plus phrase/routing consistency so foundational situations hit the right capability first time. |
-| Clearest reusable vs specific split | Journey + voice + routing + memory = architecture; Build fields + Chamber `XXX-006` = domain knowledge; MJ files = situation validation knowledge on top of reusable EF/conversation patterns. |
-| Recommended stance under Observation Mode | Use Phase docs + MJ acceptance/failure signals when validating conversations. Do not spawn duplicate systems. Prefer consistent wiring of Clear My Mind, Plan My Day, Adapt My Day, Arrival, and session resume — then log misses under the Rule of Three. |
+| Do these files demand new product architecture? | **No.** Phase protocols, Chamber reasoning, MJ-002…007, and Library `00`/`03`–`08` restate principles already in Estate Constitution, Specs 100–131, T-007, and partially encoded runtimes. |
+| Biggest gap | Live companion path vs designed engines — plus honest capability readiness and phrase/routing consistency so Priority 1 journeys hit the right spine. |
+| Clearest reusable vs specific split | Journey + voice + routing + memory + validation gates = architecture; Build fields + Chamber `XXX-006` = domain knowledge; MJ bodies + library priority/matrix rows = validation knowledge. |
+| Recommended stance under Observation Mode | Use Design Constitution + Experience Validation + MJ acceptance/failure signals when reviewing conversations. Do not spawn duplicate systems or a second constitution. Prefer consistent wiring of Clear My Mind, Plan My Day, Adapt My Day, Arrival, and session resume — log misses under the Rule of Three. Update Capability Matrix readiness only when journeys prove it. |
 
 ---
 
 ## Related existing authorities (do not duplicate)
 
-- `docs/estate/ESTATE_ARCHITECTURAL_AUTHORITY.md`
+- `docs/estate/ESTATE_ARCHITECTURAL_AUTHORITY.md` · Estate Constitution · Living in Spark Estate · Bible
 - `docs/SPARK_CONVERSATION_ARCHITECTURE_FREEZE.md` · Specs 105–119
 - `docs/SPARK_WISDOM_LAYER_FRAMEWORK.md` · Specs 120–131
 - `docs/UNIVERSAL_EXPERIENCE_STANDARDS_FRAMEWORK.md` · Spec 103
