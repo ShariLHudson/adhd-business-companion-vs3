@@ -12513,6 +12513,8 @@ export default function CompanionPageClient() {
      * which already have their own identity.
      */
     canonicalWorkId?: string | null;
+    /** See lib/createWorkflowState.ts#EntrySupportChoice. */
+    entrySupportChoice?: import("@/lib/createWorkflow").EntrySupportChoice;
   }): boolean {
     // Never call openCreateWorkspace
     const resumeWorkspaceId = opts?.resumeWorkspaceId?.trim();
@@ -12543,6 +12545,8 @@ export default function CompanionPageClient() {
               purpose: prompt,
             }
           : boot.session.workflow.discoveryAnswers,
+        entrySupportChoice:
+          opts?.entrySupportChoice ?? boot.session.workflow.entrySupportChoice,
       };
       if (opts?.isEventDomain || mayApplyEventWorkspace(artifactType)) {
         workflow = bindEventRecord(workflow, {
@@ -28066,6 +28070,7 @@ export default function CompanionPageClient() {
                   note: `begin:${outcome.artifactType}`,
                 });
                 const canonicalWorkId = opts?.canonicalWorkId ?? null;
+                const entrySupportChoice = opts?.entrySupportChoice ?? null;
                 // Fix C (2026-08-05 audit) — a guided domain already minted
                 // this canonical id via resolveGuidedBeginOpen, which is
                 // itself a substantive-work decision. Running the
@@ -28080,6 +28085,7 @@ export default function CompanionPageClient() {
                     initialPrompt: outcome.text,
                     isEventDomain: outcome.isEventDomain,
                     canonicalWorkId,
+                    entrySupportChoice,
                   });
                   publishLiveWorkspaceTrace("after_open_create_workspace", {
                     command: outcome.text,
@@ -28117,6 +28123,7 @@ export default function CompanionPageClient() {
                   artifactType: outcome.artifactType,
                   initialPrompt: outcome.text,
                   isEventDomain: outcome.isEventDomain,
+                  entrySupportChoice,
                 });
                 publishLiveWorkspaceTrace("after_open_create_workspace", {
                   command: outcome.text,

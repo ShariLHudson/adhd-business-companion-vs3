@@ -36,6 +36,7 @@ export type {
   DiscoveryQuestion,
   DiscoverySubphase,
   DraftStatus,
+  EntrySupportChoice,
   PendingFieldApproval,
 } from "./createWorkflowState";
 export {

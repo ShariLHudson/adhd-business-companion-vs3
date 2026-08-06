@@ -1,5 +1,14 @@
 /**
  * Create Simplification & Category Evaluation — Parts 1–3 acceptance.
+ *
+ * Conversational Create Entrance (2026-08-06) — Start Freely / Start With
+ * Guidance / Browse Categories were replaced with a single conversation.
+ * The invariants this file certifies that are still true (no artifact
+ * chips, no source filter chips, Find Previous Work collapsed by default)
+ * are preserved as-is; assertions tied to the removed three-way UI and
+ * live search-as-you-type are updated to match the new entrance — see
+ * components/companion/CreateEntryConversationPanel.test.tsx for the new
+ * conversation's own acceptance coverage.
  * @vitest-environment jsdom
  */
 import { act } from "react";
@@ -45,27 +54,43 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
     });
   }
 
-  it("Part 1 — shows one description field with the required placeholder", () => {
-    renderPanel();
-    const input = container.querySelector<HTMLTextAreaElement>(
-      "[data-testid='create-estate-nl-input']",
-    );
-    expect(input).toBeTruthy();
-    // Start Freely empty-state UX follow-up — conversational placeholder.
-    expect(input?.placeholder).toBe(
-      "Tell me what you're thinking about, even if it's not fully formed yet...",
-    );
+  function entryInput(): HTMLTextAreaElement {
+    return container.querySelector<HTMLTextAreaElement>(
+      "[data-testid='create-estate-entry-input']",
+    )!;
+  }
 
-    // Phase 0 (Create Entrance Copy and Path Relabel) — Start Freely /
-    // Start With Guidance primary action labels; same underlying handlers.
+  function typeAndSend(text: string) {
+    act(() => {
+      const el = entryInput();
+      const nativeSetter = Object.getOwnPropertyDescriptor(
+        window.HTMLTextAreaElement.prototype,
+        "value",
+      )!.set!;
+      nativeSetter.call(el, text);
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    act(() => {
+      container
+        .querySelector<HTMLButtonElement>(
+          "[data-testid='create-estate-entry-send']",
+        )!
+        .click();
+    });
+  }
+
+  it("Part 1 — shows the single conversational entrance, not a description field with Begin buttons", () => {
+    renderPanel();
+    expect(container.textContent).toContain("What are you working on?");
+    expect(entryInput()).toBeTruthy();
+    // Phase 0's Start Freely / Start With Guidance labels no longer exist —
+    // replaced entirely by the conversation.
     expect(
-      container.querySelector("[data-testid='create-estate-start-creating']")
-        ?.textContent,
-    ).toContain("I know where I want to begin");
+      container.querySelector("[data-testid='create-estate-start-creating']"),
+    ).toBeNull();
     expect(
-      container.querySelector("[data-testid='create-estate-help-me-choose']")
-        ?.textContent,
-    ).toContain("Help me figure this out");
+      container.querySelector("[data-testid='create-estate-help-me-choose']"),
+    ).toBeNull();
   });
 
   it("Entrance Cleanup (2026-08) — never shows artifact-specific quick-choice chips", () => {
@@ -91,56 +116,35 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
     expect(container.querySelector("button[aria-label='Clear']")).toBeNull();
   });
 
-  it("Part 10 — typing narrows to matching ideas instead of a filtered catalog grid", () => {
+  it("no categories, templates, or search results appear before the conversation earns them", () => {
     renderPanel();
-    const input = container.querySelector<HTMLTextAreaElement>(
-      "[data-testid='create-estate-nl-input']",
-    )!;
-
-    act(() => {
-      const setter = Object.getOwnPropertyDescriptor(
-        window.HTMLTextAreaElement.prototype,
-        "value",
-      )!.set!;
-      setter.call(input, "email");
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-    });
-
-    // Suggested chips step aside while actively searching.
+    typeAndSend("email");
+    // The acceptance test for the new entrance: no categories, templates,
+    // or search results — only the one topic-aware acknowledgment turn.
+    expect(
+      container.querySelector("[data-testid='create-estate-search-results']"),
+    ).toBeNull();
+    expect(
+      container.querySelector("[data-testid='create-estate-browse-categories']"),
+    ).toBeNull();
     expect(
       container.querySelector("[data-testid='create-estate-suggested-choices']"),
     ).toBeNull();
-    const results = container.querySelectorAll(
-      "[data-testid='create-estate-search-result']",
-    );
-    expect(results.length).toBeGreaterThan(0);
-    expect(container.textContent).toMatch(/Email/);
   });
 
-  it("Part 11 — no match still offers a way forward instead of a dead end", () => {
+  it("an unresolvable second turn still offers a way forward instead of a dead end", () => {
     renderPanel();
-    const input = container.querySelector<HTMLTextAreaElement>(
-      "[data-testid='create-estate-nl-input']",
-    )!;
-
-    act(() => {
-      const setter = Object.getOwnPropertyDescriptor(
-        window.HTMLTextAreaElement.prototype,
-        "value",
-      )!.set!;
-      setter.call(input, "zzzznonexistentxyz");
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-    });
-
+    typeAndSend("zzzznonexistentxyz");
+    typeAndSend("zzzzstillnonexistentxyz");
+    // resolveCreateBeginOutcome's own ambiguous-clarify message — unchanged
+    // — surfaces as feedback instead of a silent no-op.
     expect(
-      container.querySelector("[data-testid='create-estate-search-empty']"),
-    ).toBeTruthy();
-    expect(
-      container.querySelector("[data-testid='create-estate-create-from-scratch']"),
-    ).toBeTruthy();
+      container.querySelector("[data-testid='create-estate-begin-feedback']")
+        ?.getAttribute("data-begin-feedback"),
+    ).toBe("clarify");
   });
 
-  it("Part 2 — Find Previous Work is collapsed by default; Browse Categories is not a second, separate section", () => {
+  it("Part 2 — Find Previous Work is collapsed by default; Browse Categories no longer exists on this screen", () => {
     renderPanel();
     const findPrevious = container.querySelector(
       "[data-testid='create-estate-find-previous-work']",
@@ -149,10 +153,9 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
     expect(findPrevious?.open).toBe(false);
     expect(findPrevious?.textContent).toContain("Find Previous Work");
 
-    // Entrance Cleanup (2026-08) — the old standalone "Browse More" section
-    // is retired. Browse Categories is nested inside Start With Guidance and
-    // only mounts once that path is opened — never a second, separately
-    // mounted category picker sitting elsewhere on the page.
+    // Conversational Create Entrance (2026-08-06) — Browse Categories was
+    // fully removed, not merely de-duplicated. No category picker mounts
+    // anywhere on this screen, before or after engagement.
     expect(
       container.querySelector("[data-testid='create-estate-browse-more']"),
     ).toBeNull();
@@ -161,106 +164,41 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
     ).toBeNull();
   });
 
-  it("Help Me Choose opens Browse Categories (single mount) one guided question at a time, then closes on selection", () => {
+  it("Conversational Create Entrance (2026-08-06) — engagement narrows to a focused conversation, hiding Find Previous Work / Start New", () => {
     renderPanel();
-    const button = container.querySelector<HTMLButtonElement>(
-      "[data-testid='create-estate-help-me-choose']",
-    )!;
-    act(() => {
-      button.click();
-    });
-    const browseCategories = container.querySelector(
-      "[data-testid='create-estate-browse-categories']",
-    );
-    expect(browseCategories).toBeTruthy();
-    expect(browseCategories?.textContent).toContain("Browse Categories");
-    expect(
-      container.querySelector("[data-testid='create-browse-category-cards']"),
-    ).toBeTruthy();
 
-    const category = container.querySelector<HTMLButtonElement>(
-      "[data-testid='create-browse-category-card']",
-    )!;
-    act(() => {
-      category.click();
-    });
-    expect(
-      container.querySelector("[data-testid='create-browse-parent-cards']"),
-    ).toBeTruthy();
-  });
-
-  it("Entrance Cleanup (2026-08) — Start Freely engagement narrows to a focused writing surface", () => {
-    renderPanel();
-    const input = container.querySelector<HTMLTextAreaElement>(
-      "[data-testid='create-estate-nl-input']",
-    )!;
-
-    // Before engagement — both paths visible.
-    expect(
-      container.querySelector("[data-testid='create-estate-start-with-guidance']"),
-    ).toBeTruthy();
+    // Before engagement — Find Previous Work visible.
     expect(
       container.querySelector("[data-testid='create-estate-find-previous-work']"),
     ).toBeTruthy();
 
-    act(() => {
-      const setter = Object.getOwnPropertyDescriptor(
-        window.HTMLTextAreaElement.prototype,
-        "value",
-      )!.set!;
-      setter.call(input, "a checklist for onboarding");
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-    });
+    typeAndSend("a checklist for onboarding");
 
-    // Engaged — the alternate path and secondary navigation step aside;
-    // the input and its own Begin button remain.
-    expect(
-      container.querySelector("[data-testid='create-estate-start-with-guidance']"),
-    ).toBeNull();
+    // Engaged — the secondary navigation steps aside; the conversation
+    // (with its own input) remains.
     expect(
       container.querySelector("[data-testid='create-estate-find-previous-work']"),
     ).toBeNull();
     expect(
-      container.querySelector("[data-testid='create-estate-start-creating']"),
-    ).toBeTruthy();
-
-    act(() => {
-      const setter = Object.getOwnPropertyDescriptor(
-        window.HTMLTextAreaElement.prototype,
-        "value",
-      )!.set!;
-      setter.call(input, "");
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-      input.blur();
-    });
-
-    // Cleared and blurred — reverts to showing both paths again.
-    expect(
-      container.querySelector("[data-testid='create-estate-start-with-guidance']"),
+      container.querySelector("[data-testid='create-estate-entry-conversation']"),
     ).toBeTruthy();
   });
 
-  it("Start Freely with an empty text area focuses the input and offers encouragement, not a silent no-op", () => {
+  it("the Send button is disabled for empty input, instead of a silent no-op", () => {
     renderPanel();
-    const input = container.querySelector<HTMLTextAreaElement>(
-      "[data-testid='create-estate-nl-input']",
-    )!;
     const button = container.querySelector<HTMLButtonElement>(
-      "[data-testid='create-estate-start-creating']",
+      "[data-testid='create-estate-entry-send']",
     )!;
-
-    expect(document.activeElement).not.toBe(input);
+    expect(button.disabled).toBe(true);
 
     act(() => {
-      button.click();
+      const nativeSetter = Object.getOwnPropertyDescriptor(
+        window.HTMLTextAreaElement.prototype,
+        "value",
+      )!.set!;
+      nativeSetter.call(entryInput(), "something");
+      entryInput().dispatchEvent(new Event("input", { bubbles: true }));
     });
-
-    expect(document.activeElement).toBe(input);
-    expect(
-      container.querySelector("[data-testid='create-estate-begin-feedback']")
-        ?.textContent,
-    ).toContain(
-      "Start wherever you are. Tell me what you're working on — even if it's just a rough idea.",
-    );
+    expect(button.disabled).toBe(false);
   });
 });

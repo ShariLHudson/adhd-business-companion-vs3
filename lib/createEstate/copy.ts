@@ -193,6 +193,34 @@ export const CREATE_ESTATE_HELP_ME_CHOOSE_HINT =
   "Pick the area that fits best — Shari will narrow it down from there.";
 
 /**
+ * Conversational Create Entrance (2026-08-06) — replaces the three-way
+ * Start Freely / Start With Guidance / Browse Categories choice with a
+ * single open conversation. See docs decision: prove the conversation
+ * before any category/template UI is shown again.
+ */
+export const CREATE_ESTATE_ENTRY_CONVERSATION_HEADING =
+  "What are you working on?";
+export const CREATE_ESTATE_ENTRY_CONVERSATION_SUBTEXT =
+  "Tell me what you're thinking about.\nIt doesn't have to be figured out yet.";
+
+/** The reflection turn, wrapping the existing confirm outcome message. */
+export const CREATE_ESTATE_ENTRY_REFLECTION_PREFIX =
+  "Here's what I think we're working on.";
+export const CREATE_ESTATE_ENTRY_REFLECTION_QUESTION = "Does that sound right?";
+
+/** Support-level decision gate — "how much support," not "which thing." */
+export const CREATE_ESTATE_ENTRY_SUPPORT_CHOICE_HEADING =
+  "How would you like to work?";
+export const CREATE_ESTATE_ENTRY_SUPPORT_GUIDED_LABEL =
+  "Help me think it through";
+export const CREATE_ESTATE_ENTRY_SUPPORT_GUIDED_DESCRIPTION =
+  "Ask questions and guide me step by step";
+export const CREATE_ESTATE_ENTRY_SUPPORT_INDEPENDENT_LABEL =
+  "I know what I want";
+export const CREATE_ESTATE_ENTRY_SUPPORT_INDEPENDENT_DESCRIPTION =
+  "Help me organize and build it";
+
+/**
  * Entrance Cleanup (2026-08) — renamed from "Browse More". Now the single
  * category-browsing surface, nested inside Start With Guidance instead of
  * living as a second, separately-mounted section (see

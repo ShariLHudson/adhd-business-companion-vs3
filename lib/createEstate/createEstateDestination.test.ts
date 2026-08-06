@@ -8,7 +8,6 @@ import { resolve } from "node:path";
 import { ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS } from "@/lib/estate/estateFullBleedPanelSections";
 import { WELCOME_HOME_NAV_CATEGORIES } from "@/lib/estate/welcomeHomeNavigationStructure";
 import {
-  CREATE_ESTATE_BROWSE_CATEGORIES_HEADING,
   CREATE_ESTATE_CONTINUE_HEADING,
   CREATE_ESTATE_EXPLANATION,
   CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING,
@@ -52,7 +51,7 @@ describe("Build → Create navigation (116 / 149)", () => {
     expect(client).toContain("resolveCreateLauncherType");
   });
 
-  it("CreateEstateEntrancePanel shows Find Previous Work + Browse Categories + continue (no Browse / Start With)", () => {
+  it("CreateEstateEntrancePanel shows Find Previous Work + the conversation + continue (no Browse / Start With / Browse Categories)", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     const findPrevious = read(
       "components/companion/CreateFindPreviousWorkPanel.tsx",
@@ -60,22 +59,21 @@ describe("Build → Create navigation (116 / 149)", () => {
     expect(panel).toContain("create-estate-entrance");
     expect(panel).toContain("create-estate-intent-confirm");
     expect(panel).toContain("create-estate-find-previous-work");
-    // Entrance Cleanup (2026-08) — renamed from "Browse More", now the
-    // single category-picker mount nested in Start With Guidance.
-    expect(panel).toContain("create-estate-browse-categories");
+    // Conversational Create Entrance (2026-08-06) — Browse Categories was
+    // removed entirely, not merely renamed/nested.
+    expect(panel).not.toContain("create-estate-browse-categories");
+    expect(panel).not.toContain("CreateBrowseCategoriesPanel");
     expect(panel).toContain("CreateFindPreviousWorkPanel");
-    expect(panel).toContain("CreateBrowseCategoriesPanel");
+    expect(panel).toContain("CreateEntryConversationPanel");
     expect(findPrevious).toContain("CreateDraftResumeList");
     expect(panel).toContain("CREATE_ESTATE_CONTINUE_HEADING");
     expect(panel).toContain("CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING");
-    expect(panel).toContain("CREATE_ESTATE_BROWSE_CATEGORIES_HEADING");
     expect(panel).not.toContain("CREATE_ESTATE_START_CHOICES");
     expect(panel).not.toContain("Browse things I can create");
     expect(panel).not.toContain("Start with what I need");
     expect(panel).not.toContain("Start with a Blueprint");
     expect(panel).not.toContain("UniversalBlueprintInterface");
     expect(CREATE_ESTATE_WINDOW_TITLE).toBe("Create");
-    expect(CREATE_ESTATE_BROWSE_CATEGORIES_HEADING).toBe("Browse Categories");
     expect(CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING).toBe(
       "Find Previous Work",
     );

@@ -55,20 +55,24 @@ describe("Create morning-room scroll contract (133)", () => {
     );
   });
 
-  it("Create entrance keeps Browse Categories / Find Previous Work clickable targets", () => {
+  it("Create entrance keeps the entry conversation / Find Previous Work clickable targets", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
+    const entryConversation = read(
+      "components/companion/CreateEntryConversationPanel.tsx",
+    );
     const findPrevious = read(
       "components/companion/CreateFindPreviousWorkPanel.tsx",
     );
     const copy = read("lib/createEstate/copy.ts");
-    // Entrance Cleanup (2026-08) — renamed from "Browse More", now the
-    // single category-picker mount nested in Start With Guidance.
-    expect(panel).toContain("create-estate-browse-categories");
+    // Conversational Create Entrance (2026-08-06) — Browse Categories was
+    // removed entirely; the composer's clickable target is now the entry
+    // conversation panel.
     expect(panel).toContain("create-estate-find-previous-work");
-    expect(panel).toContain("CreateBrowseCategoriesPanel");
+    expect(panel).toContain("CreateEntryConversationPanel");
+    expect(entryConversation).toContain("create-estate-entry-conversation");
     expect(panel).toContain("CreateFindPreviousWorkPanel");
     expect(panel).toContain("onSelectCreationType");
-    expect(copy).toContain("CREATE_ESTATE_BROWSE_CATEGORIES_HEADING");
+    expect(copy).toContain("CREATE_ESTATE_ENTRY_CONVERSATION_HEADING");
     expect(copy).toContain("CREATE_ESTATE_CONTINUE_HEADING");
     expect(findPrevious).toContain("CreateDraftResumeList");
     expect(panel).toContain("useDismissibleWindow");

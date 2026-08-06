@@ -2,32 +2,28 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CreateEstateRoomShell } from "@/components/companion/CreateEstateRoomShell";
-import { CreateBrowseCategoriesPanel } from "@/components/companion/CreateBrowseCategoriesPanel";
+import { CreateEntryConversationPanel } from "@/components/companion/CreateEntryConversationPanel";
 import { CreateFindPreviousWorkPanel } from "@/components/companion/CreateFindPreviousWorkPanel";
 import { CreateWorkspaceResumeList } from "@/components/companion/CreateWorkspaceResumeList";
 import { AppBackButton } from "@/components/companion/AppBackButton";
 import {
   CREATE_ESTATE_AMBIGUITY_CANCEL,
-  CREATE_ESTATE_BROWSE_CATEGORIES_HEADING,
   CREATE_ESTATE_CONFIRM_CANCEL,
   CREATE_ESTATE_CONFIRM_OTHER,
   CREATE_ESTATE_CONTINUE_HEADING,
-  CREATE_ESTATE_CREATE_FROM_SCRATCH_LABEL,
-  CREATE_ESTATE_DESCRIBE_PLACEHOLDER,
   CREATE_ESTATE_ENTRANCE_INVITATION,
+  CREATE_ESTATE_ENTRY_REFLECTION_PREFIX,
+  CREATE_ESTATE_ENTRY_REFLECTION_QUESTION,
+  CREATE_ESTATE_ENTRY_SUPPORT_CHOICE_HEADING,
+  CREATE_ESTATE_ENTRY_SUPPORT_GUIDED_DESCRIPTION,
+  CREATE_ESTATE_ENTRY_SUPPORT_GUIDED_LABEL,
+  CREATE_ESTATE_ENTRY_SUPPORT_INDEPENDENT_DESCRIPTION,
+  CREATE_ESTATE_ENTRY_SUPPORT_INDEPENDENT_LABEL,
   CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING,
   CREATE_ESTATE_FIND_PREVIOUS_WORK_HINT,
-  CREATE_ESTATE_HELP_ME_CHOOSE_LABEL,
-  CREATE_ESTATE_NO_SEARCH_RESULTS_MESSAGE,
   CREATE_ESTATE_OPEN_FAILED_MESSAGE,
-  CREATE_ESTATE_START_CREATING_LABEL,
-  CREATE_ESTATE_START_FREELY_DESCRIPTION,
-  CREATE_ESTATE_START_FREELY_HEADING,
   CREATE_ESTATE_START_NEW_LABEL,
   CREATE_ESTATE_START_NEW_READY_MESSAGE,
-  CREATE_ESTATE_START_WITH_GUIDANCE_DESCRIPTION,
-  CREATE_ESTATE_START_WITH_GUIDANCE_HEADING,
-  CREATE_ESTATE_WHAT_WOULD_YOU_LIKE_HEADING,
   CREATE_ESTATE_WINDOW_TITLE,
 } from "@/lib/createEstate/copy";
 import {
@@ -37,13 +33,7 @@ import type { ActiveCreationWorkspaceSummary } from "@/lib/createEstate/listActi
 import { listActiveCreationWorkspaces } from "@/lib/createEstate/listActiveCreationWorkspaces";
 import { getRuntimeCreationRecord } from "@/lib/currentFocus/creationRecord";
 import {
-  resolveSuggestionContext,
-} from "@/lib/createEstate/contextAwareSuggestions";
-import { queryExploreIdeas } from "@/lib/createEstate/exploreIdeas/search";
-import type { ExploreIdeaResult } from "@/lib/createEstate/exploreIdeas/types";
-import {
   confirmCreateBeginToOpen,
-  resolveCatalogCreateConfirm,
   resolveCreateBeginOutcome,
   switchCreateBeginConfirmType,
   type CreateBeginOutcome,
@@ -56,8 +46,6 @@ import {
   armForceNewCreateSession,
   clearForceNewCreateSession,
 } from "@/lib/createEstate/forceNewCreateSession";
-import { SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS } from "@/lib/sparkCreateIntentConstitution/types";
-import { resolveCreateLauncherType } from "@/lib/createLauncherTypes";
 import {
   CREATE_BEGIN_PROGRESS_MESSAGE,
 } from "@/lib/primaryActionFeedback";
@@ -65,6 +53,7 @@ import { resolveCreateExitDestination } from "@/lib/createGuidedConversation189"
 import type { CreateCatalogItem } from "@/lib/createCatalog";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 import { tryDirectNavigationInterrupt } from "@/lib/conversationRouter/tryDirectNavigationInterrupt";
+import type { EntrySupportChoice } from "@/lib/createWorkflowState";
 
 type Props = {
   onBack: () => void;
@@ -84,6 +73,14 @@ type Props = {
        * orphaned or double-minted under a second id.
        */
       canonicalWorkId?: string | null;
+      /**
+       * Conversational Create Entrance (2026-08-06) — "How would you like
+       * to work?" captured from the new entry conversation. Hook field per
+       * the Intelligence-Ready Architecture rule: recorded on the
+       * RuntimeCreationRecord, not yet consumed by any Build Type's Current
+       * Focus pacing.
+       */
+      entrySupportChoice?: EntrySupportChoice;
     },
   ) => boolean | void | Promise<boolean | void>;
   /** Optional browse — catalog type opens workflow. */
@@ -143,7 +140,6 @@ export function CreateEstateEntrancePanel({
   onRestoreContinuity,
   exitOriginHint,
 }: Props) {
-  const [prompt, setPrompt] = useState("");
   const [activeWorkspaces, setActiveWorkspaces] = useState<
     ActiveCreationWorkspaceSummary[]
   >([]);
@@ -161,37 +157,26 @@ export function CreateEstateEntrancePanel({
     GuidedBeginOpenOutcome,
     { kind: "clarify" }
   > | null>(null);
-  const [helpMeChooseOpen, setHelpMeChooseOpen] = useState(false);
   const [findPreviousWorkOpen, setFindPreviousWorkOpen] = useState(false);
-  // Entrance Cleanup (2026-08) — Start Freely narrows the screen to a
-  // focused writing surface once the member has engaged with the input.
-  // Never hides the feedback area; reverts once blurred with empty text.
-  const [composerFocused, setComposerFocused] = useState(false);
+  // Conversational Create Entrance (2026-08-06) — the composer is
+  // "engaged" once the member has sent their opening message; narrows the
+  // screen the same way the old focused-input state used to (hides Find
+  // Previous Work / Start New while a conversation is underway).
+  const [composerEngaged, setComposerEngaged] = useState(false);
+  // The last text handed to submitPrompt — lets Retry resubmit without a
+  // shared textarea to read from (the conversation panel owns its own).
+  const [lastSubmittedText, setLastSubmittedText] = useState("");
+  // The resolved "open" outcome, awaiting the guided/independent choice —
+  // set once Yes is clicked on the reflection step, before openConfirmed.
+  const [pendingOpenOutcome, setPendingOpenOutcome] = useState<Extract<
+    CreateBeginOutcome,
+    { kind: "open" }
+  > | null>(null);
+  const [entrySupportChoice, setEntrySupportChoice] =
+    useState<EntrySupportChoice>(null);
   const confirmRegionRef = useRef<HTMLDivElement | null>(null);
-  const promptInputRef = useRef<HTMLTextAreaElement | null>(null);
 
   const exitDestination = resolveCreateExitDestination(exitOriginHint);
-  const suggestionContext = useMemo(
-    () => resolveSuggestionContext(activeWorkspaces),
-    [activeWorkspaces],
-  );
-
-  // Part 10 — the same field doubles as natural-language search. Two
-  // characters is enough to start narrowing; never a separate search box.
-  const trimmedPrompt = prompt.trim();
-  const searchResults = useMemo<ExploreIdeaResult[]>(() => {
-    if (trimmedPrompt.length < 2) return [];
-    return queryExploreIdeas({
-      search: trimmedPrompt,
-      suggestionContext,
-    }).slice(0, 5);
-  }, [trimmedPrompt, suggestionContext]);
-  const isSearching = trimmedPrompt.length >= 2;
-
-  // Entrance Cleanup (2026-08) — Start Freely: once the member has engaged
-  // with the input (focused it or typed anything), narrow to a focused
-  // writing surface. Reverts once blurred with the field empty again.
-  const composerEngaged = composerFocused || trimmedPrompt.length > 0;
 
   // Spec 132 — Escape dismisses the confirm layer before leaving Create.
   useDismissibleWindow({
@@ -248,19 +233,6 @@ export function CreateEstateEntrancePanel({
     setBeginBusy(false);
   }
 
-  function requestCatalogConfirm(item: CreateCatalogItem) {
-    // A choice from suggested chips, search results, or Browse More /
-    // Help Me Choose all land here — the confirm gate never differs by path.
-    setHelpMeChooseOpen(false);
-    const resolved = resolveCreateLauncherType(item.label);
-    showConfirm(
-      resolveCatalogCreateConfirm({
-        label: resolved.catalogLabel,
-        requestText: prompt.trim() || null,
-      }),
-    );
-  }
-
   useEffect(() => {
     onRestoreContinuity?.();
     // Once on entrance mount — restore after refresh / return
@@ -294,7 +266,13 @@ export function CreateEstateEntrancePanel({
 
   function openConfirmed(
     outcome: Extract<CreateBeginOutcome, { kind: "open" }>,
-    opts?: { forceNewArmed?: boolean },
+    opts?: {
+      forceNewArmed?: boolean;
+      /** Falls back to the entrySupportChoice state when omitted — the
+       * anywhere-clarify continuation calls (acceptAnywhereStartNew) don't
+       * pass it explicitly and rely on that fallback. */
+      entrySupportChoice?: EntrySupportChoice;
+    },
   ) {
     setPendingAnywhereClarify(null);
 
@@ -342,6 +320,8 @@ export function CreateEstateEntrancePanel({
     // onBeginCreate opens binds to that identity instead of orphaning it.
     const canonicalWorkId =
       guided.kind === "open_new" ? guided.resolution.workId : null;
+    const effectiveSupportChoice =
+      opts?.entrySupportChoice ?? entrySupportChoice;
 
     void (async () => {
       try {
@@ -349,7 +329,10 @@ export function CreateEstateEntrancePanel({
         setBeginFeedback(CREATE_BEGIN_PROGRESS_MESSAGE);
         setBeginFeedbackKind("progress");
         const opened = await Promise.resolve(
-          onBeginCreate(outcome, { canonicalWorkId }),
+          onBeginCreate(outcome, {
+            canonicalWorkId,
+            entrySupportChoice: effectiveSupportChoice,
+          }),
         );
         if (opened === false) {
           setBeginFeedback(CREATE_ESTATE_OPEN_FAILED_MESSAGE);
@@ -413,57 +396,50 @@ export function CreateEstateEntrancePanel({
     setBeginFeedbackKind(null);
   }
 
-  function submitPrompt() {
-    // Direct Estate navigation outranks Create intent — never append as content.
-    const navInterrupt = tryDirectNavigationInterrupt(prompt);
-    if (navInterrupt.interrupted && onDirectNavigationInterrupt) {
-      const navText = navInterrupt.userText;
-      setPrompt("");
-      setPendingConfirm(null);
-      setPendingAnywhereClarify(null);
+  /**
+   * Checked once, against the conversation's opening message only, before
+   * any acknowledgment is shown — Estate navigation phrases outrank Create
+   * intent and must never be swallowed into the new conversation. Returns
+   * true when handled (the panel does nothing further with that turn).
+   */
+  function handleOpeningMessage(text: string): boolean {
+    const navInterrupt = tryDirectNavigationInterrupt(text);
+    if (!navInterrupt.interrupted || !onDirectNavigationInterrupt) return false;
+    const navText = navInterrupt.userText;
+    setPendingConfirm(null);
+    setPendingAnywhereClarify(null);
+    setBeginBusy(true);
+    setBeginFeedback("Taking you there…");
+    setBeginFeedbackKind("progress");
+    void Promise.resolve(
+      onDirectNavigationInterrupt({
+        userText: navText,
+        destinationId: navInterrupt.destinationId,
+        label: navInterrupt.label,
+      }),
+    ).then(() => {
+      setBeginBusy(false);
       setBeginFeedback(null);
       setBeginFeedbackKind(null);
-      setBeginBusy(true);
-      setBeginFeedback("Taking you there…");
-      setBeginFeedbackKind("progress");
-      void Promise.resolve(
-        onDirectNavigationInterrupt({
-          userText: navText,
-          destinationId: navInterrupt.destinationId,
-          label: navInterrupt.label,
-        }),
-      ).then((handled) => {
-        if (handled === false) {
-          setBeginBusy(false);
-          setBeginFeedback(null);
-          setBeginFeedbackKind(null);
-          setPrompt(navText);
-          return;
-        }
-        setBeginBusy(false);
-        setBeginFeedback(null);
-        setBeginFeedbackKind(null);
-      });
-      return;
-    }
+    });
+    return true;
+  }
 
-    // P0 — every Start Creating click produces visible feedback (never silent)
+  function submitPrompt(text: string) {
+    setLastSubmittedText(text);
+
+    // P0 — every Begin produces visible feedback (never silent)
     setBeginBusy(true);
     setBeginFeedback(CREATE_BEGIN_PROGRESS_MESSAGE);
     setBeginFeedbackKind("progress");
     setPendingConfirm(null);
 
-    const outcome = resolveCreateBeginOutcome(prompt);
+    const outcome = resolveCreateBeginOutcome(text);
 
     if (outcome.kind === "clarify") {
       setBeginFeedback(outcome.message);
       setBeginFeedbackKind("clarify");
       setBeginBusy(false);
-      // Empty Start Freely click — make the next action obvious instead of
-      // leaving the member wondering what happened (live-testing gap).
-      if (outcome.reason === "empty") {
-        promptInputRef.current?.focus();
-      }
       return;
     }
 
@@ -486,35 +462,37 @@ export function CreateEstateEntrancePanel({
 
   function acceptConfirm() {
     if (!pendingConfirm) return;
+    // Conversational Create Entrance (2026-08-06) — the guided/independent
+    // choice sits between confirming intent and actually opening; hold the
+    // resolved outcome until that choice is made instead of opening here.
+    setPendingOpenOutcome(confirmCreateBeginToOpen(pendingConfirm));
+    setPendingConfirm(null);
+    setBeginFeedback(null);
+    setBeginFeedbackKind(null);
+  }
+
+  function chooseSupportAndOpen(choice: Exclude<EntrySupportChoice, null>) {
+    if (!pendingOpenOutcome) return;
+    const outcome = pendingOpenOutcome;
+    setEntrySupportChoice(choice);
+    setPendingOpenOutcome(null);
     setBeginBusy(true);
-    openConfirmed(confirmCreateBeginToOpen(pendingConfirm));
+    openConfirmed(outcome, { entrySupportChoice: choice });
   }
 
   function declineConfirm() {
     setPendingConfirm(null);
     setBeginFeedback(
-      "No problem — tell me a little more about what you'd like to create, or use Help Me Choose below.",
+      "No problem — tell me a little more about what you'd like to create.",
     );
     setBeginFeedbackKind("clarify");
   }
 
   function cancelConfirm() {
     setPendingConfirm(null);
+    setPendingOpenOutcome(null);
     setBeginFeedback(null);
     setBeginFeedbackKind(null);
-  }
-
-  function clearFeedbackOnEdit() {
-    if (
-      beginFeedbackKind === "clarify" ||
-      beginFeedbackKind === "error" ||
-      beginFeedbackKind === "confirm"
-    ) {
-      setBeginFeedback(null);
-      setBeginFeedbackKind(null);
-      setPendingConfirm(null);
-      setPendingAnywhereClarify(null);
-    }
   }
 
   return (
@@ -565,172 +543,26 @@ export function CreateEstateEntrancePanel({
           </section>
         ) : null}
 
-        {/* 2 — What would you like to create? (Part 1 — the default screen) */}
+        {/* 2 — Conversational Create Entrance (2026-08-06). Replaces Start
+            Freely / Start With Guidance / Browse Categories with a single
+            open conversation — no categories, no template grid, no section
+            UI until the conversation earns that next step. */}
         <section
           className="mt-6 flex flex-col gap-3"
           data-testid="create-estate-composer"
-          aria-labelledby="create-estate-composer-heading"
         >
-          <h2
-            id="create-estate-composer-heading"
-            className="text-lg font-semibold text-[#1f1c19]"
-          >
-            {CREATE_ESTATE_WHAT_WOULD_YOU_LIKE_HEADING}
-          </h2>
-          <textarea
-            ref={promptInputRef}
-            value={prompt}
-            onChange={(e) => {
-              setPrompt(e.target.value);
-              clearFeedbackOnEdit();
-            }}
-            onFocus={() => setComposerFocused(true)}
-            onBlur={() => setComposerFocused(false)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                if (!beginBusy) submitPrompt();
-              }
-            }}
-            rows={3}
-            placeholder={CREATE_ESTATE_DESCRIBE_PLACEHOLDER}
-            className="w-full max-w-2xl resize-y rounded-2xl border border-[#cfc6b8] bg-white/95 px-4 py-4 text-lg leading-relaxed text-[#1f1c19] shadow-sm placeholder:text-[#9a8f82] focus:border-[#8a7a68] focus:outline-none focus:ring-2 focus:ring-[#c4b8a8]/60"
-            data-testid="create-estate-nl-input"
-            aria-label={CREATE_ESTATE_DESCRIBE_PLACEHOLDER}
-            disabled={beginBusy}
+          <CreateEntryConversationPanel
+            onReady={submitPrompt}
+            onOpeningMessage={handleOpeningMessage}
+            onEngagementChange={setComposerEngaged}
+            disabled={
+              beginBusy ||
+              beginFeedbackKind === "confirm" ||
+              Boolean(pendingOpenOutcome)
+            }
           />
 
-          {/* Part 10 — the description field doubles as natural-language search. */}
-          {isSearching ? (
-            searchResults.length > 0 ? (
-              <ul
-                className="flex max-w-2xl flex-col gap-1.5"
-                data-testid="create-estate-search-results"
-                aria-label="Matching ideas"
-              >
-                {searchResults.map((result) => (
-                  <li key={result.id}>
-                    <button
-                      type="button"
-                      disabled={beginBusy}
-                      className="flex w-full items-center gap-2 rounded-xl border border-[#e7dfd4] bg-white/90 px-4 py-2.5 text-left text-base text-[#1f1c19] transition hover:border-[#cfc6b8] disabled:opacity-70"
-                      data-testid="create-estate-search-result"
-                      onClick={() => {
-                        if (result.catalogItem) {
-                          requestCatalogConfirm(result.catalogItem);
-                        }
-                      }}
-                    >
-                      <span aria-hidden="true">{result.emoji}</span>
-                      <span className="font-semibold">{result.label}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div
-                className="flex max-w-2xl flex-col gap-2"
-                data-testid="create-estate-search-empty"
-              >
-                <p className="text-sm leading-relaxed text-[#6b635a]">
-                  {CREATE_ESTATE_NO_SEARCH_RESULTS_MESSAGE}
-                </p>
-                <button
-                  type="button"
-                  disabled={beginBusy}
-                  onClick={submitPrompt}
-                  className="self-start rounded-xl border border-[#cfc6b8] bg-white px-4 py-2 text-sm font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0] disabled:opacity-70"
-                  data-testid="create-estate-create-from-scratch"
-                >
-                  {CREATE_ESTATE_CREATE_FROM_SCRATCH_LABEL}
-                </button>
-              </div>
-            )
-          ) : null}
-
           <div className="flex flex-col items-start gap-3">
-            {/* Phase 0 — Start Freely / Start With Guidance both reuse the
-                existing free-text Begin and Help Me Choose paths below;
-                only the framing copy and grouping are new. */}
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <div
-                className="flex max-w-sm flex-col gap-2 rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
-                data-testid="create-estate-start-freely"
-              >
-                <h3 className="text-base font-semibold text-[#1f1c19]">
-                  {CREATE_ESTATE_START_FREELY_HEADING}
-                </h3>
-                <p className="text-sm leading-relaxed text-[#6b635a]">
-                  {CREATE_ESTATE_START_FREELY_DESCRIPTION}
-                </p>
-                <button
-                  type="button"
-                  onClick={submitPrompt}
-                  disabled={beginBusy}
-                  aria-busy={beginBusy}
-                  className="self-start rounded-xl bg-[#3d3429] px-6 py-3 text-base font-semibold text-[#f7f2ea] transition enabled:hover:bg-[#2c241c] disabled:cursor-wait disabled:opacity-70"
-                  data-testid="create-estate-start-creating"
-                  data-primary-action="begin"
-                >
-                  {beginBusy ? "Beginning…" : CREATE_ESTATE_START_CREATING_LABEL}
-                </button>
-              </div>
-
-              {/* Entrance Cleanup (2026-08) — once Start Freely is engaged
-                  (input focused or has text), the alternate path and
-                  secondary navigation step aside; the input + its own Begin
-                  button remain the primary focus. Nothing about routing,
-                  the confirm gate, or Start With Guidance's own logic changes
-                  — only whether this card and the items below it render. */}
-              {!composerEngaged ? (
-                <div
-                  className="flex max-w-sm flex-col gap-2 rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
-                  data-testid="create-estate-start-with-guidance"
-                >
-                  <h3 className="text-base font-semibold text-[#1f1c19]">
-                    {CREATE_ESTATE_START_WITH_GUIDANCE_HEADING}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-[#6b635a]">
-                    {CREATE_ESTATE_START_WITH_GUIDANCE_DESCRIPTION}
-                  </p>
-                  <button
-                    type="button"
-                    disabled={beginBusy}
-                    aria-pressed={helpMeChooseOpen}
-                    onClick={() => setHelpMeChooseOpen((open) => !open)}
-                    className="self-start rounded-xl border border-[#cfc6b8] bg-white px-5 py-2.5 text-base font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0] disabled:opacity-70"
-                    data-testid="create-estate-help-me-choose"
-                  >
-                    {CREATE_ESTATE_HELP_ME_CHOOSE_LABEL}
-                  </button>
-
-                  {/* Part 9 — Help Me Choose is one guided question at a
-                      time. Renamed from the separate "Browse More" section
-                      (2026-08 Entrance Cleanup) — same CreateBrowseCategoriesPanel,
-                      same requestCatalogConfirm gate, now the single mount
-                      point instead of a second, duplicate one further down
-                      the page. */}
-                  {helpMeChooseOpen ? (
-                    <div
-                      className="mt-2 rounded-2xl border border-[#e7dfd4] bg-white/80 px-4 py-3"
-                      data-testid="create-estate-browse-categories"
-                      data-max-decision-layers={SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS}
-                    >
-                      <h4 className="text-sm font-semibold text-[#1f1c19]">
-                        {CREATE_ESTATE_BROWSE_CATEGORIES_HEADING}
-                      </h4>
-                      <div className="mt-2">
-                        <CreateBrowseCategoriesPanel
-                          mode="guided"
-                          onRequestCreate={requestCatalogConfirm}
-                        />
-                      </div>
-                    </div>
-                  ) : null}
-                </div>
-              ) : null}
-            </div>
-
             {!composerEngaged && hasWorkspaces ? (
               <div className="flex flex-wrap items-center gap-3">
                 <button
@@ -742,7 +574,6 @@ export function CreateEstateEntrancePanel({
                     void (async () => {
                       try {
                         armForceNewCreateSession();
-                        setPrompt("");
                         setPendingConfirm(null);
                         setPendingAnywhereClarify(null);
                         await Promise.resolve(onStartSomethingNew());
@@ -777,7 +608,15 @@ export function CreateEstateEntrancePanel({
                 data-testid="create-estate-begin-feedback"
                 data-begin-feedback={beginFeedbackKind ?? "none"}
               >
+                {beginFeedbackKind === "confirm" ? (
+                  <p className="mb-1 font-semibold text-[#1f1c19]">
+                    {CREATE_ESTATE_ENTRY_REFLECTION_PREFIX}
+                  </p>
+                ) : null}
                 <p>{beginFeedback}</p>
+                {beginFeedbackKind === "confirm" ? (
+                  <p className="mt-1">{CREATE_ESTATE_ENTRY_REFLECTION_QUESTION}</p>
+                ) : null}
                 {beginFeedbackKind === "clarify" && pendingAnywhereClarify ? (
                   <div
                     className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap"
@@ -831,7 +670,7 @@ export function CreateEstateEntrancePanel({
                           acceptConfirm();
                           return;
                         }
-                        if (!beginBusy) submitPrompt();
+                        if (!beginBusy) submitPrompt(lastSubmittedText);
                       }}
                     >
                       Retry
@@ -908,6 +747,55 @@ export function CreateEstateEntrancePanel({
                     ) : null}
                   </div>
                 ) : null}
+              </div>
+            ) : null}
+
+            {/* Conversational Create Entrance (2026-08-06) — "how much
+                support," not "which thing." Sits between confirming intent
+                and actually opening (chooseSupportAndOpen), before
+                onBeginCreate ever fires. */}
+            {pendingOpenOutcome ? (
+              <div
+                className="max-w-2xl rounded-xl border border-[#d4cdc3] bg-[#faf7f2] px-4 py-3"
+                data-testid="create-estate-support-choice"
+                role="group"
+                aria-label={CREATE_ESTATE_ENTRY_SUPPORT_CHOICE_HEADING}
+              >
+                <p className="font-semibold text-[#1f1c19]">
+                  {CREATE_ESTATE_ENTRY_SUPPORT_CHOICE_HEADING}
+                </p>
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                  <button
+                    type="button"
+                    disabled={beginBusy}
+                    className="flex max-w-xs flex-col items-start gap-1 rounded-xl border border-[#cfc6b8] bg-white px-5 py-3 text-left transition hover:bg-[#f3ebe0] disabled:opacity-70"
+                    data-testid="create-estate-support-guided"
+                    data-primary-action="begin"
+                    onClick={() => chooseSupportAndOpen("guided")}
+                  >
+                    <span className="text-base font-semibold text-[#3d3429]">
+                      {CREATE_ESTATE_ENTRY_SUPPORT_GUIDED_LABEL}
+                    </span>
+                    <span className="text-sm text-[#6b635a]">
+                      {CREATE_ESTATE_ENTRY_SUPPORT_GUIDED_DESCRIPTION}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    disabled={beginBusy}
+                    className="flex max-w-xs flex-col items-start gap-1 rounded-xl border border-[#cfc6b8] bg-white px-5 py-3 text-left transition hover:bg-[#f3ebe0] disabled:opacity-70"
+                    data-testid="create-estate-support-independent"
+                    data-primary-action="begin"
+                    onClick={() => chooseSupportAndOpen("independent")}
+                  >
+                    <span className="text-base font-semibold text-[#3d3429]">
+                      {CREATE_ESTATE_ENTRY_SUPPORT_INDEPENDENT_LABEL}
+                    </span>
+                    <span className="text-sm text-[#6b635a]">
+                      {CREATE_ESTATE_ENTRY_SUPPORT_INDEPENDENT_DESCRIPTION}
+                    </span>
+                  </button>
+                </div>
               </div>
             ) : null}
           </div>
