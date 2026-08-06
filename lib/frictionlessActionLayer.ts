@@ -124,6 +124,7 @@ import {
   saveDiscoverySession,
   shouldEnterDiscoveryMode,
 } from "./estateBrain/discoveryMode";
+import { resolveWorkRecognitionFallthrough } from "./estateBrain/workRecognitionFallthrough";
 import {
   syncUniversalCreationHandoffToSession,
 } from "./conversationSession";
@@ -2068,6 +2069,47 @@ function tryUniversalCreationFlow(
 
   // Exhaustiveness: all UC kinds are handled above. Never open Create workspace.
   return null;
+}
+
+/**
+ * Universal Work Recognition — Step 1 (2026-08-06). The additive fallthrough
+ * seam: called ONLY at the very end of resolveFrictionlessActionImpl, after
+ * every other recognizer already returned no-match (see the call site near
+ * the final `return finish({ ...none })`). By construction this can never
+ * preempt or regress a currently-working route — it only ever fires when
+ * nothing else did.
+ *
+ * Never opens a workspace (Step 2, explicitly deferred). See
+ * docs/create-experience/UNIVERSAL_WORK_RECOGNITION_ARCHITECTURE_ANALYSIS.md.
+ */
+function tryWorkRecognitionFallthrough(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  if (!userText) return null;
+
+  const result = resolveWorkRecognitionFallthrough(
+    userText,
+    input.lastAssistantText,
+  );
+  if (!result) return null;
+
+  return {
+    category: "estate_discovery",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint:
+      result.kind === "question"
+        ? "WORK RECOGNITION: understanding conversation in progress — ask ONE thoughtful question, never a form."
+        : "WORK RECOGNITION: understanding complete — recognition and confirmation only, do not open a workspace.",
+    localReply: result.message,
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+  };
 }
 
 function tryDiscoveryFlow(
@@ -4382,6 +4424,15 @@ function resolveFrictionlessActionImpl(
 
   const visualRecommendationLate = tryVisualRecommendationFlow(input, routing);
   if (visualRecommendationLate) return visualRecommendationLate;
+
+  // Universal Work Recognition — Step 1 (2026-08-06). The last chance,
+  // after every other recognizer above has already returned no-match: is
+  // this work the member wants help creating, planning, developing,
+  // building, or improving, even without using those words? See
+  // tryWorkRecognitionFallthrough's own doc comment for the safety
+  // argument.
+  const workRecognitionFlow = tryWorkRecognitionFallthrough(input, routing);
+  if (workRecognitionFlow) return workRecognitionFlow;
 
   return finish({
     ...none,
