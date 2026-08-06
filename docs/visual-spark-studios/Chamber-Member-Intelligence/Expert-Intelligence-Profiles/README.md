@@ -78,3 +78,7 @@ If no → revise ADHD layer (§6), adaptations (§7), and signature questions (�
 1. Founder / quality review of Phase 1–3 profiles (`Review` → `Production`)
 2. Map profile activation to Estate Brain / Phase 33 without new engines
 3. Keep `XXX-001`… libraries as deep source; profiles as activation digests
+
+## Activation architecture (analysis, not yet built)
+
+**[`docs/estate/CHAMBER_EXPERT_ACTIVATION_ARCHITECTURE.md`](../../../estate/CHAMBER_EXPERT_ACTIVATION_ARCHITECTURE.md)** — how these 24 profiles should connect to the Universal Reasoning Journey / Work Recognition signals already live in `lib/intentRoutingIntelligence.ts` and `lib/estateBrain/`, without a new engine, agent, or memory system. Read before any implementation handoff.
