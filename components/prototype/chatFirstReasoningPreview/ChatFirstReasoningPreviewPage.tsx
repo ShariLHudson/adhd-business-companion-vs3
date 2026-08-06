@@ -5,20 +5,25 @@ import {
   answerCurrentQuestion,
   isJourneyComplete,
   JOURNEY_CHIP_EXAMPLES,
+  journeyFor,
   OPENING_QUESTION,
   OPENING_SUPPORT,
   PREVIEW_BOUNDARY_REPLY,
   PROGRESS_CAPTION,
   RESEARCH_CHOICE_NOT_NOW,
   RESEARCH_CHOICE_YES,
+  RESEARCH_USE_IDEAS_LABEL,
+  RESEARCH_USE_RECOMMENDATION_LABEL,
   researchAcceptMessages,
   researchDeclineMessages,
   researchOfferFor,
+  researchUseMessages,
   startJourney,
   thinkingHelpFor,
   UNCLEAR_REPLY,
   type JourneyState,
   type PreviewMessage,
+  type ResearchUse,
 } from "./chatFirstReasoningJourney";
 
 /**
@@ -38,9 +43,12 @@ export function ChatFirstReasoningPreviewPage() {
   const [journeyState, setJourneyState] = useState<JourneyState | null>(null);
   const [messages, setMessages] = useState<PreviewMessage[]>([]);
   const [inputValue, setInputValue] = useState("");
-  // Research was offered and awaits the member's choice. Answering the
-  // question instead simply dissolves the offer — research never blocks.
-  const [researchPending, setResearchPending] = useState(false);
+  // Research stages: "offer" awaits yes/not-now; "use" awaits how the member
+  // wants findings applied (Rule 7). Answering the question instead simply
+  // dissolves either stage — research never blocks.
+  const [researchStage, setResearchStage] = useState<"offer" | "use" | null>(
+    null,
+  );
 
   const inJourney = journeyState !== null && !isJourneyComplete(journeyState);
   const complete = journeyState !== null && isJourneyComplete(journeyState);
@@ -59,14 +67,14 @@ export function ChatFirstReasoningPreviewPage() {
     setJourneyState(null);
     setMessages([]);
     setInputValue("");
-    setResearchPending(false);
+    setResearchStage(null);
   }
 
   function send(rawText?: string) {
     const text = (rawText ?? inputValue).trim();
     if (!text) return;
     setInputValue("");
-    setResearchPending(false);
+    setResearchStage(null);
     setMessages((prev) => [...prev, { role: "user", content: text }]);
 
     if (journeyState === null) {
@@ -99,12 +107,11 @@ export function ChatFirstReasoningPreviewPage() {
   function researchThis() {
     if (!journeyState) return;
     appendSpark([researchOfferFor(journeyState)]);
-    setResearchPending(true);
+    setResearchStage("offer");
   }
 
   function chooseResearch(accepted: boolean) {
     if (!journeyState) return;
-    setResearchPending(false);
     setMessages((prev) => [
       ...prev,
       {
@@ -112,11 +119,29 @@ export function ChatFirstReasoningPreviewPage() {
         content: accepted ? RESEARCH_CHOICE_YES : RESEARCH_CHOICE_NOT_NOW,
       },
     ]);
-    appendSpark(
-      accepted
-        ? researchAcceptMessages(journeyState)
-        : researchDeclineMessages(journeyState),
-    );
+    if (accepted) {
+      appendSpark(researchAcceptMessages(journeyState));
+      setResearchStage("use");
+      return;
+    }
+    setResearchStage(null);
+    appendSpark(researchDeclineMessages(journeyState));
+  }
+
+  function chooseResearchUse(use: ResearchUse) {
+    if (!journeyState) return;
+    setResearchStage(null);
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "user",
+        content:
+          use === "ideas"
+            ? RESEARCH_USE_IDEAS_LABEL
+            : RESEARCH_USE_RECOMMENDATION_LABEL,
+      },
+    ]);
+    appendSpark(researchUseMessages(journeyState, use));
   }
 
   return (
@@ -143,9 +168,9 @@ export function ChatFirstReasoningPreviewPage() {
           }
         >
           <div className="flex items-center gap-1.5" aria-hidden="true">
-            {[0, 1, 2].map((i) => (
+            {journeyFor(journeyState.journeyId).questions.map((q, i) => (
               <span
-                key={i}
+                key={q.id}
                 className={
                   i < answeredCount
                     ? "h-2 w-2 rounded-full bg-[#8a7a68]"
@@ -183,7 +208,7 @@ export function ChatFirstReasoningPreviewPage() {
       </ul>
 
       {/* Optional companions to the current question — never required. */}
-      {inJourney && researchPending ? (
+      {inJourney && researchStage === "offer" ? (
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
@@ -203,7 +228,27 @@ export function ChatFirstReasoningPreviewPage() {
           </button>
         </div>
       ) : null}
-      {inJourney && !researchPending ? (
+      {inJourney && researchStage === "use" ? (
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => chooseResearchUse("ideas")}
+            className="rounded-full border border-[#cfc6b8] bg-white px-4 py-2 text-sm font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0]"
+            data-testid="preview-research-use-ideas"
+          >
+            {RESEARCH_USE_IDEAS_LABEL}
+          </button>
+          <button
+            type="button"
+            onClick={() => chooseResearchUse("recommendation")}
+            className="rounded-full border border-[#cfc6b8] bg-white px-4 py-2 text-sm font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0]"
+            data-testid="preview-research-use-recommendation"
+          >
+            {RESEARCH_USE_RECOMMENDATION_LABEL}
+          </button>
+        </div>
+      ) : null}
+      {inJourney && researchStage === null ? (
         <div className="flex flex-wrap gap-2">
           <button
             type="button"

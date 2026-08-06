@@ -39,7 +39,8 @@ export type BuildJourney = {
   outcomeLabel: string;
   /** Example chip shown on the opening screen. */
   chipExample: string;
-  questions: readonly [JourneyQuestion, JourneyQuestion, JourneyQuestion];
+  /** Rule 2 order: outcome → why it matters → who → what already exists. */
+  questions: readonly JourneyQuestion[];
   researchOffer: string;
   /** What accepted research would bring back — concept demonstration only. */
   researchPreviewFinding: string;
@@ -76,6 +77,23 @@ export const RESEARCH_CHOICE_YES = "Yes — research this";
 
 export const RESEARCH_CHOICE_NOT_NOW = "Not right now";
 
+/** Rule 6 step 3 / Rule 7 — the member controls how research is used. */
+export const RESEARCH_USE_PROMPT =
+  "Before I look — how would you like me to use what I find?";
+
+export type ResearchUse = "ideas" | "recommendation";
+
+export const RESEARCH_USE_IDEAS_LABEL = "Ideas and examples to choose from";
+
+export const RESEARCH_USE_RECOMMENDATION_LABEL = "A clear recommendation";
+
+export const RESEARCH_USE_ACKS: Record<ResearchUse, string> = {
+  ideas:
+    "Perfect — I'll bring back ideas and examples, and you choose what fits.",
+  recommendation:
+    "Got it — I'll weigh what I find and bring you one clear recommendation.",
+};
+
 export const RESEARCH_KEPT_NOTE =
   "I'd keep what we find — and the decisions it helps you make — with this work, so nothing gets lost.";
 
@@ -104,6 +122,16 @@ const JOURNEYS: Record<JourneyId, BuildJourney> = {
         thinkingHelp:
           "One way in: picture the last time this went really well. What was true at the end that you'd want every single time?",
         recapLabel: "What it should make possible",
+      },
+      {
+        id: "sop-why",
+        prompt:
+          "Why now — what's happening in your business that makes this the moment for it?",
+        learnedAcknowledgment:
+          "That's the real reason we're doing this — and it tells us what this process has to protect.",
+        thinkingHelp:
+          "Sometimes it's a moment: a mistake that stung, a new hire, a growth spurt, or just being tired of holding it all in your head.",
+        recapLabel: "Why it matters now",
       },
       {
         id: "sop-who",
@@ -146,6 +174,15 @@ const JOURNEYS: Record<JourneyId, BuildJourney> = {
         thinkingHelp:
           "Try finishing this sentence: “They walked in unsure about ___, and walked out able to ___.”",
         recapLabel: "The transformation",
+      },
+      {
+        id: "workshop-why",
+        prompt: "Why this workshop, and why now — what makes it matter to you?",
+        learnedAcknowledgment:
+          "Knowing why keeps every choice honest — the agenda serves that reason, not the other way around.",
+        thinkingHelp:
+          "Maybe it grows your business, maybe it's a message you can't not share — both are good reasons, and naming yours helps us design for it.",
+        recapLabel: "Why it matters",
       },
       {
         id: "workshop-audience",
@@ -191,6 +228,15 @@ const JOURNEYS: Record<JourneyId, BuildJourney> = {
         recapLabel: "What people should leave saying",
       },
       {
+        id: "event-why",
+        prompt: "Why does this gathering matter — for them, and for you?",
+        learnedAcknowledgment:
+          "That's the heartbeat of it. Experiences built on a real why feel different the moment people walk in.",
+        thinkingHelp:
+          "There's usually a business reason and a personal one. Name whichever is louder right now.",
+        recapLabel: "Why it matters",
+      },
+      {
         id: "event-audience",
         prompt: "Who is this for — and what do they need most from time with you?",
         learnedAcknowledgment:
@@ -231,6 +277,16 @@ const JOURNEYS: Record<JourneyId, BuildJourney> = {
         thinkingHelp:
           "Imagine your favorite reader closing the email. What did it leave them with — a feeling, an idea, a next step?",
         recapLabel: "What each issue should leave behind",
+      },
+      {
+        id: "newsletter-why",
+        prompt:
+          "Why a newsletter, and why now — what makes this matter for your business?",
+        learnedAcknowledgment:
+          "That's worth holding onto — it will keep the newsletter honest when writing weeks get busy.",
+        thinkingHelp:
+          "Maybe it's staying close to people between launches, or owning your audience instead of renting it. What's yours?",
+        recapLabel: "Why it matters",
       },
       {
         id: "newsletter-audience",
@@ -274,6 +330,16 @@ const JOURNEYS: Record<JourneyId, BuildJourney> = {
         thinkingHelp:
           "Be concrete if you can — more of what? Fewer of what? What would you stop worrying about?",
         recapLabel: "What success looks like",
+      },
+      {
+        id: "marketing-why",
+        prompt:
+          "Why does this matter right now — what's happening in your business that brought it up today?",
+        learnedAcknowledgment:
+          "That context changes everything — strategy for where you actually are beats strategy for an ideal version of you.",
+        thinkingHelp:
+          "A slow season, an income goal, a shift you're making — whatever's behind it is useful for us to know.",
+        recapLabel: "Why now",
       },
       {
         id: "marketing-audience",
@@ -453,18 +519,36 @@ export function researchOfferFor(state: JourneyState): string {
 }
 
 /**
- * Member said yes to research: show what it would bring back (concept only),
- * promise the learning stays with the work, then return them to the exact
- * question they paused on. Research is a capability at every step — never a
- * detour they have to find their way back from.
+ * Member said yes to research. Before anything is gathered, Spark asks how
+ * they want the information used (Rule 6 step 3 / Rule 7) — the member
+ * controls how research is applied, always.
  */
-export function researchAcceptMessages(state: JourneyState): string[] {
+export function researchAcceptMessages(_state: JourneyState): string[] {
+  return [RESEARCH_USE_PROMPT];
+}
+
+/**
+ * Member chose how to use it: acknowledge their choice, show what research
+ * would bring back (concept only), promise the learning stays with the work,
+ * then return them to the exact question they paused on. Research is a
+ * capability at every step — never a detour they have to find their way
+ * back from.
+ */
+export function researchUseMessages(
+  state: JourneyState,
+  use: ResearchUse,
+): string[] {
   const journey = JOURNEYS[state.journeyId];
   const question = currentQuestion(state);
   const returnTo = question
     ? [`${RESEARCH_RETURN_LINE}\n\n${question.prompt}`]
     : [];
-  return [journey.researchPreviewFinding, RESEARCH_KEPT_NOTE, ...returnTo];
+  return [
+    RESEARCH_USE_ACKS[use],
+    journey.researchPreviewFinding,
+    RESEARCH_KEPT_NOTE,
+    ...returnTo,
+  ];
 }
 
 /** Member said not now: no friction, straight back to the exact question. */

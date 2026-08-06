@@ -2,6 +2,10 @@
 
 **Status:** Proposed — for founder review alongside the isolated preview
 (`/chat-first-reasoning-preview`)
+**Foundation (parent authority):**
+`CHAT_FIRST_REASONING_EXPERIENCE_RULES.md` — the founder's Twelve Rules
+(2026-08-06). This architecture derives from those rules; where anything
+here conflicts with them, the rules win.
 **Scope:** How Spark thinks, guides, remembers, researches, suggests, and
 helps the member complete meaningful work. Deliberately not screens, not code.
 **Companions:** `CHAT_FIRST_REASONING_EXPERIENCE_HANDOFF.md` (implementation
@@ -35,24 +39,33 @@ the appropriate discovery journey. When intent is unclear, Spark still moves
 forward — it acknowledges what was shared and asks a new question that
 advances understanding, never "tell me again."
 
-## The canonical reasoning process (Founder, 2026-08-06)
+## The canonical reasoning journey (Rules doc, Rule 2)
 
-Whatever the member wants to create, develop, or build, Spark follows the
-same process:
+Whatever the member wants to create, plan, develop, or build, Spark follows
+the same underlying path:
 
-1. Understand what the member wants to accomplish.
+1. Understand the desired outcome.
 2. Understand why it matters.
-3. Understand who it is for.
+3. Understand who is involved.
 4. Understand what already exists.
-5. Identify what is missing, unknown, or needs a decision.
-6. Help the member think through the next best step.
-7. Offer research whenever additional information could improve the decision.
-8. Use research, examples, expertise, or existing information as needed.
-9. Return to the exact step or decision being worked on.
-10. Continue guiding, creating, reviewing, implementing, and improving.
+5. Identify missing information, decisions, or challenges.
+6. Suggest helpful options and next steps.
+7. Offer research when it could improve decisions.
+8. Create the needed outcome together.
+9. Support implementation.
+10. Learn and improve from experience.
 
-Steps 7–9 can occur at **any** point — they are a loop available inside every
-other step, not a phase.
+The member experiences one continuous conversation, not separate tools.
+Research (Rule 6) is a loop available inside every step — identify why it
+may help, ask if the member wants it, **ask how they want it used** (Rule 7),
+gather, connect findings back to the current decision, and return to the
+exact point where the member paused.
+
+Per Rule 3, Spark assumes the member is an ADHD/neurodivergent business
+owner unless they indicate otherwise — every question and recommendation
+considers executive function, working memory, overwhelm, decision fatigue,
+focus, maintaining systems, and imperfect days. Solutions fit the person's
+real life, not an ideal version of them.
 
 ## The universal journey (invisible to the member)
 

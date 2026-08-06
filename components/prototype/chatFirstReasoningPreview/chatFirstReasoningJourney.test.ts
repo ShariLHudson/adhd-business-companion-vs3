@@ -22,9 +22,12 @@ import {
   RESEARCH_DECLINE_LINE,
   RESEARCH_KEPT_NOTE,
   RESEARCH_RETURN_LINE,
+  RESEARCH_USE_ACKS,
+  RESEARCH_USE_PROMPT,
   researchAcceptMessages,
   researchDeclineMessages,
   researchOfferFor,
+  researchUseMessages,
   startJourney,
   thinkingHelpFor,
   UNCLEAR_REPLY,
@@ -40,7 +43,7 @@ const ALL_JOURNEYS: JourneyId[] = [
   "marketing",
 ];
 
-function runFullJourney(text: string, answers: [string, string, string]) {
+function runFullJourney(text: string, answers: readonly string[]) {
   const started = startJourney(text);
   expect(started).not.toBeNull();
   let state = started!.state;
@@ -109,10 +112,11 @@ describe("SOP journey — the founder-specified script", () => {
     );
   });
 
-  it("asks the three reasoning-first questions in order", () => {
+  it("asks the reasoning-first questions in Rule 2 order — outcome, why, who, what exists", () => {
     const journey = journeyFor("sop");
     expect(journey.questions.map((q) => q.prompt)).toEqual([
       "What should someone be able to accomplish after following this SOP?",
+      "Why now — what's happening in your business that makes this the moment for it?",
       "Who will use this process once it is created?",
       "Do you already have a process, notes, documents, or examples we can build from?",
     ]);
@@ -130,6 +134,7 @@ describe("SOP journey — the founder-specified script", () => {
       "I need an SOP for onboarding clients.",
       [
         "A new VA can onboard a client without me",
+        "I'm hiring help and can't keep it all in my head",
         "My virtual assistant",
         "Some notes in a doc",
       ],
@@ -161,15 +166,23 @@ describe("SOP journey — the founder-specified script", () => {
 });
 
 describe("research as a capability at every step", () => {
-  it("accepted research shows the concept finding, keeps the learning, and returns to the exact question", () => {
+  it("saying yes first asks how the member wants the research used (Rule 7)", () => {
+    const started = startJourney("I want to plan a workshop.");
+    expect(researchAcceptMessages(started!.state)).toEqual([
+      RESEARCH_USE_PROMPT,
+    ]);
+  });
+
+  it("after the use choice: acknowledge it, show the concept finding, keep the learning, return to the exact question", () => {
     const started = startJourney("I want to plan a workshop.");
     let state = started!.state;
     state = answerCurrentQuestion(state, "Run discovery calls confidently").state;
 
     const q2 = currentQuestion(state)!;
-    const messages = researchAcceptMessages(state);
-    expect(messages[0]).toBe(journeyFor("workshop").researchPreviewFinding);
-    expect(messages[1]).toBe(RESEARCH_KEPT_NOTE);
+    const messages = researchUseMessages(state, "recommendation");
+    expect(messages[0]).toBe(RESEARCH_USE_ACKS.recommendation);
+    expect(messages[1]).toBe(journeyFor("workshop").researchPreviewFinding);
+    expect(messages[2]).toBe(RESEARCH_KEPT_NOTE);
     expect(messages.at(-1)).toBe(`${RESEARCH_RETURN_LINE}\n\n${q2.prompt}`);
   });
 
@@ -183,10 +196,14 @@ describe("research as a capability at every step", () => {
 });
 
 describe("the one universal pattern across journeys", () => {
-  it("every journey has three authored questions with help and recap", () => {
+  it("every journey has the four Rule 2 understanding questions with help and recap", () => {
     for (const id of ALL_JOURNEYS) {
       const journey = journeyFor(id);
-      expect(journey.questions).toHaveLength(3);
+      expect(journey.questions).toHaveLength(4);
+      // Rule 2 step 2 — every journey asks why it matters.
+      expect(
+        journey.questions.some((q) => /\bwhy\b/i.test(q.prompt)),
+      ).toBe(true);
       for (const q of journey.questions) {
         expect(q.prompt.trim()).not.toBe("");
         expect(q.learnedAcknowledgment.trim()).not.toBe("");
@@ -202,6 +219,7 @@ describe("the one universal pattern across journeys", () => {
   it("names one unsettled decision at journey close, before suggesting direction", () => {
     const { sparkLines } = runFullJourney("I need a marketing strategy.", [
       "Steady inquiries",
+      "Slow season coming",
       "Local creatives",
       "Posted sporadically",
     ]);
@@ -240,6 +258,7 @@ describe("the one universal pattern across journeys", () => {
         "first answer",
         "second answer",
         "third answer",
+        "fourth answer",
       ]);
       expect(isJourneyComplete(state)).toBe(true);
       expect(currentQuestion(state)).toBeNull();
@@ -256,7 +275,7 @@ describe("the one universal pattern across journeys", () => {
     const state: JourneyState = {
       journeyId: "newsletter",
       originalText: "I need a newsletter.",
-      answers: ["Feel understood", "", "My launch emails"],
+      answers: ["Feel understood", "", "", "My launch emails"],
     };
     const recap = completionMessages(state)[0];
     expect(recap).toContain("Feel understood");
@@ -276,6 +295,9 @@ describe("what the preview must never show", () => {
         journey.openDecisionNote,
         RESEARCH_KEPT_NOTE,
         RESEARCH_DECLINE_LINE,
+        RESEARCH_USE_PROMPT,
+        RESEARCH_USE_ACKS.ideas,
+        RESEARCH_USE_ACKS.recommendation,
         ...journey.questions.flatMap((q) => [
           q.prompt,
           q.learnedAcknowledgment,
@@ -285,7 +307,7 @@ describe("what the preview must never show", () => {
         ...completionMessages({
           journeyId: id,
           originalText: journey.chipExample,
-          answers: ["one", "two", "three"],
+          answers: ["one", "two", "three", "four"],
         }),
       ];
       for (const line of lines) {
