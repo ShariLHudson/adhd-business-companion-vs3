@@ -83,6 +83,19 @@ describe("CreateEstateEntrancePanel — guided domain canonical work id (Fix C)"
       beginButton.click();
     });
 
+    // Chat-First Phase 1 (2026-08-06) — an understanding conversation now
+    // runs before classification. Skipping every question is a valid path
+    // and lands on the same confirm gate this test certifies.
+    for (let i = 0; i < 6; i++) {
+      const skip = container.querySelector<HTMLButtonElement>(
+        "[data-testid='create-estate-understanding-skip']",
+      );
+      if (!skip) break;
+      await act(async () => {
+        skip.click();
+      });
+    }
+
     const confirmYes = container.querySelector<HTMLButtonElement>(
       "[data-testid='create-estate-confirm-yes']",
     );

@@ -161,7 +161,9 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
     ).toBeNull();
   });
 
-  it("Help Me Choose opens Browse Categories (single mount) one guided question at a time, then closes on selection", () => {
+  it("Help Me Choose starts the understanding conversation; categories only via its examples fallback (Chat-First Phase 1)", () => {
+    // 133 supersession (Founder, 2026-08-06) — guidance is the same
+    // reasoning conversation as typing; categories are never exposed first.
     renderPanel();
     const button = container.querySelector<HTMLButtonElement>(
       "[data-testid='create-estate-help-me-choose']",
@@ -169,23 +171,33 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
     act(() => {
       button.click();
     });
+    // No category panel — the conversation opens with the goal question.
+    expect(
+      container.querySelector("[data-testid='create-estate-browse-categories']"),
+    ).toBeFalsy();
+    const feedback = container.querySelector(
+      "[data-testid='create-estate-begin-feedback']",
+    );
+    expect(feedback?.getAttribute("data-begin-feedback")).toBe("understanding");
+    expect(feedback?.textContent).toContain(
+      "What are you working on — or hoping to make happen?",
+    );
+
+    // The category browser remains reachable — one intentional step away,
+    // through the conversation's own examples fallback (capability kept).
+    const examples = container.querySelector<HTMLButtonElement>(
+      "[data-testid='create-estate-understanding-examples']",
+    )!;
+    expect(examples).toBeTruthy();
+    act(() => {
+      examples.click();
+    });
     const browseCategories = container.querySelector(
       "[data-testid='create-estate-browse-categories']",
     );
     expect(browseCategories).toBeTruthy();
-    expect(browseCategories?.textContent).toContain("Browse Categories");
     expect(
       container.querySelector("[data-testid='create-browse-category-cards']"),
-    ).toBeTruthy();
-
-    const category = container.querySelector<HTMLButtonElement>(
-      "[data-testid='create-browse-category-card']",
-    )!;
-    act(() => {
-      category.click();
-    });
-    expect(
-      container.querySelector("[data-testid='create-browse-parent-cards']"),
     ).toBeTruthy();
   });
 

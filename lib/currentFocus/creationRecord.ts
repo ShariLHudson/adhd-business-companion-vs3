@@ -30,6 +30,7 @@ import {
 } from "./canonicalFacts";
 import { deriveWorkingMemoryFields, type WorkingMemoryFields } from "./workingMemory";
 import {
+  isSopDiscoveryEligible,
   nextSopDiscoveryQuestion,
   sopDiscoveryFieldForQuestion,
 } from "./sopDiscoveryFocus";
@@ -396,10 +397,15 @@ export function applyDiscoveryAnswerToRuntimeCreationRecord(
   // leaving mid-discovery would see "Continue with Purpose" and land back
   // on a discovery question instead). Recompute explicitly both ways rather
   // than leaving a stale value from whichever state came before.
-  const remaining = nextSopDiscoveryQuestion({
-    discoveryAnswers,
-    skippedDiscoveryIds: skipped,
-  });
+  // Chat-First Phase 1: entrance answers now arrive for ANY type through
+  // this function — the SOP-remaining wording must only apply to records
+  // whose Focus actually runs the SOP gate.
+  const remaining = isSopDiscoveryEligible(record.typeLabel)
+    ? nextSopDiscoveryQuestion({
+        discoveryAnswers,
+        skippedDiscoveryIds: skipped,
+      })
+    : null;
   if (remaining) {
     workingMemory.nextHelpfulStep = "Continue understanding your SOP";
   } else {

@@ -131,11 +131,16 @@ describe("Spec 135 — Create 12/10 certification polish", () => {
     expect(findPrevious).toContain("create-find-previous-work-empty");
   });
 
-  it("entrance Escape cancels confirm before leaving Create", () => {
+  it("entrance Escape cancels confirm/understanding before leaving Create", () => {
+    // Chat-First Phase 1 (2026-08-06) — the understanding conversation is a
+    // second Escape-dismissible layer; both cancel before the room closes.
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
-    expect(panel).toContain('closeOnEscape: beginFeedbackKind !== "confirm"');
+    expect(panel).toContain(
+      'beginFeedbackKind !== "confirm" && beginFeedbackKind !== "understanding"',
+    );
     expect(panel).toContain('event.key !== "Escape"');
     expect(panel).toContain("setPendingConfirm(null)");
+    expect(panel).toContain("setUnderstanding(null)");
   });
 
   it("working panel save acks never expose Blueprint IDs", () => {

@@ -24,13 +24,26 @@ import type { WorkingMemoryFields } from "./workingMemory";
 /** The only Working Memory fields a discovery question may write to. */
 type SopDiscoveryFieldTarget = Extract<
   keyof WorkingMemoryFields,
-  "ownershipContext" | "existingAssetsFound" | "intendedAudience"
+  | "ownershipContext"
+  | "existingAssetsFound"
+  | "intendedAudience"
+  | "desiredResult"
+  | "whyItMatters"
 >;
 
+/**
+ * Chat-First Reasoning Phase 1 (2026-08-06) — this map is the single
+ * discovery-answer → Working Memory table, so the universal entrance
+ * question ids (create-*) live here alongside SOP's. Same write path
+ * (applyDiscoveryAnswerToRuntimeCreationRecord) for both.
+ */
 const SOP_DISCOVERY_FIELD_MAP: Record<string, SopDiscoveryFieldTarget> = {
   "sop-audience-type": "ownershipContext",
   "sop-starting-point": "existingAssetsFound",
   "sop-audience-size": "intendedAudience",
+  "create-outcome": "desiredResult",
+  "create-why": "whyItMatters",
+  "create-audience": "intendedAudience",
 };
 
 export type SopDiscoveryState = {

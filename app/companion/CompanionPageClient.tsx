@@ -668,6 +668,8 @@ import {
   forceNewCreationAcknowledgment,
 } from "@/lib/universalCreationEntrypoint";
 import { armForceNewCreateSession } from "@/lib/createEstate/forceNewCreateSession";
+import { consumeEntranceUnderstandingHandoff } from "@/lib/createEstate/entranceUnderstanding";
+import { applyDiscoveryAnswerToRuntimeCreationRecord } from "@/lib/currentFocus/creationRecord";
 import {
   consumeCreationWorkspaceCreateHandoff,
   consumeCreationWorkspaceEstateHandoff,
@@ -12584,6 +12586,28 @@ export default function CompanionPageClient() {
       createWorkflowId: workflow.sessionId,
       projectHomeId: createLinkedProjectHomeId,
     });
+    // Chat-First Reasoning Phase 1 (2026-08-06) — the entrance understanding
+    // conversation's answers land in the record's discoveryAnswers + Working
+    // Memory through the same write path the SOP gate uses, so nothing is
+    // ever asked twice (Rule 5 / AT-B8). One-shot: consuming clears; no-op
+    // when no conversation preceded this open or the record isn't found.
+    const entranceUnderstanding = consumeEntranceUnderstandingHandoff();
+    if (entranceUnderstanding) {
+      for (const [questionId, answer] of Object.entries(
+        entranceUnderstanding.answers,
+      )) {
+        applyDiscoveryAnswerToRuntimeCreationRecord(
+          workspaceId,
+          questionId,
+          answer,
+        );
+      }
+      for (const questionId of entranceUnderstanding.skippedIds) {
+        applyDiscoveryAnswerToRuntimeCreationRecord(workspaceId, questionId, "", {
+          skip: true,
+        });
+      }
+    }
     setActiveSection("create");
     activeSectionRef.current = "create";
     setActiveNav("create");

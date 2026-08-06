@@ -14,7 +14,14 @@ export type DiscoveryTopic =
   | "create_sop"
   | "focus"
   | "business_growth"
-  | "research";
+  | "research"
+  /**
+   * Chat-First Reasoning Phase 1 (2026-08-06) — the universal understanding
+   * set the Create entrance runs before classification. Never returned by
+   * detectDiscoveryTopic; chat routing cannot start it.
+   * @see docs/create-experience/CHAT_FIRST_REASONING_EXPERIENCE_HANDOFF.md
+   */
+  | "create_general";
 
 export type DiscoverySlot = "goal" | "obstacle" | "outcome" | "context";
 

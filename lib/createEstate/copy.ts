@@ -153,6 +153,15 @@ export const CREATE_ESTATE_WHAT_WOULD_YOU_LIKE_HEADING =
 export const CREATE_ESTATE_DESCRIBE_PLACEHOLDER =
   "Tell me what you're thinking about, even if it's not fully formed yet...";
 
+// Chat-First Reasoning Phase 1 (2026-08-06) — the understanding conversation
+// that runs before classification. @see entranceUnderstanding.ts
+export const CREATE_ESTATE_UNDERSTANDING_PLACEHOLDER =
+  "Share as much or as little as you like…";
+export const CREATE_ESTATE_UNDERSTANDING_SKIP_LABEL = "Skip this question";
+export const CREATE_ESTATE_UNDERSTANDING_CONTINUE_LABEL = "Continue";
+export const CREATE_ESTATE_UNDERSTANDING_EXAMPLES_LABEL =
+  "Prefer to look at examples instead?";
+
 /**
  * Phase 0 (Create Entrance Copy and Path Relabel) — primary action for the
  * Start Freely path. Still the existing free-text Begin behavior; only the

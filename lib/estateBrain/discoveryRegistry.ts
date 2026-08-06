@@ -9,6 +9,8 @@ export const DISCOVERY_INTROS: Partial<Record<DiscoveryTopic, string>> = {
     "I'd be happy to help.\n\nLet me understand what you're trying to build.",
   business_growth:
     "I'd love to help you grow.\n\nWhat feels most important right now?",
+  create_general:
+    "I'd love to help with that.\n\nBefore we jump in, let me make sure I understand what you're going for.",
 };
 
 export const DISCOVERY_QUESTIONS: Record<
@@ -81,6 +83,41 @@ export const DISCOVERY_QUESTIONS: Record<
         "What kind of research would help most — a quick comparison, current landscape, a deeper report, or ongoing monitoring?",
       signalPatterns: [
         /\b(?:quick|comparison|current|landscape|deep|report|monitor|ongoing)\b/i,
+      ],
+    },
+  ],
+  // Chat-First Reasoning Phase 1 — universal Create understanding, in the
+  // acceptance contract's Rule 2 order: outcome → why → who. create-goal is
+  // prefilled from the member's typed request when present; it is asked only
+  // on the guided path where nothing has been typed yet.
+  create_general: [
+    {
+      id: "create-goal",
+      slot: "goal",
+      prompt: "What are you working on — or hoping to make happen?",
+    },
+    {
+      id: "create-outcome",
+      slot: "outcome",
+      prompt:
+        "What would you like this to accomplish? When it's done and working, what should be different?",
+      signalPatterns: [
+        /\b(?:so that|so my|so i can|to help (?:me|my|them|people)|the goal is|i hope|should feel|want (?:them|people|readers|clients|members) to)\b/i,
+      ],
+    },
+    {
+      id: "create-why",
+      slot: "obstacle",
+      prompt:
+        "Why does this matter right now — what's happening that brought it up today?",
+      signalPatterns: [/\b(?:because|since i|now that|why)\b/i],
+    },
+    {
+      id: "create-audience",
+      slot: "context",
+      prompt: "Who is this for?",
+      signalPatterns: [
+        /\b(?:for (?:my|our|new|existing) (?:clients?|customers?|team|va|assistant|audience|subscribers?|students?|members|readers)|for myself|just for me)\b/i,
       ],
     },
   ],

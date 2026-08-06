@@ -27,9 +27,22 @@ import {
   CREATE_ESTATE_START_NEW_READY_MESSAGE,
   CREATE_ESTATE_START_WITH_GUIDANCE_DESCRIPTION,
   CREATE_ESTATE_START_WITH_GUIDANCE_HEADING,
+  CREATE_ESTATE_UNDERSTANDING_CONTINUE_LABEL,
+  CREATE_ESTATE_UNDERSTANDING_EXAMPLES_LABEL,
+  CREATE_ESTATE_UNDERSTANDING_PLACEHOLDER,
+  CREATE_ESTATE_UNDERSTANDING_SKIP_LABEL,
   CREATE_ESTATE_WHAT_WOULD_YOU_LIKE_HEADING,
   CREATE_ESTATE_WINDOW_TITLE,
 } from "@/lib/createEstate/copy";
+import {
+  advanceEntranceUnderstanding,
+  armEntranceUnderstandingHandoff,
+  clearEntranceUnderstandingHandoff,
+  startEntranceUnderstanding,
+  startGuidedEntranceUnderstanding,
+  type EntranceUnderstandingSession,
+  type EntranceUnderstandingStep,
+} from "@/lib/createEstate/entranceUnderstanding";
 import {
   createConfirmPrimaryLabel,
 } from "@/lib/createEstate/createIntentConfirmation";
@@ -151,8 +164,17 @@ export function CreateEstateEntrancePanel({
   const [startNewBusy, setStartNewBusy] = useState(false);
   const [beginFeedback, setBeginFeedback] = useState<string | null>(null);
   const [beginFeedbackKind, setBeginFeedbackKind] = useState<
-    "clarify" | "error" | "progress" | "confirm" | null
+    "clarify" | "error" | "progress" | "confirm" | "understanding" | null
   >(null);
+  // Chat-First Reasoning Phase 1 — the understanding conversation that runs
+  // before classification (AT-1.x). The composer doubles as the answer box.
+  const [understanding, setUnderstanding] =
+    useState<EntranceUnderstandingSession | null>(null);
+  const [understandingGuided, setUnderstandingGuided] = useState(false);
+  // The completed conversation, held for the Working Memory handoff armed at
+  // the moment the member confirms (never before — Rule 12 / 130).
+  const completedUnderstandingRef =
+    useRef<EntranceUnderstandingSession | null>(null);
   const [pendingConfirm, setPendingConfirm] = useState<Extract<
     CreateBeginOutcome,
     { kind: "confirm" }
@@ -178,26 +200,30 @@ export function CreateEstateEntrancePanel({
 
   // Part 10 — the same field doubles as natural-language search. Two
   // characters is enough to start narrowing; never a separate search box.
+  // Suspended while the understanding conversation is active — the member is
+  // answering a question, not searching (Rule 4: no competing UI).
   const trimmedPrompt = prompt.trim();
   const searchResults = useMemo<ExploreIdeaResult[]>(() => {
-    if (trimmedPrompt.length < 2) return [];
+    if (trimmedPrompt.length < 2 || understanding) return [];
     return queryExploreIdeas({
       search: trimmedPrompt,
       suggestionContext,
     }).slice(0, 5);
-  }, [trimmedPrompt, suggestionContext]);
-  const isSearching = trimmedPrompt.length >= 2;
+  }, [trimmedPrompt, suggestionContext, understanding]);
+  const isSearching = trimmedPrompt.length >= 2 && !understanding;
 
   // Entrance Cleanup (2026-08) — Start Freely: once the member has engaged
   // with the input (focused it or typed anything), narrow to a focused
   // writing surface. Reverts once blurred with the field empty again.
   const composerEngaged = composerFocused || trimmedPrompt.length > 0;
 
-  // Spec 132 — Escape dismisses the confirm layer before leaving Create.
+  // Spec 132 — Escape dismisses the confirm/understanding layer before
+  // leaving Create.
   useDismissibleWindow({
     open: true,
     onClose: onBack,
-    closeOnEscape: beginFeedbackKind !== "confirm",
+    closeOnEscape:
+      beginFeedbackKind !== "confirm" && beginFeedbackKind !== "understanding",
   });
 
   useEffect(() => {
@@ -213,6 +239,23 @@ export function CreateEstateEntrancePanel({
     window.addEventListener("keydown", onKeyDown, true);
     return () => window.removeEventListener("keydown", onKeyDown, true);
   }, [beginFeedbackKind, pendingConfirm]);
+
+  // Spec 132 — Escape during the understanding conversation cancels the
+  // conversation layer, never the room.
+  useEffect(() => {
+    if (beginFeedbackKind !== "understanding" || !understanding) return;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      event.stopPropagation();
+      setUnderstanding(null);
+      setUnderstandingGuided(false);
+      setBeginFeedback(null);
+      setBeginFeedbackKind(null);
+    }
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => window.removeEventListener("keydown", onKeyDown, true);
+  }, [beginFeedbackKind, understanding]);
 
   useEffect(() => {
     if (!registerBack) return;
@@ -248,9 +291,76 @@ export function CreateEstateEntrancePanel({
     setBeginBusy(false);
   }
 
+  /** Chat-First Phase 1 — render an understanding step or hand to confirm. */
+  function applyUnderstandingStep(step: EntranceUnderstandingStep) {
+    if (step.kind === "question") {
+      setUnderstanding(step.session);
+      const parts = [
+        step.acknowledgment,
+        step.intro,
+        step.question.prompt,
+      ].filter((part): part is string => Boolean(part));
+      setBeginFeedback(parts.join("\n\n"));
+      setBeginFeedbackKind("understanding");
+      setBeginBusy(false);
+      return;
+    }
+
+    // Understanding complete — classification ran on the enriched
+    // conversation; the member's wording stays the identity. The 130 gate
+    // is unchanged: confirm before anything exists.
+    setUnderstanding(null);
+    setUnderstandingGuided(false);
+    completedUnderstandingRef.current = step.session;
+    const outcome = step.outcome;
+
+    if (outcome.kind === "clarify") {
+      setBeginFeedback(outcome.message);
+      setBeginFeedbackKind("clarify");
+      setBeginBusy(false);
+      return;
+    }
+    if (outcome.kind === "error") {
+      setBeginFeedback(outcome.message);
+      setBeginFeedbackKind("error");
+      setBeginBusy(false);
+      return;
+    }
+    if (outcome.kind === "confirm") {
+      showConfirm(
+        step.acknowledgment
+          ? { ...outcome, message: `${step.acknowledgment}\n\n${outcome.message}` }
+          : outcome,
+      );
+      return;
+    }
+    // Defensive — resolveCreateBeginOutcome no longer returns open.
+    openConfirmed(outcome);
+  }
+
+  function skipUnderstandingQuestion() {
+    if (!understanding) return;
+    applyUnderstandingStep(
+      advanceEntranceUnderstanding(understanding, "", { skip: true }),
+    );
+  }
+
+  function cancelUnderstandingToExamples() {
+    setUnderstanding(null);
+    setUnderstandingGuided(false);
+    setBeginFeedback(null);
+    setBeginFeedbackKind(null);
+    setHelpMeChooseOpen(true);
+  }
+
   function requestCatalogConfirm(item: CreateCatalogItem) {
     // A choice from suggested chips, search results, or Browse More /
     // Help Me Choose all land here — the confirm gate never differs by path.
+    // A catalog pick is not an understanding conversation — never carry a
+    // stale one into its Working Memory handoff.
+    completedUnderstandingRef.current = null;
+    setUnderstanding(null);
+    setUnderstandingGuided(false);
     setHelpMeChooseOpen(false);
     const resolved = resolveCreateLauncherType(item.label);
     showConfirm(
@@ -313,6 +423,9 @@ export function CreateEstateEntrancePanel({
     }
 
     if (guided.kind === "continue_existing") {
+      // Resuming existing work — entrance answers must never overwrite the
+      // resumed record's own memory.
+      clearEntranceUnderstandingHandoff();
       void (async () => {
         try {
           setBeginFeedback(CREATE_BEGIN_PROGRESS_MESSAGE);
@@ -352,6 +465,7 @@ export function CreateEstateEntrancePanel({
           onBeginCreate(outcome, { canonicalWorkId }),
         );
         if (opened === false) {
+          clearEntranceUnderstandingHandoff();
           setBeginFeedback(CREATE_ESTATE_OPEN_FAILED_MESSAGE);
           setBeginFeedbackKind("error");
           return;
@@ -362,6 +476,7 @@ export function CreateEstateEntrancePanel({
         setPendingConfirm(null);
         setPendingAnywhereClarify(null);
       } catch {
+        clearEntranceUnderstandingHandoff();
         setBeginFeedback(CREATE_ESTATE_OPEN_FAILED_MESSAGE);
         setBeginFeedbackKind("error");
       } finally {
@@ -414,6 +529,18 @@ export function CreateEstateEntrancePanel({
   }
 
   function submitPrompt() {
+    // Chat-First Phase 1 — mid-conversation, the composer text is the answer
+    // to the current understanding question, nothing else.
+    if (understanding) {
+      const answer = prompt;
+      setPrompt("");
+      setBeginBusy(true);
+      setBeginFeedback(CREATE_BEGIN_PROGRESS_MESSAGE);
+      setBeginFeedbackKind("progress");
+      applyUnderstandingStep(advanceEntranceUnderstanding(understanding, answer));
+      return;
+    }
+
     // Direct Estate navigation outranks Create intent — never append as content.
     const navInterrupt = tryDirectNavigationInterrupt(prompt);
     if (navInterrupt.interrupted && onDirectNavigationInterrupt) {
@@ -453,39 +580,44 @@ export function CreateEstateEntrancePanel({
     setBeginFeedbackKind("progress");
     setPendingConfirm(null);
 
-    const outcome = resolveCreateBeginOutcome(prompt);
-
-    if (outcome.kind === "clarify") {
-      setBeginFeedback(outcome.message);
-      setBeginFeedbackKind("clarify");
-      setBeginBusy(false);
-      // Empty Start Freely click — make the next action obvious instead of
-      // leaving the member wondering what happened (live-testing gap).
-      if (outcome.reason === "empty") {
-        promptInputRef.current?.focus();
+    // Chat-First Phase 1 — understanding before classification (AT-1.1).
+    // startEntranceUnderstanding returns null only for empty text; keep the
+    // classifier's own empty-clarify handling for that case.
+    const step = startEntranceUnderstanding(prompt);
+    if (!step) {
+      const outcome = resolveCreateBeginOutcome(prompt);
+      if (outcome.kind === "clarify") {
+        setBeginFeedback(outcome.message);
+        setBeginFeedbackKind("clarify");
+        setBeginBusy(false);
+        // Empty Start Freely click — make the next action obvious instead of
+        // leaving the member wondering what happened (live-testing gap).
+        if (outcome.reason === "empty") {
+          promptInputRef.current?.focus();
+        }
+        return;
       }
-      return;
-    }
-
-    if (outcome.kind === "error") {
-      setBeginFeedback(outcome.message);
-      setBeginFeedbackKind("error");
+      setBeginFeedback(
+        outcome.kind === "error" ? outcome.message : null,
+      );
+      setBeginFeedbackKind(outcome.kind === "error" ? "error" : null);
       setBeginBusy(false);
       return;
     }
 
-    // Spec 127 / 130 — never silently create; confirm inferred type first.
-    if (outcome.kind === "confirm") {
-      showConfirm(outcome);
-      return;
-    }
-
-    // Defensive — resolveCreateBeginOutcome no longer returns open.
-    openConfirmed(outcome);
+    completedUnderstandingRef.current = null;
+    setUnderstandingGuided(false);
+    applyUnderstandingStep(step);
   }
 
   function acceptConfirm() {
     if (!pendingConfirm) return;
+    // Chat-First Phase 1 — the member said yes: arm the understanding
+    // answers so the workflow seed site writes them into Working Memory
+    // (Rule 8; never armed before consent).
+    if (completedUnderstandingRef.current) {
+      armEntranceUnderstandingHandoff(completedUnderstandingRef.current);
+    }
     setBeginBusy(true);
     openConfirmed(confirmCreateBeginToOpen(pendingConfirm));
   }
@@ -593,7 +725,11 @@ export function CreateEstateEntrancePanel({
               }
             }}
             rows={3}
-            placeholder={CREATE_ESTATE_DESCRIBE_PLACEHOLDER}
+            placeholder={
+              understanding
+                ? CREATE_ESTATE_UNDERSTANDING_PLACEHOLDER
+                : CREATE_ESTATE_DESCRIBE_PLACEHOLDER
+            }
             className="w-full max-w-2xl resize-y rounded-2xl border border-[#cfc6b8] bg-white/95 px-4 py-4 text-lg leading-relaxed text-[#1f1c19] shadow-sm placeholder:text-[#9a8f82] focus:border-[#8a7a68] focus:outline-none focus:ring-2 focus:ring-[#c4b8a8]/60"
             data-testid="create-estate-nl-input"
             aria-label={CREATE_ESTATE_DESCRIBE_PLACEHOLDER}
@@ -672,7 +808,11 @@ export function CreateEstateEntrancePanel({
                   data-testid="create-estate-start-creating"
                   data-primary-action="begin"
                 >
-                  {beginBusy ? "Beginning…" : CREATE_ESTATE_START_CREATING_LABEL}
+                  {beginBusy
+                    ? "Beginning…"
+                    : understanding
+                      ? CREATE_ESTATE_UNDERSTANDING_CONTINUE_LABEL
+                      : CREATE_ESTATE_START_CREATING_LABEL}
                 </button>
               </div>
 
@@ -693,11 +833,20 @@ export function CreateEstateEntrancePanel({
                   <p className="text-sm leading-relaxed text-[#6b635a]">
                     {CREATE_ESTATE_START_WITH_GUIDANCE_DESCRIPTION}
                   </p>
+                  {/* Chat-First Phase 1 (AT-E2) — guidance starts the same
+                      understanding conversation as typing (entry-path
+                      consistency); the category panel below is reachable only
+                      through the conversation's own examples fallback. */}
                   <button
                     type="button"
                     disabled={beginBusy}
                     aria-pressed={helpMeChooseOpen}
-                    onClick={() => setHelpMeChooseOpen((open) => !open)}
+                    onClick={() => {
+                      setHelpMeChooseOpen(false);
+                      completedUnderstandingRef.current = null;
+                      setUnderstandingGuided(true);
+                      applyUnderstandingStep(startGuidedEntranceUnderstanding());
+                    }}
                     className="self-start rounded-xl border border-[#cfc6b8] bg-white px-5 py-2.5 text-base font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0] disabled:opacity-70"
                     data-testid="create-estate-help-me-choose"
                   >
@@ -777,7 +926,38 @@ export function CreateEstateEntrancePanel({
                 data-testid="create-estate-begin-feedback"
                 data-begin-feedback={beginFeedbackKind ?? "none"}
               >
-                <p>{beginFeedback}</p>
+                <p className="whitespace-pre-line">{beginFeedback}</p>
+                {/* Chat-First Phase 1 — the understanding conversation's
+                    quiet companions: skip is always safe; the examples
+                    fallback appears only on the guided path (categories are
+                    never exposed first — 133 supersession). */}
+                {beginFeedbackKind === "understanding" && understanding ? (
+                  <div
+                    className="mt-3 flex flex-wrap items-center gap-3"
+                    data-testid="create-estate-understanding-controls"
+                  >
+                    <button
+                      type="button"
+                      disabled={beginBusy}
+                      className="rounded-xl px-4 py-2 text-sm font-semibold text-[#6b635a] transition hover:underline disabled:opacity-70"
+                      data-testid="create-estate-understanding-skip"
+                      onClick={skipUnderstandingQuestion}
+                    >
+                      {CREATE_ESTATE_UNDERSTANDING_SKIP_LABEL}
+                    </button>
+                    {understandingGuided ? (
+                      <button
+                        type="button"
+                        disabled={beginBusy}
+                        className="rounded-xl px-4 py-2 text-sm font-semibold text-[#1e4f4f] transition hover:underline disabled:opacity-70"
+                        data-testid="create-estate-understanding-examples"
+                        onClick={cancelUnderstandingToExamples}
+                      >
+                        {CREATE_ESTATE_UNDERSTANDING_EXAMPLES_LABEL}
+                      </button>
+                    ) : null}
+                  </div>
+                ) : null}
                 {beginFeedbackKind === "clarify" && pendingAnywhereClarify ? (
                   <div
                     className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap"
