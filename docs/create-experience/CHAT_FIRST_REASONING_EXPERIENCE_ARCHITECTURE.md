@@ -10,7 +10,10 @@ here conflicts with them, the rules win.
 helps the member complete meaningful work. Deliberately not screens, not code.
 **Companions:** `CHAT_FIRST_REASONING_EXPERIENCE_HANDOFF.md` (implementation
 mapping, deferred until this design and the preview are approved) ·
-`docs/THE_FRIEND_WE_ALL_DESERVE.md` · Constitutions 128 / 130 / 131 / 132.
+`UNIVERSAL_REASONING_JOURNEY_DESIGN.md` (how this journey powers Create,
+Projects, Strategies, Business Build, and the Chat / Chamber / Board /
+navigation doorways) · `docs/THE_FRIEND_WE_ALL_DESERVE.md` · Constitutions
+128 / 130 / 131 / 132.
 
 ---
 
