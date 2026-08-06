@@ -41,7 +41,12 @@ Future Estate reasoning and experience standards (protocol + intelligence librar
 | Context · Systems · Stakeholder · Dependency Intelligence Frameworks v1 | Reusable orchestration intelligences named by Reasoning Engine / Activation Matrix |
 | Event Operations Knowledge Domain Master v1 | Parent domain for event/workshop/conference expertise; lifecycle + module map |
 | Event Operations Knowledge Modules v1 | ROS · Hospitality/Green Room · Venue · AV · Speaker/VIP · Volunteer · Registration/Check-In · Book & Product Sales |
-| Knowledge Domain Foundations v1 | Strategy · Communication · Customer Experience — cross-Build domain libraries (payloads) |
+| Knowledge Domain Foundations v1 | Strategy · Communication · CX · Marketing · Sales · Operations (+ Event Ops Master) |
+| Business Knowledge Library Architecture v1 | Where expertise lives: Domains → Fingers → Guided Builds; Builds orchestrate, library thinks |
+| Knowledge Finger Authoring Framework v1 | Required structure for every Finger (expert thinking, not templates) |
+| SOP · Checklist Knowledge Finger Full Specs v1 | Version-1 essential Fingers (SOP uploaded twice — identical duplicates) |
+| Business Knowledge Acquisition System v1 | Evidence → candidate → validation → library; living knowledge, not static dump |
+| Experience Intelligence Routing Standard + Addendum v1 | Member words → situation → response mode → support path; companion-first; add routing fields without rewrite |
 | *(not uploaded)* Library `01` · `02` | Named in library README; Spec 103 / Library Standard stand in |
 
 Runtime mirrors already present for many phases under `lib/estate/sparkEstate*.ts` and `lib/universalCreation/` — treated as **partial encoding**, not as proof of full companion-path wiring.
@@ -414,10 +419,10 @@ These six files describe **how existing capabilities work together**. Several op
 
 | Question | Finding |
 |----------|---------|
-| Do these files demand new product architecture? | **No.** Universal Build Engine and siblings explicitly coordinate existing capabilities. Reuse Before Reinvention forbids new layers when orchestration would suffice. Library/MJ docs are validation-only. |
-| Biggest gap | Orchestration and Build-Type **knowledge depth** on the live companion/`universalCreation` path; Reasoning Engine exists but is largely unwired; readiness honesty; organize-before-build routing (MJ-001/002). |
-| Clearest reusable vs specific split | **Shared orchestration** (reasoning · activation · context/systems/stakeholder/dependency · build flow · implementation · reuse governance · Shari) vs **payloads** (Build Types · Chamber libraries · Event Ops modules · MJ situation knowledge). |
-| Recommended stance under Observation Mode | Map every new doc label to an existing home. Extend `universalCreation` + Estate Brain + conversation Specs. Store Event modules as knowledge, not new engines. Disambiguate Event hospitality vs Spec 111. Validate with MJ-001 + acceptance/failure signals. Rule of Three before prompt/behavior change. |
+| Do these files demand new product architecture? | **No.** Builds orchestrate; expertise lives in one Business Knowledge Library (map to Chamber libraries). Reuse Before Reinvention forbids parallel engines/trees. MJ library is validation-only. |
+| Biggest gap | Knowledge **depth** (Fingers/Domains) on the live `universalCreation` path; EI situation→path routing vs keyword heuristics; Reasoning Engine largely unwired; organize-before-build (MJ-001/002). |
+| Clearest reusable vs specific split | **Orchestration** (reasoning · activation · EI routing · context/systems/stakeholder/dependency · build · implementation) → **Domains** → **Fingers/Modules** → **Build Types**; MJ validates situations. |
+| Recommended stance under Observation Mode | One library home per domain (Chamber). Fingers deepen SOP/Checklist/etc. inside existing plugins. Companion-first EI routing. No third Knowledge Library tree. Validate with MJ-001. Rule of Three / Acquisition validation levels before global learning. |
 
 ### Authority order (for future readers)
 
@@ -431,21 +436,25 @@ These six files describe **how existing capabilities work together**. Several op
 
 ## 9. Intelligence frameworks · Knowledge Domains · Event Operations modules
 
-Three layers of knowledge/intelligence docs — do not flatten into one product each.
+Knowledge stack (refined by Business Knowledge Library Architecture — see also §10):
 
 ```
 Orchestration (reusable)
   Context · Systems · Stakeholder · Dependency
-  (+ Reasoning · Activation · Build · Implementation)
+  (+ Reasoning · Activation · Build · Implementation · Experience Intelligence Routing)
         ↓ selects
-Knowledge Domains (payload libraries)
-  Strategy · Communication · Customer Experience · Event Operations · …
-        ↓ contain
-Knowledge Modules (deep payloads)
-  e.g. under Event Ops: ROS · Venue · AV · Speaker/VIP · …
+Business Knowledge Library
+  Knowledge Domains (Strategy · Marketing · Sales · Ops · CX · Events · …)
+        ↓ feed
+  Knowledge Fingers (SOP · Checklist · Marketing Plan · …)
+  Knowledge Modules (Event Ops: ROS · Venue · AV · …)
         ↓ used by
-Build Types / Guided Builds / MJ validations
+Build Types / Guided Builds
+        ↓ validated by
+MJ situation journeys
 ```
+
+**Library Architecture rule:** Guided Builds orchestrate conversations; **expertise lives in the Business Knowledge Library** — not inside each Build.
 
 ### A. Reusable orchestration frameworks
 
@@ -462,10 +471,14 @@ Build Types / Guided Builds / MJ validations
 
 | Domain | Supports (examples) | Maps toward existing |
 |--------|---------------------|----------------------|
-| **Strategy** | Plans, offers, pricing, priorities, decisions, Guided Builds | Strategy Intelligence Chamber (`STR-*`) · Decision Intelligence · Marketing Plan / Offer Builds |
-| **Communication** | Email, proposal, onboarding, workshop, support, sales copy | Content / Presentations Chamber libraries · Email/Proposal Builds · Shari voice (delivery only) |
-| **Customer Experience** | Onboarding, support, workshops, events, retention, referrals | Client Relationships Chamber · Client Onboarding Build · Spec 111 is **companion** hospitality, not CX domain |
-| **Event Operations (Master)** | Workshops, conferences, retreats, trade shows, signings, speaking | Events Intelligence Chamber (`EVT-*`) · Workshop Build Type (Living) · all Event modules below |
+| **Strategy** | Plans, offers, pricing, priorities, decisions | `STR-*` · Decision Intelligence · Offer/Marketing Plan Builds |
+| **Marketing** | Positioning, messaging, content, launches, journeys | Marketing Intelligence Chamber (`MKT-*`) · Marketing Plan Build |
+| **Sales** | Discovery, objections, pricing, follow-up, fit | Sales Intelligence Chamber (`SALES-*`) · Proposal/Offer Builds |
+| **Operations** | SOPs, checklists, workflows, delegation, QC | Project Management / Systems Chambers · SOP/Checklist Fingers · Event Ops |
+| **Communication** | Email, proposal, presentations, client messages | Content / Presentations Chambers · Email/Proposal Builds |
+| **Customer Experience** | Onboarding, support, retention, referrals | Client Relationships Chamber · Client Onboarding Build |
+| **Event Operations (Master)** | Workshops → conferences → signings | `EVT-*` · Workshop Living Build · Event modules |
+| *(also named in Library Architecture)* Leadership · Finance · Technology · Productivity | Map to Leadership / Finance / AI-Tech / EF Chambers when authored | One home per domain — no parallel trees |
 
 Domains are **libraries Activation selects** — not separate companions, rooms, or conversation engines.
 
@@ -497,9 +510,43 @@ Event Ops Master defines the lifecycle (vision → follow-up/lessons) and which 
 
 | Reusable architecture | Specific knowledge |
 |-----------------------|--------------------|
-| Context · Systems · Stakeholder · Dependency (+ Reasoning/Activation/Build/Implementation) | Knowledge Domains: Strategy · Communication · CX · Event Ops Master |
-| When modules activate; Free↔Guided; Light/Guided/Living | Event modules (ROS, Venue, AV, Speaker/VIP, Volunteer, Registration, Sales, Green Room) |
-| Shari voice · permission · memory · Projects/Calendar connections | Build Type areas/outputs · Chamber `XXX-*` · MJ situation knowledge |
+| Context · Systems · Stakeholder · Dependency (+ Reasoning/Activation/Build/Implementation/EI Routing) | Knowledge Domains (Strategy · Marketing · Sales · Ops · CX · Events · …) |
+| Finger authoring framework · acquisition validation · companion-first routing | Knowledge Fingers (SOP · Checklist · …) · Event modules · Build Type areas |
+| Shari voice · permission · memory · Projects/Calendar | Chamber `XXX-*` content · MJ situation knowledge |
+
+---
+
+## 10. Business Knowledge Library · Fingers · Acquisition · Experience Intelligence Routing
+
+### Behaviors required
+
+| Document | Requires |
+|----------|----------|
+| **Business Knowledge Library Architecture** | Expertise lives in the library; Builds only orchestrate. Domains → Fingers → Guided Builds; one Shari conversation. |
+| **Knowledge Finger Authoring Framework** | Fingers = expert thinking (not prompts/templates/forms). Essential / Expert / Edge Cases; one-question flow; assemble/polish; completion test. |
+| **SOP Finger / Checklist Finger** | V1 essential Fingers: success = execution, not document length; beginner gaps; supporting outputs. |
+| **Knowledge Acquisition System** | Research → evidence → candidate → validation → library. Levels: Observed / Supported / Proven. No single source auto-promotes. |
+| **Experience Intelligence Routing Standard** | Not keyword routing. Words → situation → response mode → support path (Companion First · Chamber · Board · Strategy · Create/Build · Research · Reflection). |
+| **EI Routing Addendum** | Add routing fields to existing EI records — do not rewrite the library. Include Do Not Activate rules. |
+
+### Existing systems
+
+| Concept | Home |
+|---------|------|
+| Business Knowledge Library | Chamber Member Intelligence Library · Estate Brain · Spec 117 philosophy |
+| Domains | Chamber folders (`STR-*`, `MKT-*`, `SALES-*`, Ops/Systems/PM, CX, `EVT-*`, …) |
+| Fingers | Deep payloads for `documentCreationProfiles` + Build Types + `XXX-006` reasoning |
+| Acquisition | Observation Mode Rule of Three · Spec 117 trust gate · Learning Log / Evolution Board |
+| EI Routing | Spec 114 modes · Estate Brain intent→capability→expert · coach-before-navigate · Wisdom Loop |
+
+### Conflicts
+
+1. **Library Architecture vs Chamber Library** — Same job. One home only; no third `BusinessKnowledgeLibrary/` tree.  
+2. **Finger vs Build Type vs document plugin** — Three labels for one SOP path. Consolidate: Catalog = behavior contract; Finger = expert payload; profiles = runtime questions.  
+3. **Duplicate SOP Finger files** — `…_f068.md` and `…__1__4cdb.md` are identical; keep one.  
+4. **Acquisition vs Spec 112/117** — Global “improve Spark for every user” still needs trust/permission + validation levels; no silent promote from one chat.  
+5. **EI Routing vs keyword heuristics** — Standard forbids keyword-only routing; live path still has heuristic branches (e.g. MJ-002). Target: situation → mode → path.  
+6. **Board / Strategy paths** — Perspective under One Companion (Phase 33), not separate personalities.
 
 ---
 
