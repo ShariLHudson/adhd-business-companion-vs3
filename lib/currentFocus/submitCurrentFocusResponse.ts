@@ -22,6 +22,7 @@ import {
 } from "@/lib/trustKernel";
 import {
   applyAnswerToRuntimeCreationRecord,
+  applyDiscoveryAnswerToRuntimeCreationRecord,
   ensureRuntimeCreationRecord,
   mergeRuntimeRecordIntoWorkflow,
 } from "./creationRecord";
@@ -190,6 +191,67 @@ async function persistAndAuthorize(input: {
   };
 }
 
+/**
+ * SOP Reasoning-First Migration Phase 2 (2026-08-06) — discovery submission.
+ * Parallel to the section-answer path below, writing into discoveryAnswers
+ * + the mapped Working Memory field instead of sectionContent. Reuses the
+ * exact same persistAndAuthorize durable-save call as every other answer —
+ * no separate persistence path.
+ */
+async function handleDiscoverySubmission(input: {
+  creationId: string;
+  requestId: string;
+  contextVersion: number;
+  preserved: string;
+  focus: CanonicalCurrentFocus;
+  trimmedOrEmpty: string;
+  skip: boolean;
+  workflow?: CreateWorkflowState | null;
+}): Promise<
+  SubmitCurrentFocusResponseResult & { updatedWorkflow?: CreateWorkflowState | null }
+> {
+  const questionId = input.focus.focusId.slice("discovery:".length);
+  const nextRecord = applyDiscoveryAnswerToRuntimeCreationRecord(
+    input.creationId,
+    questionId,
+    input.trimmedOrEmpty,
+    input.skip ? { skip: true } : undefined,
+  );
+  if (!nextRecord) {
+    return fail(
+      input.preserved,
+      "I couldn't hold this creation for a moment. Retry stays in this workspace.",
+      input.focus,
+      input.workflow,
+    );
+  }
+  const updatedWorkflow = input.workflow
+    ? mergeRuntimeRecordIntoWorkflow(input.workflow, nextRecord)
+    : mergeRuntimeRecordIntoWorkflow(
+        {
+          sessionId: nextRecord.id,
+          selectedTypeLabel: nextRecord.typeLabel,
+          selectedTemplateName: nextRecord.title,
+          sectionContent: nextRecord.sectionContent,
+          templateSections: nextRecord.templateSections ?? undefined,
+          workspaceFirst: true,
+          questionMode: "current_focus",
+        } as CreateWorkflowState,
+        nextRecord,
+      );
+  return persistAndAuthorize({
+    requestId: input.requestId,
+    contextVersion: input.contextVersion,
+    creationId: nextRecord.id,
+    preserved: input.preserved,
+    focus: input.focus,
+    updatedWorkflow,
+    proposedMessage: input.skip
+      ? "We can come back to that."
+      : "Got it — that helps me understand what you're building.",
+  });
+}
+
 export async function submitCurrentFocusResponse(
   input: SubmitCurrentFocusResponseInput,
   opts?: {
@@ -297,6 +359,18 @@ export async function submitCurrentFocusResponse(
   }
 
   if (input.responseType === "skip") {
+    if (focus.focusId.startsWith("discovery:")) {
+      return handleDiscoverySubmission({
+        creationId: input.creationId,
+        requestId: input.requestId,
+        contextVersion: input.contextVersion,
+        preserved,
+        focus,
+        trimmedOrEmpty: "",
+        skip: true,
+        workflow: opts?.workflow,
+      });
+    }
     const eventRecord = getEventRecord(input.creationId);
     let updatedWorkflow = opts?.workflow ?? null;
     if (!eventRecord && focus.sectionId) {
@@ -340,6 +414,19 @@ export async function submitCurrentFocusResponse(
       focus,
       opts?.workflow,
     );
+  }
+
+  if (focus.focusId.startsWith("discovery:")) {
+    return handleDiscoverySubmission({
+      creationId: input.creationId,
+      requestId: input.requestId,
+      contextVersion: input.contextVersion,
+      preserved,
+      focus,
+      trimmedOrEmpty: trimmed,
+      skip: false,
+      workflow: opts?.workflow,
+    });
   }
 
   const eventRecord = getEventRecord(input.creationId);

@@ -1,10 +1,18 @@
 /**
  * Create Reasoning-First Migration — Phase 1B (intent preservation).
  *
- * Proves the first question of a fresh creation acknowledges the member's
- * own opening words when they hold real content, and degrades cleanly to
- * today's plain question otherwise. Build-Type-agnostic: no Build Type name
- * appears in the assertions below beyond fixture setup.
+ * Proves the first SECTION question of a fresh creation acknowledges the
+ * member's own opening words when they hold real content, and degrades
+ * cleanly to today's plain question otherwise. Build-Type-agnostic: no
+ * Build Type name appears in the assertions below beyond fixture setup.
+ *
+ * Updated 2026-08-06 (SOP Reasoning-First Migration Phase 2): for SOP
+ * specifically, three discovery questions now precede the section flow
+ * (sopDiscoveryFocus.ts / sopDiscoveryGate.test.ts). This file's "first
+ * question" tests now resolve past discovery first — the acknowledgment
+ * logic itself is completely unchanged; it still fires on the first
+ * SECTION question exactly as before. Email (no discovery gate) is
+ * unaffected and still tests the true first Focus directly.
  *
  * @see docs/create-experience/CREATE_REASONING_FIRST_MIGRATION_IMPLEMENTATION_PLAN.md#1b
  */
@@ -14,9 +22,23 @@ import { defaultTemplateFor } from "@/lib/createTemplates";
 import { resolveCanonicalCurrentFocus } from "@/lib/currentFocus/resolveCanonicalFocus";
 import {
   applyAnswerToRuntimeCreationRecord,
+  applyDiscoveryAnswerToRuntimeCreationRecord,
   clearRuntimeCreationRecordsForTests,
 } from "@/lib/currentFocus/creationRecord";
 import type { CreateWorkflowState } from "@/lib/createWorkflowState";
+
+/** Resolves SOP's three discovery questions (skip is enough — content doesn't matter here). */
+function skipSopDiscovery(creationId: string): void {
+  for (const id of [
+    "sop-audience-type",
+    "sop-starting-point",
+    "sop-audience-size",
+  ]) {
+    applyDiscoveryAnswerToRuntimeCreationRecord(creationId, id, "", {
+      skip: true,
+    });
+  }
+}
 
 function workflowFor(
   itemType: string,
@@ -39,8 +61,17 @@ function workflowFor(
 }
 
 describe("First question acknowledges genuine original intent", () => {
-  it("acknowledges real member words on the first SOP question", () => {
+  it("acknowledges real member words on the first section question (after discovery)", () => {
     clearRuntimeCreationRecordsForTests();
+    resolveCanonicalCurrentFocus({
+      creationId: "intent-sop-1",
+      workflow: workflowFor(
+        "SOP",
+        "intent-sop-1",
+        "I need an SOP for onboarding clients",
+      ),
+    });
+    skipSopDiscovery("intent-sop-1");
     const focus = resolveCanonicalCurrentFocus({
       creationId: "intent-sop-1",
       workflow: workflowFor(
@@ -79,6 +110,11 @@ describe("First question acknowledges genuine original intent", () => {
 
   it("degrades to the plain purpose line when originalRequest is absent", () => {
     clearRuntimeCreationRecordsForTests();
+    resolveCanonicalCurrentFocus({
+      creationId: "intent-sop-2",
+      workflow: workflowFor("SOP", "intent-sop-2", null),
+    });
+    skipSopDiscovery("intent-sop-2");
     const focus = resolveCanonicalCurrentFocus({
       creationId: "intent-sop-2",
       workflow: workflowFor("SOP", "intent-sop-2", null),
@@ -90,9 +126,13 @@ describe("First question acknowledges genuine original intent", () => {
   });
 
   it("degrades to the plain purpose line for an auto-generated placeholder request", () => {
-    clearRuntimeCreationRecordsForTests();
     for (const placeholder of ["Create a SOP", "Create SOP", "SOP"]) {
       clearRuntimeCreationRecordsForTests();
+      resolveCanonicalCurrentFocus({
+        creationId: "intent-sop-3",
+        workflow: workflowFor("SOP", "intent-sop-3", placeholder),
+      });
+      skipSopDiscovery("intent-sop-3");
       const focus = resolveCanonicalCurrentFocus({
         creationId: "intent-sop-3",
         workflow: workflowFor("SOP", "intent-sop-3", placeholder),
@@ -101,8 +141,17 @@ describe("First question acknowledges genuine original intent", () => {
     }
   });
 
-  it("appears once — the second question does not repeat the acknowledgment", () => {
+  it("appears once — the second section question does not repeat the acknowledgment", () => {
     clearRuntimeCreationRecordsForTests();
+    resolveCanonicalCurrentFocus({
+      creationId: "intent-sop-4",
+      workflow: workflowFor(
+        "SOP",
+        "intent-sop-4",
+        "I need an SOP for onboarding clients",
+      ),
+    });
+    skipSopDiscovery("intent-sop-4");
     const first = resolveCanonicalCurrentFocus({
       creationId: "intent-sop-4",
       workflow: workflowFor(
@@ -111,6 +160,7 @@ describe("First question acknowledges genuine original intent", () => {
         "I need an SOP for onboarding clients",
       ),
     });
+    expect(first!.sectionId).toBe("purpose");
     expect(first!.purpose).toContain("You said:");
 
     applyAnswerToRuntimeCreationRecord(

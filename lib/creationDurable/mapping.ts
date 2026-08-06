@@ -178,6 +178,14 @@ export function buildPayloadFromWorkflow(
       // migration, additive to every creation type. Only present when the
       // record actually has something to carry.
       workingMemory: runtime?.workingMemory ?? null,
+      // SOP Reasoning-First Migration Phase 2 (2026-08-06) — record-scoped
+      // discovery state (distinct from workflow.discoveryAnswers above).
+      // The discovery gate in resolveCanonicalFocus.ts reads these fields
+      // directly, not workingMemory — without persisting them, a fresh
+      // login would re-ask already-answered discovery questions even
+      // though their derived Working Memory values already survived.
+      sopDiscoveryAnswers: runtime?.discoveryAnswers ?? null,
+      sopSkippedDiscoveryIds: runtime?.skippedDiscoveryIds ?? null,
     },
     registryMeta: {
       humanTitle: title,

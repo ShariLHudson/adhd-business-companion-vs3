@@ -14,7 +14,10 @@ import { describe, expect, it } from "vitest";
 import { defaultTemplateFor, listPresetTemplates } from "@/lib/createTemplates";
 import { workspaceV2Sections } from "@/lib/createWorkspaceSections";
 import { resolveCanonicalCurrentFocus } from "@/lib/currentFocus/resolveCanonicalFocus";
-import { clearRuntimeCreationRecordsForTests } from "@/lib/currentFocus/creationRecord";
+import {
+  applyDiscoveryAnswerToRuntimeCreationRecord,
+  clearRuntimeCreationRecordsForTests,
+} from "@/lib/currentFocus/creationRecord";
 import type { CreateWorkflowState } from "@/lib/createWorkflowState";
 import { V1_PRIORITY_REGISTRY_ITEMS } from "@/lib/createRegistry/items.v1Priority.seed";
 import { computeIsUserVisible } from "@/lib/createRegistry/visibility";
@@ -27,6 +30,24 @@ const SOP_EXPECTED_SECTIONS = [
   "completion-check",
   "troubleshooting",
 ] as const;
+
+/**
+ * SOP Reasoning-First Migration Phase 2 (2026-08-06) — three discovery
+ * questions now precede the section flow this file certifies. Resolve
+ * (skip) them first so these section-level tests exercise the same
+ * section behavior they always have.
+ */
+function skipSopDiscovery(creationId: string): void {
+  for (const id of [
+    "sop-audience-type",
+    "sop-starting-point",
+    "sop-audience-size",
+  ]) {
+    applyDiscoveryAnswerToRuntimeCreationRecord(creationId, id, "", {
+      skip: true,
+    });
+  }
+}
 
 function sopWorkflow(): CreateWorkflowState {
   const template = defaultTemplateFor("SOP");
@@ -107,6 +128,11 @@ describe("2. Every SOP section carries an authored prompt", () => {
 describe("3. Current Focus prefers the authored prompt", () => {
   it("opens an SOP with the outcome question, not the form phrasing", () => {
     clearRuntimeCreationRecordsForTests();
+    resolveCanonicalCurrentFocus({
+      creationId: "sop-phase1-test",
+      workflow: sopWorkflow(),
+    });
+    skipSopDiscovery("sop-phase1-test");
     const focus = resolveCanonicalCurrentFocus({
       creationId: "sop-phase1-test",
       workflow: sopWorkflow(),
@@ -121,6 +147,11 @@ describe("3. Current Focus prefers the authored prompt", () => {
 
   it("uses the authored reason as the Focus purpose", () => {
     clearRuntimeCreationRecordsForTests();
+    resolveCanonicalCurrentFocus({
+      creationId: "sop-phase1-test",
+      workflow: sopWorkflow(),
+    });
+    skipSopDiscovery("sop-phase1-test");
     const focus = resolveCanonicalCurrentFocus({
       creationId: "sop-phase1-test",
       workflow: sopWorkflow(),
@@ -136,6 +167,11 @@ describe("3. Current Focus prefers the authored prompt", () => {
       ...sopWorkflow(),
       sectionContent: { purpose: "Izna can share a Loom without asking me." },
     } as CreateWorkflowState;
+    resolveCanonicalCurrentFocus({
+      creationId: "sop-phase1-test",
+      workflow,
+    });
+    skipSopDiscovery("sop-phase1-test");
     const focus = resolveCanonicalCurrentFocus({
       creationId: "sop-phase1-test",
       workflow,

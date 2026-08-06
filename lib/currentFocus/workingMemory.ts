@@ -36,6 +36,16 @@ export type WorkingMemoryFields = {
   nextHelpfulStep?: string | null;
   whyItMatters?: string | null;
   connectedAssets?: string[] | null;
+  /**
+   * SOP Reasoning-First Migration Phase 2 (2026-08-06) — discovery question 1
+   * ("for your own business, or for a client?"). Kept deliberately separate
+   * from primaryUser (who follows the finished SOP, derived from the
+   * Intended User section) rather than overloading one field with two
+   * different questions.
+   */
+  ownershipContext?: string | null;
+  /** Discovery question 3 ("will one person use this, or multiple?"). */
+  intendedAudience?: string | null;
 };
 
 export const WORKING_MEMORY_FIELD_KEYS: readonly (keyof WorkingMemoryFields)[] =
@@ -50,6 +60,8 @@ export const WORKING_MEMORY_FIELD_KEYS: readonly (keyof WorkingMemoryFields)[] =
     "nextHelpfulStep",
     "whyItMatters",
     "connectedAssets",
+    "ownershipContext",
+    "intendedAudience",
   ];
 
 /** Section ids treated as directly answering a Working Memory field, when present. */

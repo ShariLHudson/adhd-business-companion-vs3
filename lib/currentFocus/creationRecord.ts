@@ -29,6 +29,10 @@ import {
   WORKSPACE_SCHEMA_VERSION,
 } from "./canonicalFacts";
 import { deriveWorkingMemoryFields, type WorkingMemoryFields } from "./workingMemory";
+import {
+  nextSopDiscoveryQuestion,
+  sopDiscoveryFieldForQuestion,
+} from "./sopDiscoveryFocus";
 
 const STORAGE_KEY = RUNTIME_CREATION_RECORDS_KEY;
 
@@ -69,6 +73,16 @@ export type RuntimeCreationRecord = {
    * created before this phase. See lib/currentFocus/workingMemory.ts.
    */
   workingMemory?: WorkingMemoryFields | null;
+  /**
+   * SOP Reasoning-First Migration Phase 2 (2026-08-06) — record-scoped
+   * discovery answers, keyed by DiscoveryQuestion.id. Distinct from
+   * CreateWorkflowState.discoveryAnswers (a separate, workflow-level bag
+   * used elsewhere) — this one gates entry into the section flow via
+   * resolveCanonicalFocus.ts. SOP-only for now. Optional and additive.
+   */
+  discoveryAnswers?: Record<string, string> | null;
+  /** Discovery questions explicitly skipped — mirrors skippedSectionIds. */
+  skippedDiscoveryIds?: string[] | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -284,6 +298,14 @@ export function ensureRuntimeCreationRecord(
     originalRequest,
     workingIntent,
     workingMemory,
+    // SOP Reasoning-First Migration Phase 2 (2026-08-06) — preserve, never
+    // derive here. ensureRuntimeCreationRecord rebuilds the whole record on
+    // every call (including at the top of every submitCurrentFocusResponse
+    // invocation); without this, any later call would silently wipe
+    // discovery state written moments earlier by
+    // applyDiscoveryAnswerToRuntimeCreationRecord.
+    discoveryAnswers: existing?.discoveryAnswers ?? null,
+    skippedDiscoveryIds: existing?.skippedDiscoveryIds ?? null,
     createdAt: existing?.createdAt ?? now,
     updatedAt: now,
   });
@@ -330,6 +352,72 @@ export function applyAnswerToRuntimeCreationRecord(
     canonicalFacts,
     focusSectionId: sectionId ?? record.focusSectionId,
     schemaVersion: WORKSPACE_SCHEMA_VERSION,
+    workingMemory,
+  });
+}
+
+/**
+ * SOP Reasoning-First Migration Phase 2 (2026-08-06) — the discovery-answer
+ * write path, parallel to applyAnswerToRuntimeCreationRecord but writing
+ * into discoveryAnswers + the mapped Working Memory field instead of
+ * sectionContent. Mirrors that function's skip handling exactly
+ * (skippedDiscoveryIds alongside skippedSectionIds).
+ */
+export function applyDiscoveryAnswerToRuntimeCreationRecord(
+  creationId: string,
+  questionId: string,
+  answer: string,
+  opts?: { skip?: boolean },
+): RuntimeCreationRecord | null {
+  const record = getRuntimeCreationRecord(creationId);
+  if (!record) return null;
+  const trimmed = answer.trim();
+  const discoveryAnswers = { ...(record.discoveryAnswers ?? {}) };
+  let skipped = [...(record.skippedDiscoveryIds ?? [])];
+  const workingMemory: WorkingMemoryFields = { ...(record.workingMemory ?? {}) };
+
+  if (opts?.skip) {
+    if (!skipped.includes(questionId)) skipped.push(questionId);
+    delete discoveryAnswers[questionId];
+  } else if (trimmed) {
+    discoveryAnswers[questionId] = trimmed;
+    skipped = skipped.filter((id) => id !== questionId);
+    const field = sopDiscoveryFieldForQuestion(questionId);
+    if (field === "existingAssetsFound") {
+      workingMemory.existingAssetsFound = [trimmed];
+    } else if (field) {
+      workingMemory[field] = trimmed;
+    }
+  }
+
+  // Keep nextHelpfulStep honest at every stage. It was set at record
+  // creation to the first SECTION's label ("Continue with Purpose") —
+  // correct once discovery is done, misleading while it isn't (a member
+  // leaving mid-discovery would see "Continue with Purpose" and land back
+  // on a discovery question instead). Recompute explicitly both ways rather
+  // than leaving a stale value from whichever state came before.
+  const remaining = nextSopDiscoveryQuestion({
+    discoveryAnswers,
+    skippedDiscoveryIds: skipped,
+  });
+  if (remaining) {
+    workingMemory.nextHelpfulStep = "Continue understanding your SOP";
+  } else {
+    const sections = record.templateSections ?? [];
+    const nextSection = sections.find(
+      (s) =>
+        !record.skippedSectionIds.includes(s.id) &&
+        !record.sectionContent[s.id]?.trim(),
+    );
+    workingMemory.nextHelpfulStep = nextSection
+      ? `Continue with ${nextSection.label}`
+      : (record.workingMemory?.nextHelpfulStep ?? null);
+  }
+
+  return upsertRuntimeCreationRecord({
+    ...record,
+    discoveryAnswers,
+    skippedDiscoveryIds: skipped,
     workingMemory,
   });
 }

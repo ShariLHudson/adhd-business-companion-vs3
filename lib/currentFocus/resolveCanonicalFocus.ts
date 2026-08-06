@@ -18,8 +18,58 @@ import {
 import {
   ensureRuntimeCreationRecord,
   getRuntimeCreationRecord,
+  type RuntimeCreationRecord,
 } from "./creationRecord";
+import {
+  isSopDiscoveryEligible,
+  nextSopDiscoveryQuestion,
+  sopDiscoveryIntro,
+} from "./sopDiscoveryFocus";
 import type { CanonicalCurrentFocus } from "./types";
+
+/**
+ * SOP Reasoning-First Migration, Phase 2 (2026-08-06) — the discovery gate.
+ * Conversation first, structure second: before SOP's existing section flow
+ * begins, ask the three discoveryRegistry.ts questions one at a time
+ * through the exact same Focus mechanism sections use. Returns null the
+ * instant discovery is resolved (answered or skipped), so the existing,
+ * unmodified section logic in focusFromRuntimeRecord takes over — this
+ * function never touches templateSections or sectionContent.
+ * SOP-only; every other Build Type is unaffected (isSopDiscoveryEligible
+ * gates on typeLabel === "SOP" before any of this runs).
+ */
+function focusFromSopDiscovery(
+  record: RuntimeCreationRecord,
+  version: number,
+  knownContext: string[],
+): CanonicalCurrentFocus | null {
+  if (!isSopDiscoveryEligible(record.typeLabel)) return null;
+  const question = nextSopDiscoveryQuestion({
+    discoveryAnswers: record.discoveryAnswers,
+    skippedDiscoveryIds: record.skippedDiscoveryIds,
+  });
+  if (!question) return null;
+
+  const isFirstQuestion = !record.discoveryAnswers && !record.skippedDiscoveryIds;
+  return {
+    focusId: `discovery:${question.id}`,
+    creationId: record.id,
+    title: "Understanding your SOP",
+    purpose: isFirstQuestion
+      ? (sopDiscoveryIntro() ?? "Let's understand what you're trying to build.")
+      : "One more thing before we start shaping the SOP.",
+    prompt: question.prompt,
+    responseType: "multiline",
+    knownContext,
+    availableGuidance: ["I'm not sure yet", "Skip for now"],
+    completionCriteria: "Answer or skip",
+    nextTransition: "next_discovery_question",
+    contextVersion: version,
+    sectionId: null,
+    assetTypeId: null,
+    introductoryGuidance: null,
+  };
+}
 
 /**
  * Create Reasoning-First Migration, Phase 1B (2026-08-05) — acknowledge the
@@ -176,6 +226,17 @@ function focusFromRuntimeRecord(
   }
 
   const typeLabel = record.typeLabel || "Creation";
+
+  // SOP Reasoning-First Migration Phase 2 — discovery gate. A no-op return
+  // (null) for every non-SOP Build Type and for SOP once discovery is
+  // resolved; the section logic below is otherwise completely unchanged.
+  const discoveryFocus = focusFromSopDiscovery(
+    record,
+    contextVersion ?? (Date.parse(record.updatedAt) || 1),
+    record.knownFacts.slice(0, 8),
+  );
+  if (discoveryFocus) return discoveryFocus;
+
   const wfStub = {
     ...(workflow ?? {}),
     sessionId: creationId,

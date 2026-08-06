@@ -128,8 +128,8 @@ describe("isWorkingMemoryEmpty", () => {
 });
 
 describe("WORKING_MEMORY_FIELD_KEYS", () => {
-  it("lists exactly the approved 10 fields", () => {
-    expect(WORKING_MEMORY_FIELD_KEYS).toHaveLength(10);
+  it("lists the approved 10 fields plus the 2 added for SOP discovery (Phase 2)", () => {
+    expect(WORKING_MEMORY_FIELD_KEYS).toHaveLength(12);
     expect([...WORKING_MEMORY_FIELD_KEYS].sort()).toEqual(
       [
         "connectedAssets",
@@ -137,8 +137,10 @@ describe("WORKING_MEMORY_FIELD_KEYS", () => {
         "dependencies",
         "desiredResult",
         "existingAssetsFound",
+        "intendedAudience",
         "nextHelpfulStep",
         "openQuestions",
+        "ownershipContext",
         "primaryUser",
         "waitingItems",
         "whyItMatters",

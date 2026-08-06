@@ -70,6 +70,21 @@ export function authoritativeToRuntimeRecord(
           workingMemory?: WorkingMemoryFields;
         } | null
       )?.workingMemory ?? null,
+    // SOP Reasoning-First Migration Phase 2 — same hydrate-safety pattern.
+    // Absent on every record saved before this phase, which correctly
+    // means the discovery gate treats them as not-yet-started.
+    discoveryAnswers:
+      (
+        record.payload.workflowSnapshot as {
+          sopDiscoveryAnswers?: Record<string, string>;
+        } | null
+      )?.sopDiscoveryAnswers ?? null,
+    skippedDiscoveryIds:
+      (
+        record.payload.workflowSnapshot as {
+          sopSkippedDiscoveryIds?: string[];
+        } | null
+      )?.sopSkippedDiscoveryIds ?? null,
     createdAt: record.createdAt,
     updatedAt: now,
   };
