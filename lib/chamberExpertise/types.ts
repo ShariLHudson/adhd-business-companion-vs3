@@ -1,8 +1,9 @@
 /**
  * Chamber Expert Activation — shared types.
  *
- * Phase A/B foundation only. Not wired into the LLM prompt stack.
- * See docs/estate/CHAMBER_EXPERT_ACTIVATION_ARCHITECTURE.md for the
+ * Types shared by the registry, composition function, and hint builders.
+ * Live in the companion chat runtime since Phase C — see
+ * docs/estate/CHAMBER_EXPERT_ACTIVATION_ARCHITECTURE.md for the
  * architecture this implements, and docs/visual-spark-studios/
  * Chamber-Member-Intelligence/Expert-Intelligence-Profiles/ for the
  * 24 source Expert Intelligence Profiles this registry digests.
@@ -70,6 +71,14 @@ export type ChamberExpertRegistryEntry = {
   id: ChamberExpertId;
   /** Canonical name, matches docs/visual-spark-studios/MEMBER_INDEX.md */
   name: string;
+  /**
+   * "When this expert helps, what do they notice that others miss?" —
+   * from the profile's §2 Expert Thinking Pattern. A signature move, not
+   * a restated job description. This is what makes a hint *change how
+   * Spark thinks* rather than just naming an expert — see
+   * docs/estate/CHAMBER_EXPERTISE_CONTRIBUTION_TESTS.md.
+   */
+  expertThinkingPattern: string;
   /**
    * Situational phrases from the profile's "Invite when" signals (§0),
    * compiled into short trigger-style phrases. Multi-word entries require

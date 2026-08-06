@@ -19,11 +19,31 @@
  */
 
 import { chamberExpertById } from "./chamberExpertRegistry";
+import { chamberCollaborationBridgeLine } from "./chamberCollaborationLanguage";
 import { resolveChamberExpertActivation } from "./resolveChamberExpertActivation";
 import type { ChamberExpertActivationInput, ChamberExpertId } from "./types";
 
+/** How many concrete themes to surface per expert — enough to change the
+ * answer's substance, short enough to stay a hint, not a knowledge dump. */
+const MAX_THEMES_PER_EXPERT = 5;
+
 function expertLabel(id: ChamberExpertId): string {
   return chamberExpertById(id)?.name ?? id;
+}
+
+/**
+ * Substance line for one expert: name, signature thinking pattern, and the
+ * concrete themes it should pull into the answer. This is the piece that
+ * makes a Chamber hint *change what gets recommended* rather than just
+ * naming which expert is "in the room" — see the Chamber Expertise
+ * Contribution Tests (docs/estate/CHAMBER_EXPERTISE_CONTRIBUTION_TESTS.md)
+ * for why naming alone was judged insufficient.
+ */
+function expertContributionLine(id: ChamberExpertId, roleLabel: string): string {
+  const entry = chamberExpertById(id);
+  if (!entry) return `${roleLabel}: ${id}.`;
+  const themes = entry.expertiseAreas.slice(0, MAX_THEMES_PER_EXPERT).join(", ");
+  return `${roleLabel}: ${entry.name} — ${entry.expertThinkingPattern} Bring in: ${themes}.`;
 }
 
 /**
@@ -40,26 +60,28 @@ export function chamberExpertiseHintForChat(
   const activation = resolveChamberExpertActivation(input);
   if (!activation.primary || activation.confidence === "low") return undefined;
 
-  const primaryLabel = expertLabel(activation.primary);
-  const supportingLabels = activation.supporting.map(expertLabel);
-  const possibleLabels = activation.possible.map(expertLabel);
-
   const lines = [
     "CHAMBER EXPERTISE (internal — shapes Shari's thinking, never announced):",
-    `Leading perspective: ${primaryLabel}.`,
+    expertContributionLine(activation.primary, "Leading perspective"),
   ];
-  if (supportingLabels.length > 0) {
-    lines.push(`Also relevant: ${supportingLabels.join(", ")}.`);
+  for (const supportingId of activation.supporting) {
+    lines.push(expertContributionLine(supportingId, "Also relevant"));
   }
-  if (possibleLabels.length > 0) {
+  if (activation.possible.length > 0) {
+    const possibleLabels = activation.possible.map(expertLabel);
     lines.push(`Worth a mention if it fits: ${possibleLabels.join(", ")}.`);
   }
+  const collaborationBridge = chamberCollaborationBridgeLine(activation);
+  if (collaborationBridge) {
+    lines.push(collaborationBridge);
+  }
   lines.push(
-    "Use this to decide what to notice, ask, and recommend — do not announce it, name it as a " +
-      'separate person, or say things like "bringing in the Marketing expert" or "now talking to ' +
-      'Systems." Speak only as Shari, one conversation, one voice. Ask before assuming; give one ' +
-      "helpful next step; connect it to what the member is actually trying to accomplish. The member " +
-      'should feel "Spark is helping me think" — never a handoff.',
+    "Use these themes to decide what to notice, ask, and recommend — do not list them as a " +
+      "checklist, and do not announce them, name any expert as a separate person, or say things " +
+      'like "bringing in the Marketing expert" or "now talking to Systems." Speak only as Shari, ' +
+      "one conversation, one voice. Ask before assuming; give one helpful next step; connect it to " +
+      'what the member is actually trying to accomplish. The member should feel "Spark is helping ' +
+      'me think" — never a handoff, and never a generic answer that ignores these themes.',
   );
 
   return lines.join(" ");

@@ -58,6 +58,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "STR",
     name: "Strategy Intelligence",
     category: "strategy",
+    expertThinkingPattern:
+      "Notices when busy has quietly replaced chosen. Names the one bet worth protecting, then defends it against every equally-interesting alternative.",
     activationSignals: [
       "unclear direction",
       "too many priorities",
@@ -89,6 +91,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "SYS",
     name: "Systems Intelligence",
     category: "operations",
+    expertThinkingPattern:
+      "Notices friction before the founder names it. Reduces repeated decisions into a written path. Creates the repeatable route once, so willpower is never the plan again.",
     activationSignals: [
       "onboarding process",
       "create a process",
@@ -104,9 +108,10 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "tools multiply",
     ],
     expertiseAreas: [
-      "Process design",
+      "Repeatable steps and process design",
       "checklist architecture",
       "handoff design",
+      "documentation of what happens before, during, and after the work",
       "exception handling",
       "tooling for flow",
       "quality gates",
@@ -122,6 +127,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "MKT",
     name: "Marketing Intelligence",
     category: "marketing",
+    expertThinkingPattern:
+      "Notices when a message is technically true but unclear to a stranger. Connects what the audience actually needs to what the offer already provides — before reaching for more channels.",
     activationSignals: [
       "marketing strategy",
       "marketing plan",
@@ -135,14 +142,15 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "launch",
     ],
     expertiseAreas: [
-      "Positioning",
-      "offer messaging",
+      "Audience clarity",
+      "positioning",
       "channel strategy",
+      "offer messaging and message clarity",
+      "testing and simple measurement",
       "campaign design",
       "launch architecture",
       "nurture",
       "proof and trust assets",
-      "simple measurement",
     ],
     supportingRelationships: ["STR", "CR"],
     possibleRelationships: ["CNT", "SALES"],
@@ -154,6 +162,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "CR",
     name: "Client Relationships Intelligence",
     category: "people",
+    expertThinkingPattern:
+      "Notices the gap between what the client was told and what they now expect. Repairs trust with a small honest update before it becomes a bigger silence.",
     activationSignals: [
       "client onboarding",
       "new client experience",
@@ -170,8 +180,9 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "why clients leave",
     ],
     expertiseAreas: [
-      "Client avatar / ICP",
-      "journey moments",
+      "Trust building",
+      "client avatar / ICP",
+      "journey moments and member experience",
       "onboarding",
       "status communication",
       "feedback loops",
@@ -189,6 +200,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "FIN",
     name: "Finance Intelligence",
     category: "finance",
+    expertThinkingPattern:
+      "Notices when growth is being funded by avoidance instead of margin. Protects the founder's resources before protecting the plan's ambition.",
     activationSignals: [
       "pricing fear",
       "runway anxiety",
@@ -217,6 +230,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "SALES",
     name: "Sales Intelligence",
     category: "sales_growth",
+    expertThinkingPattern:
+      "Notices the moment interest stops being guided toward a real decision. Hears when a founder is explaining value instead of learning what the buyer still needs to trust. Turns follow-up into a clear, kind next step before the lead goes cold.",
     activationSignals: [
       "hate selling",
       "sales conversation",
@@ -246,6 +261,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "CNT",
     name: "Content Intelligence",
     category: "marketing",
+    expertThinkingPattern:
+      "Notices the one alive idea buried under the founder's tabs, tangents, and almost-posts. Checks whether the format is serving that idea or stealing the wheel. Protects the founder's real voice before polish turns it generic.",
     activationSignals: [
       "many ideas no piece",
       "content inconsistent",
@@ -276,6 +293,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "PM",
     name: "Project Management Intelligence",
     category: "operations",
+    expertThinkingPattern:
+      "Notices when a project is missing a finish line, not motivation. Finds the hidden dependency, handoff, or restart point that will quietly break the path later. Makes the next visible step small enough to survive real life.",
     activationSignals: [
       "big idea needs steps",
       "project feels overwhelming",
@@ -308,6 +327,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "AI",
     name: "AI & Technology Intelligence",
     category: "technology",
+    expertThinkingPattern:
+      "Notices when a shiny tool is being asked to solve an unclear process. Separates the outcome from the app, then checks risk, review, and fallback before anything gets automated. Keeps technology useful enough to reduce friction, not become another thing to babysit.",
     activationSignals: [
       "choosing tools",
       "which ai tool",
@@ -337,6 +358,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "RES",
     name: "Research Intelligence",
     category: "research_learning",
+    expertThinkingPattern:
+      "Notices when the real question has been buried under too many open tabs. Separates what is known, what is trustworthy, and what would actually change the decision. Stops the search when the next responsible step is clear enough.",
     activationSignals: [
       "need current information",
       "claims need evidence",
@@ -367,6 +390,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "CRE",
     name: "Creative Studio Intelligence",
     category: "marketing",
+    expertThinkingPattern:
+      "Notices when the visual work is carrying five feelings at once. Finds the one emotional promise strong enough to guide the assets, then adds the constraint that lets the founder stop redesigning and ship.",
     activationSignals: [
       "visual concept",
       "brand expression flat",
@@ -396,6 +421,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "DATA",
     name: "Data & Analytics Intelligence",
     category: "technology",
+    expertThinkingPattern:
+      "Notices which numbers are creating shame, noise, or false certainty before asking for more data. Keeps only the signals that would change a decision early enough to matter.",
     activationSignals: [
       "what is working",
       "decisions based on vibes",
@@ -425,6 +452,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "EVT",
     name: "Events Intelligence",
     category: "events",
+    expertThinkingPattern:
+      "Notices the transformation guests are meant to feel before building the agenda. Designs the experience arc, logistics, energy, and ADHD-friendly pacing so the event feels held from invitation through aftercare.",
     activationSignals: [
       "plan an event",
       "plan a workshop",
@@ -436,14 +465,14 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "webinar",
     ],
     expertiseAreas: [
-      "Event strategy",
-      "guest journey mapping",
-      "agenda pacing",
-      "run-of-show planning",
+      "Attendee transformation",
+      "experience design and guest journey mapping",
+      "logistics and run-of-show planning",
+      "energy management",
+      "ADHD-friendly pacing",
       "hospitality touchpoints",
       "event communications",
       "experience recovery",
-      "founder energy planning",
     ],
     supportingRelationships: ["MKT", "CR"],
     possibleRelationships: ["PM", "CRE"],
@@ -455,6 +484,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "HOR",
     name: "Horizons Intelligence",
     category: "strategy",
+    expertThinkingPattern:
+      "Notices when the future is giving courage and when it is becoming a hiding place. Keeps the horizon alive while finding the bridge back to current capacity, real constraints, and one evidence step.",
     activationSignals: [
       "imagining the future",
       "long term vision",
@@ -483,6 +514,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "INN",
     name: "Innovations Intelligence",
     category: "research_learning",
+    expertThinkingPattern:
+      "Notices the assumption an exciting idea is standing on before the founder starts building. Shrinks possibility into the smallest honest experiment, so novelty becomes learning instead of another unfinished pivot.",
     activationSignals: [
       "new idea",
       "product experiment",
@@ -511,6 +544,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "KMG",
     name: "Knowledge Management Intelligence",
     category: "operations",
+    expertThinkingPattern:
+      "Notices when saved knowledge is comforting the founder now but will disappear when it could help later. Connects each note to the moment, decision, or asset it should return for, then lets the rest move out of the way.",
     activationSignals: [
       "notes scattered everywhere",
       "saved knowledge not retrieved",
@@ -543,6 +578,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "LEAD",
     name: "Leadership Intelligence",
     category: "people",
+    expertThinkingPattern:
+      "Notices where a people problem is really an unstated expectation, an avoided conversation, or the founder quietly rescuing the system. Turns tension into one kind true sentence, one clear agreement, and a rhythm that does not rely on panic.",
     activationSignals: [
       "managing people",
       "expectations unclear",
@@ -572,6 +609,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "LEARN",
     name: "Learning Intelligence",
     category: "research_learning",
+    expertThinkingPattern:
+      "Notices when a course has become shelter instead of skill. Pulls one live capability out of the notes, then asks where it will be practiced before the next lesson is allowed to multiply.",
     activationSignals: [
       "keep buying courses",
       "learning replaces doing",
@@ -600,6 +639,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "MOM",
     name: "Momentum Intelligence",
     category: "momentum_wellbeing",
+    expertThinkingPattern:
+      "Notices overwhelm before the founder calls it that. Breaks the frozen next move into a step small enough to actually take today.",
     activationSignals: [
       "false starts",
       "boom bust energy",
@@ -629,6 +670,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "NET",
     name: "Networking Intelligence",
     category: "sales_growth",
+    expertThinkingPattern:
+      "Notices the warm thread after a noisy room, before it disappears into a contact list. Protects one human detail and one natural next touch, so silence does not get to rewrite the relationship.",
     activationSignals: [
       "avoids events",
       "leaves events overwhelmed",
@@ -657,6 +700,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "PART",
     name: "Partnerships Intelligence",
     category: "sales_growth",
+    expertThinkingPattern:
+      "Notices when chemistry is carrying promises that capacity has not agreed to yet. Slows the shared idea long enough to name roles, contribution, and the exit path while trust is still warm.",
     activationSignals: [
       "considering a collaboration",
       "excitement moving faster than clarity",
@@ -686,6 +731,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "PC",
     name: "People & Culture Intelligence",
     category: "people",
+    expertThinkingPattern:
+      "Notices when everyone is being nice around an expectation nobody has actually said out loud. Turns culture from founder intention into one clear behavior, rhythm, or kind truth the team can experience.",
     activationSignals: [
       "avoids conflict",
       "hires from urgency",
@@ -717,6 +764,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "PRES",
     name: "Presentations Intelligence",
     category: "marketing",
+    expertThinkingPattern:
+      "Notices when the deck is getting bigger because being seen feels exposed. Finds the audience shift and message spine first, then gives every slide a job or lets it go.",
     activationSignals: [
       "need a talk",
       "need a pitch",
@@ -747,6 +796,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     id: "WELL",
     name: "Wellness Intelligence",
     category: "momentum_wellbeing",
+    expertThinkingPattern:
+      "Notices borrowed energy before it looks like burnout. Lets the body's signal change the business plan, choosing the capacity floor before ambition writes another promise.",
     activationSignals: [
       "ignoring body signals",
       "using productivity to avoid rest",

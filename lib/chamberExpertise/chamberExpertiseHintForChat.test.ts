@@ -39,7 +39,7 @@ describe("chamberExpertiseHintForChat", () => {
     // "do not say things like ..." instruction — verify that framing, not a
     // bare absence of the words (which would also match a hint that never
     // warned against them at all).
-    expect(hint).toMatch(/do not announce it.*say things like/i);
+    expect(hint).toMatch(/do not announce them.*say things like/i);
     expect(hint).toContain("never a handoff");
     expect(hint).toContain("Spark is helping me think");
   });
