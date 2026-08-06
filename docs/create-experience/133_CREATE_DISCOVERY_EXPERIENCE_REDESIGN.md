@@ -5,6 +5,13 @@
 **Parents:** Spec 128 · Spec 130 · Spec 131 · Spec 132 · Create 127–129  
 **Report:** [`133_CREATE_DISCOVERY_EXPERIENCE_REDESIGN_REPORT.md`](./133_CREATE_DISCOVERY_EXPERIENCE_REDESIGN_REPORT.md)
 
+> **Supersession (2026-08-06, Founder-approved):** the "Show Me Categories"
+> section below is superseded by the Chat-First Reasoning Experience —
+> understanding conversation before classification; categories are never
+> exposed first. See
+> [`CHAT_FIRST_REASONING_EXPERIENCE_HANDOFF.md`](./CHAT_FIRST_REASONING_EXPERIENCE_HANDOFF.md).
+> All other sections of 133 remain in force.
+
 ---
 
 ## Constitutional Principle
