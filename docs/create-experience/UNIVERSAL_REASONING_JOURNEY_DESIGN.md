@@ -85,7 +85,7 @@ differ — and it's the *only* place they differ:
 | **Create** | An artifact, shaped section-by-section in Current Focus | Yes — implementation #1, per the handoff doc |
 | **Projects** | A project home with pieces and active work | Yes — Project Homes' own create flow (`create-purpose → create-why → create-pieces → create-home`) **already asks purpose and why**; converge those steps onto the journey's questions instead of keeping a parallel set |
 | **Strategies** | A decision + a strategy work item | Yes — Strategy Chamber's `guidedJourney.ts` / `conversationGuidance.ts` / `answerIntake.ts` is a **second, independent reasoning-journey implementation** with its own resume recap; converge, don't keep two |
-| **Business Build** | A business asset / growth commitment | **No single area exists** — "Business Build" currently names two unrelated systems (Business Strategy Builder; My Business Estate). Recommendation: do **not** build a third; Business Build journeys are long journeys whose finishes land in existing surfaces. Needs a founder naming decision. |
+| **Business Build** | A business asset / growth commitment | **Definition pending (Founder, 2026-08-06).** No single area exists — "Business Build" currently names two unrelated systems (Business Strategy Builder; My Business Estate). No Business Build work proceeds until the founder defines it; do **not** build a third system. |
 | **Future areas** | Whatever the area finishes | A journey definition + Knowledge Fingers — content, not engines |
 
 ## 2. The four doorways

@@ -317,7 +317,7 @@ only.
 
 | Asset | What was found (2026-08-06) |
 |---|---|
-| Spark Experience Library | **No module by this name exists.** Closest: `lib/sparkExperiencePatterns/` — twelve reusable interaction patterns (discovery, clarity, creation, decision, …) + flow stages, per `docs/EXPERIENCE_PATTERNS.md`. Candidate home for the behavior-rules layer; founder confirmation needed that this is the intended library. |
+| Spark Experience Library | **Founder clarification (2026-08-06):** `lib/sparkExperiencePatterns/` (twelve interaction patterns + flow stages, per `docs/EXPERIENCE_PATTERNS.md`) is **part of — not equal to — the Spark Experience Library.** The library as a whole (behavior rules, conversation style, journey-facing experience files) is larger and partly still to be authored; no single module implements it today. |
 | Knowledge Fingers | Authored as docs (SOP Knowledge Finger spec + framework); runtime expertise is hard-coded per guided package (`lib/universalWorkEngine/packages/**`). No runtime Finger registry. |
 | Create reasoning-first preview | `/chat-first-reasoning-preview` — 5 journeys, 19 tests; the prototype this standard generalizes. |
 | SOP discovery gate | `lib/currentFocus/sopDiscoveryFocus.ts` + `applyDiscoveryAnswerToRuntimeCreationRecord` — the shipped proof that discovery answers persist and are never re-asked. |

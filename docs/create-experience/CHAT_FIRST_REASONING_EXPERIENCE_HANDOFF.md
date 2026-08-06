@@ -1,10 +1,10 @@
 # Chat-First Reasoning Experience — Development Handoff
 
-**Status:** Approved direction (Founder, 2026-08-06) · Implementation
-**deferred** — founder review of the isolated preview
-(`/chat-first-reasoning-preview`) and the experience architecture
-(`CHAT_FIRST_REASONING_EXPERIENCE_ARCHITECTURE.md`) comes first (founder
-direction, 2026-08-06)
+**Status:** Approved — Phase 1 implementation authorized (Founder,
+2026-08-06): production Create reasoning-first migration only. Acceptance
+contract: `UNIVERSAL_REASONING_JOURNEY_ACCEPTANCE_TESTS.md` (converts
+AT-1.x, AT-2.x, AT-B6/B8 toward SATISFIED). Scope explicitly excludes
+Projects, Chamber, Board, and Business Build (definition pending).
 **Supersedes:** `133_CREATE_DISCOVERY_EXPERIENCE_REDESIGN.md` — the "Show Me
 Categories" section only. Everything else in 133 (one search, one discovery
 experience, no parallel interfaces) remains in force.
