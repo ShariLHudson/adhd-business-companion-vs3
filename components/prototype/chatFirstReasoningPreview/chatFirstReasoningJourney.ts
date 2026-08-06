@@ -15,7 +15,12 @@
  * @see docs/create-experience/CHAT_FIRST_REASONING_EXPERIENCE_HANDOFF.md
  */
 
-export type JourneyId = "sop" | "workshop" | "newsletter" | "marketing";
+export type JourneyId =
+  | "sop"
+  | "workshop"
+  | "event"
+  | "newsletter"
+  | "marketing";
 
 export type JourneyQuestion = {
   id: string;
@@ -54,13 +59,18 @@ export type PreviewMessage = {
   content: string;
 };
 
-export const OPENING_QUESTION = "What would you like to create, develop, or build?";
+// Planning included (Founder, 2026-08-06) — many meaningful member goals are
+// experiences, events, or outcomes rather than artifacts.
+export const OPENING_QUESTION =
+  "What would you like to create, plan, develop, or build?";
 
 export const OPENING_SUPPORT =
   "Tell me what you're trying to make happen. It doesn't have to be fully figured out yet. We'll work through it together.";
 
+// Never ask the member to repeat what they already said — acknowledge it and
+// ask a forward-moving question instead.
 export const UNCLEAR_REPLY =
-  "I'd love to help. Tell me a little more about what you'd like to create, develop, or build — even a rough version is plenty to start from.";
+  "That sounds worth making happen — I'd love to help. What would you most like to be different once it's done and working?";
 
 export const RESEARCH_CHOICE_YES = "Yes — research this";
 
@@ -165,6 +175,48 @@ const JOURNEYS: Record<JourneyId, BuildJourney> = {
     openDecisionNote:
       "One thing we haven't settled yet: how long it should be. That choice follows from the transformation you named — not the other way around — and we'd decide it together.",
   },
+  event: {
+    id: "event",
+    outcomeLabel: "event plan",
+    chipExample: "I want to plan a retreat for my clients.",
+    questions: [
+      {
+        id: "event-memory",
+        prompt:
+          "When it's over and people are heading home, what do you want them to be saying about what they just experienced?",
+        learnedAcknowledgment:
+          "That's the experience we're really planning — everything else is in service of people leaving with exactly that.",
+        thinkingHelp:
+          "Picture the drive home. Someone calls a friend and says “You won't believe what this was like…” — how does that sentence end?",
+        recapLabel: "What people should leave saying",
+      },
+      {
+        id: "event-audience",
+        prompt: "Who is this for — and what do they need most from time with you?",
+        learnedAcknowledgment:
+          "That tells us a lot. An experience designed for *them* will feel completely different from one designed for everyone.",
+        thinkingHelp:
+          "Think of two or three people you'd love to see there. What are they each hoping will change for them?",
+        recapLabel: "Who it's for",
+      },
+      {
+        id: "event-inplace",
+        prompt:
+          "What's already in place — a date, a place, past events you've run — or is this starting from a blank page?",
+        learnedAcknowledgment:
+          "Good — now I know what's fixed and what's still ours to shape. Both are useful.",
+        thinkingHelp:
+          "Anything counts: a venue you love, a season that works, something you ran before that people still mention.",
+        recapLabel: "What's already in place",
+      },
+    ],
+    researchOffer:
+      "Would it help if I looked into how similar retreats and events are being run right now — pricing, length, what attendees remember most — before we shape yours?",
+    researchPreviewFinding:
+      "Here's the kind of thing I'd bring back: how similar experiences are priced and structured right now, what attendees say they remember a year later, and the logistics people most often wish they'd planned earlier — applied to your choices, not delivered as a report. (Concept demonstration — no real research runs in this preview.)",
+    openDecisionNote:
+      "One thing we haven't settled yet: the size. Intimate and deep, or bigger and higher-energy — that choice shapes everything else, and we'd make it together.",
+  },
   newsletter: {
     id: "newsletter",
     outcomeLabel: "newsletter",
@@ -253,7 +305,7 @@ const JOURNEYS: Record<JourneyId, BuildJourney> = {
 };
 
 export const JOURNEY_CHIP_EXAMPLES: readonly string[] = (
-  ["sop", "workshop", "newsletter", "marketing"] as const
+  ["sop", "workshop", "event", "newsletter", "marketing"] as const
 ).map((id) => JOURNEYS[id].chipExample);
 
 export function journeyFor(id: JourneyId): BuildJourney {
@@ -265,6 +317,9 @@ export function detectJourney(userText: string): JourneyId | null {
   if (!t) return null;
   if (/\bsops?\b|standard operating procedure/i.test(t)) return "sop";
   if (/\bworkshops?\b/i.test(t)) return "workshop";
+  if (/\bretreats?\b|\bevents?\b|\bwebinars?\b|\bsummits?\b|\bconferences?\b|\bopen house\b/i.test(t)) {
+    return "event";
+  }
   if (/\bnewsletters?\b/i.test(t)) return "newsletter";
   if (/\bmarketing\b|\bmarket my\b|\bpromot(?:e|ing|ion)\b/i.test(t)) {
     return "marketing";
@@ -299,6 +354,8 @@ export function journeyAcknowledgment(
     }
     case "workshop":
       return "A workshop — I'd love to help you build it. Before we think about slides or schedules, let's think about the transformation.";
+    case "event":
+      return "An experience for real people — that's worth planning well. Before dates and logistics, let's start with what it should feel like.";
     case "newsletter":
       return "I'd love to help. Before we write a single line, let's make sure we know what this newsletter is really for.";
     case "marketing":

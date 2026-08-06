@@ -27,11 +27,18 @@ import {
   researchOfferFor,
   startJourney,
   thinkingHelpFor,
+  UNCLEAR_REPLY,
   type JourneyId,
   type JourneyState,
 } from "./chatFirstReasoningJourney";
 
-const ALL_JOURNEYS: JourneyId[] = ["sop", "workshop", "newsletter", "marketing"];
+const ALL_JOURNEYS: JourneyId[] = [
+  "sop",
+  "workshop",
+  "event",
+  "newsletter",
+  "marketing",
+];
 
 function runFullJourney(text: string, answers: [string, string, string]) {
   const started = startJourney(text);
@@ -47,24 +54,43 @@ function runFullJourney(text: string, answers: [string, string, string]) {
 }
 
 describe("opening", () => {
-  it("uses the approved opening question and supporting line verbatim", () => {
+  it("uses the approved opening question — planning included — and supporting line verbatim", () => {
     expect(OPENING_QUESTION).toBe(
-      "What would you like to create, develop, or build?",
+      "What would you like to create, plan, develop, or build?",
     );
     expect(OPENING_SUPPORT).toBe(
       "Tell me what you're trying to make happen. It doesn't have to be fully figured out yet. We'll work through it together.",
     );
   });
 
-  it("detects each of the four example chips", () => {
-    expect(JOURNEY_CHIP_EXAMPLES).toHaveLength(4);
+  it("detects each of the five example chips", () => {
+    expect(JOURNEY_CHIP_EXAMPLES).toHaveLength(5);
     const detected = JOURNEY_CHIP_EXAMPLES.map((chip) => detectJourney(chip));
-    expect(detected).toEqual(["sop", "workshop", "newsletter", "marketing"]);
+    expect(detected).toEqual([
+      "sop",
+      "workshop",
+      "event",
+      "newsletter",
+      "marketing",
+    ]);
+  });
+
+  it("recognizes planning goals — experiences and events, not just artifacts", () => {
+    expect(detectJourney("I want to plan a retreat for my clients.")).toBe("event");
+    expect(detectJourney("help me plan a client appreciation event")).toBe("event");
+    expect(detectJourney("I'm thinking about running a webinar")).toBe("event");
+    // Workshops keep their own, more specific journey.
+    expect(detectJourney("I want to plan a workshop.")).toBe("workshop");
   });
 
   it("returns null for unclear requests so the preview can gently clarify", () => {
     expect(startJourney("I have an idea but don't know what to do with it")).toBeNull();
     expect(startJourney("")).toBeNull();
+  });
+
+  it("never asks the member to repeat themselves when intent is unclear — it moves forward", () => {
+    expect(UNCLEAR_REPLY).not.toMatch(/tell me (a little )?more about what/i);
+    expect(UNCLEAR_REPLY).toMatch(/\?$/);
   });
 });
 
@@ -205,6 +231,7 @@ describe("the one universal pattern across journeys", () => {
     const inputs: Record<JourneyId, string> = {
       sop: "I need an SOP for invoicing",
       workshop: "I want to plan a workshop.",
+      event: "I want to plan a retreat for my clients.",
       newsletter: "I need a newsletter.",
       marketing: "I need a marketing strategy.",
     };

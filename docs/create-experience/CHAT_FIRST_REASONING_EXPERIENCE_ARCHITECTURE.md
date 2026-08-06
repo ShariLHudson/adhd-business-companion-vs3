@@ -21,12 +21,19 @@ journey.**
 
 ## The entrance (Founder decision, 2026-08-06)
 
-The entrance language remains **"What would you like to create, develop, or
-build?"** — members often *do* know they want to make something, and the
-question honors that. What changes is what happens next: **the member's
-description is the starting point for a conversation, not a classification
-command.** Spark never immediately converts their words into a template or
-Build Type.
+The entrance language is **"What would you like to create, plan, develop, or
+build?"** — *plan* included, because many meaningful member goals are
+experiences, events, or outcomes rather than artifacts. Members often *do*
+know they want to make something, and the question honors that. What changes
+is what happens next: **the member's description is the starting point for a
+conversation, not a classification command.** Spark never immediately
+converts their words into a template or Build Type.
+
+**The first response never asks the member to repeat what they already
+said.** When intent is clear, Spark acknowledges it and immediately begins
+the appropriate discovery journey. When intent is unclear, Spark still moves
+forward — it acknowledges what was shared and asks a new question that
+advances understanding, never "tell me again."
 
 ## The canonical reasoning process (Founder, 2026-08-06)
 
