@@ -59,10 +59,10 @@ Future Estate reasoning and experience standards (protocol + intelligence librar
 | Projects vs Business Build Architecture Review v1.4.0 | **Founder-approved:** keep Projects / My Business Estate / Business Strategy Builder separate; retire “Business Build” name |
 | Business naming & registry cleanup handoff | Planning only — inventory/plan; **does not authorize implementation** |
 | Knowledge Finger Library Index · Architecture Map · Coverage Gap Analysis | Reasoning-pattern catalog; founder-journey map; gaps vs “leave to existing systems” |
-| Knowledge Finger Quality Acceptance Standard · Priority Roadmap · Ownership Map | What a Finger is/isn’t; smallest high-value set; ownership boundaries |
+| Knowledge Finger Quality Acceptance Standard · Priority Roadmap · Ownership Map (×2; prefer refined `d553`) | What a Finger is/isn’t; smallest high-value set; **One Concept · One Owner · One Source of Truth** |
 | Knowledge Finger Build Type Activation Matrix · Capability Orchestration Rules | Language → need → Finger → Build Type → capabilities (no tool-first thinking) |
 | Knowledge Finger Implementation Review Handoff | Review ownership/duplication **before** any Finger implementation |
-| Knowledge Fingers (reasoning patterns) | Capture & Transfer · Design Transformation · Relationship Communication · Strategic Decision Support · Experience Design · Execution Reliability · Alignment & Commitment · Customer Discovery · Sales · Product Development · Ops · Leadership · Innovation |
+| Knowledge Fingers (reasoning patterns) | **Process Transfer** (SOP) · **Transformation Design** (Workshop) · Relationship Communication · Strategic Decision Support · Experience Design · Execution Reliability · Alignment & Commitment · Customer Discovery · Sales · Product Development · Ops · Leadership · Innovation |
 | *(not uploaded)* Library `01` · `02` | Named in MJ library README |
 
 Runtime mirrors already present for many phases under `lib/estate/sparkEstate*.ts` and `lib/universalCreation/` — treated as **partial encoding**, not as proof of full companion-path wiring.
@@ -437,8 +437,8 @@ These six files describe **how existing capabilities work together**. Several op
 |----------|---------|
 | Do these files demand new product architecture? | **No.** Builds orchestrate; expertise lives in one Business Knowledge Library (map to Chamber libraries). Reuse Before Reinvention forbids parallel engines/trees. MJ library is validation-only. |
 | Biggest gap | Knowledge **depth** (Fingers/Domains) on the live `universalCreation` path; EI situation→path routing vs keyword heuristics; Reasoning Engine largely unwired; organize-before-build (MJ-001/002). |
-| Clearest reusable vs specific split | **Orchestration** → **Domains** → **Knowledge Fingers (= reasoning patterns)** → **Build Types / modules**; MJ validates situations. Fingers answer “what thinking?” — Builds answer “what artifact?” |
-| Recommended stance under Observation Mode | Prefer **Wire** over Build. Reconcile Finger vocabulary (reasoning vs Build payload). One library home. One creation runtime. Separate Projects / Business Estate / Strategy Builder. Finger Implementation Review before any Finger code. Validate with MJ-001. Rule of Three. |
+| Clearest reusable vs specific split | **Orchestration** → **Chamber/Domains** (expert systems) → **Knowledge Fingers** (situation reasoning) → **Build Types** (artifacts); MJ validates. Prefer names **Process Transfer** / **Transformation Design** over document-titled Fingers. |
+| Recommended stance under Observation Mode | Prefer **Wire** over Build. Need→Finger→Build→Capability. One Owner per concept (refined Ownership Map). Chamber ≠ Finger. Finger runtime only after Review handoff. Validate with MJ-001 (organize before Transformation Design Build). Rule of Three. |
 
 ### Authority order (for future readers)
 
@@ -727,10 +727,27 @@ Required answers: ownership · no duplication of Constitution / MJ / Build Defin
 
 ### Naming collision to resolve in docs (not by building twice)
 
-| Earlier upload language | This library’s language | Alignment |
-|-------------------------|-------------------------|-----------|
-| “SOP Knowledge Finger Full Spec” | Capture & Transfer Expertise Finger **influences** SOP Build Type | Prefer: **reasoning Finger** + **Build Type / document plugin payload**; SOP Full Spec = Build-Type expert payload under Capture & Transfer, not a second Finger OS |
-| Finger Authoring / Finger Standard | Same authoring bar for reasoning Fingers | One authoring standard; two content kinds if needed: *reasoning Finger* vs *Build Type knowledge package* — name them differently in future docs |
+| Earlier upload language | Canonical library language (latest) | Alignment |
+|-------------------------|-------------------------------------|-----------|
+| “SOP Knowledge Finger Full Spec” / Capture & Transfer Expertise | **Process Transfer** Finger → SOP / Training / Delegation Builds | Finger = reasoning; SOP Full Spec = Build-Type package under Process Transfer |
+| Design Transformation | **Transformation Design** Finger → Workshop / Course / Learning Builds | Same pattern; do not jump to slides (MJ-001) |
+| Finger Authoring / Finger Standard / Quality Standard | One authoring bar | Merge schemas; stop maintaining parallel Finger templates |
+
+### Refined Ownership Map (`d553`) — stronger boundary
+
+**One Concept. One Owner. One Source of Truth.**
+
+| Existing system owns | Finger action |
+|----------------------|---------------|
+| Constitution / foundation principles | Apply, do not repeat |
+| Member Journey Library | Provide expertise *during* journeys |
+| Build Definitions | Provide reasoning, not builders |
+| **Chamber and Intelligence Systems** | Do **not** recreate expert roles/perspectives/collaboration |
+| Shared capabilities (Research, Projects, Memory architecture, …) | Identify *when* useful only |
+
+Fingers own: Purpose · Activation Signals · Expert Reasoning · Questions · Decisions · Dependencies · Stakeholders · Risks · Research Triggers · Evidence · Examples · Possible Outputs · Implementation Guidance · Working Memory *Requirements* · Learning Signals · So What?
+
+This resolves the earlier “domain expertise” tension: **Chamber owns expert systems; Fingers own situation reasoning that may invoke them.**
 
 ### Existing systems
 
