@@ -186,10 +186,6 @@ export function buildPayloadFromWorkflow(
       // though their derived Working Memory values already survived.
       sopDiscoveryAnswers: runtime?.discoveryAnswers ?? null,
       sopSkippedDiscoveryIds: runtime?.skippedDiscoveryIds ?? null,
-      // Conversational Create Entrance (2026-08-06) — additive, same
-      // pattern as above. Hook field; not read by any Build Type today.
-      entrySupportChoice:
-        workflow.entrySupportChoice ?? runtime?.entrySupportChoice ?? null,
     },
     registryMeta: {
       humanTitle: title,

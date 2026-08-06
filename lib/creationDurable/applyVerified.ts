@@ -85,14 +85,6 @@ export function authoritativeToRuntimeRecord(
           sopSkippedDiscoveryIds?: string[];
         } | null
       )?.sopSkippedDiscoveryIds ?? null,
-    // Conversational Create Entrance (2026-08-06) — same hydrate-safety
-    // pattern; absent on every record saved before this phase.
-    entrySupportChoice:
-      (
-        record.payload.workflowSnapshot as {
-          entrySupportChoice?: "guided" | "independent" | null;
-        } | null
-      )?.entrySupportChoice ?? null,
     createdAt: record.createdAt,
     updatedAt: now,
   };

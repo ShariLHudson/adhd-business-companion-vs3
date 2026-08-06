@@ -30,15 +30,6 @@ export type CreateTemplateSection = {
 
 export type DiscoverySubphase = "questions" | "sections";
 
-/**
- * Conversational Create Entrance (2026-08-06) — "How would you like to
- * work?" captured from the new entry conversation, before Begin opens the
- * workspace. Hook field per the Intelligence-Ready Architecture rule:
- * recorded on RuntimeCreationRecord, not yet consumed by any Build Type's
- * Current Focus pacing.
- */
-export type EntrySupportChoice = "guided" | "independent" | null;
-
 export type DraftStatus = "idle" | "building" | "ready" | "error";
 
 export type CreateQuestionMode =
@@ -127,8 +118,6 @@ export type CreateWorkflowState = {
   universalCreationState?: string | null;
   originalRequest?: string | null;
   workingIntent?: string | null;
-  /** See EntrySupportChoice. */
-  entrySupportChoice?: EntrySupportChoice;
   /** Complete It Now — assembled full piece (same Work ID). */
   assembledOutput?: {
     workId: string;

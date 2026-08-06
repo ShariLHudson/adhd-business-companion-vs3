@@ -4,45 +4,42 @@
  * clearly separate optional sections: Find Previous Work and Browse More.
  * This certifies the entrance no longer offers a single dense discovery
  * surface and instead keeps the default screen calm (Parts 1–4).
- *
- * Conversational Create Entrance (2026-08-06) — Browse Categories /
- * CreateBrowseCategoriesPanel is no longer wired into the entrance at all
- * (superseded by the single conversation); CreateBrowseCategoriesPanel.tsx
- * itself is untouched and still certified independently below. The
- * confirm gate and hierarchy assertions are updated to the new entrance
- * shape; every other invariant here is unchanged.
  */
 
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING } from "./copy";
+import {
+  CREATE_ESTATE_BROWSE_CATEGORIES_HEADING,
+  CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING,
+} from "./copy";
+import { SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS } from "@/lib/sparkCreateIntentConstitution/types";
 
 function read(pathFromRoot: string): string {
   return readFileSync(resolve(process.cwd(), pathFromRoot), "utf8");
 }
 
 describe("Create Simplification — Find Previous Work + Browse More replace Explore Ideas", () => {
-  it("entrance no longer wires the old single Explore Ideas surface, or Browse Categories", () => {
+  it("entrance no longer wires the old single Explore Ideas surface", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     expect(panel).not.toContain("CreateExploreIdeasPanel");
     expect(panel).not.toContain('data-testid="create-estate-explore-ideas"');
     expect(panel).toContain("create-estate-find-previous-work");
-    // Conversational Create Entrance (2026-08-06) — Browse Categories was
-    // removed entirely, not nested elsewhere.
-    expect(panel).not.toContain("CreateBrowseCategoriesPanel");
-    expect(panel).not.toContain("create-estate-browse-categories");
+    // Entrance Cleanup (2026-08) — renamed from "Browse More", now the
+    // single category-picker mount nested in Start With Guidance.
+    expect(panel).toContain("create-estate-browse-categories");
     expect(panel).not.toContain("create-estate-guided-frameworks");
     expect(panel).not.toContain("UniversalBlueprintInterface");
     expect(panel).not.toContain("CreateCatalogPicker");
     expect(panel).not.toContain("create-estate-blueprint-marketing");
     expect(panel).not.toMatch(/aria-pressed=\{blueprintWorkTypeId/);
+    expect(CREATE_ESTATE_BROWSE_CATEGORIES_HEADING).toBe("Browse Categories");
     expect(CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING).toBe(
       "Find Previous Work",
     );
   });
 
-  it("Browse Categories (standalone component, not entrance-wired) opens curated categories, not a full catalog dump", () => {
+  it("Browse More opens curated categories, not a full catalog dump", () => {
     const browse = read(
       "components/companion/CreateBrowseCategoriesPanel.tsx",
     );
@@ -52,36 +49,46 @@ describe("Create Simplification — Find Previous Work + Browse More replace Exp
     expect(browse).toContain("onRequestCreate");
   });
 
-  it("Find Previous Work is collapsed by default, a distinct section from the conversation", () => {
+  it("Find Previous Work is a distinct section from Browse Categories", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
-    const composerAt = panel.indexOf('data-testid="create-estate-composer"');
     const prevAt = panel.indexOf('data-testid="create-estate-find-previous-work"');
-    expect(composerAt).toBeGreaterThan(-1);
-    expect(prevAt).toBeGreaterThan(composerAt);
+    // Entrance Cleanup (2026-08) — Browse Categories now nests inside the
+    // composer section (under Start With Guidance), ahead of Find Previous
+    // Work, instead of following it as a separate page section.
+    const browseAt = panel.indexOf(
+      'data-testid="create-estate-browse-categories"',
+    );
+    expect(prevAt).toBeGreaterThan(-1);
+    expect(browseAt).toBeGreaterThan(-1);
+    expect(prevAt).toBeGreaterThan(browseAt);
     const findPrevious = read(
       "components/companion/CreateFindPreviousWorkPanel.tsx",
     );
     expect(findPrevious).toContain("CreateDraftResumeList");
   });
 
-  it("preserves 130/131 confirm gate — now reached through the conversation, not a catalog click", () => {
+  it("preserves 130/131 confirm gate from every discovery path", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     expect(panel).toContain("create-estate-intent-confirm");
-    expect(panel).toContain("resolveCreateBeginOutcome");
+    expect(panel).toContain("requestCatalogConfirm");
+    expect(panel).toContain("onRequestCreate={requestCatalogConfirm}");
+    expect(panel).toContain("resolveCatalogCreateConfirm");
     expect(panel).toContain("confirmCreateBeginToOpen");
+    expect(panel).toContain("data-max-decision-layers=");
+    expect(SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS).toBe(3);
   });
 
-  it("hierarchy on entrance: Continue → composer (conversation) → Find Previous Work", () => {
+  it("hierarchy on entrance: Continue → composer (with nested Browse Categories) → Find Previous Work", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     const continueAt = panel.indexOf('data-testid="create-estate-continue"');
     const startAt = panel.indexOf('data-testid="create-estate-composer"');
-    // lastIndexOf — the import statement mentions the component name too;
-    // the JSX usage (what actually renders) is what hierarchy is about.
-    const conversationAt = panel.lastIndexOf("CreateEntryConversationPanel");
+    const browseAt = panel.indexOf(
+      'data-testid="create-estate-browse-categories"',
+    );
     const prevAt = panel.indexOf('data-testid="create-estate-find-previous-work"');
     expect(continueAt).toBeGreaterThan(-1);
     expect(startAt).toBeGreaterThan(continueAt);
-    expect(conversationAt).toBeGreaterThan(startAt);
-    expect(prevAt).toBeGreaterThan(conversationAt);
+    expect(browseAt).toBeGreaterThan(startAt);
+    expect(prevAt).toBeGreaterThan(browseAt);
   });
 });

@@ -83,12 +83,6 @@ export type RuntimeCreationRecord = {
   discoveryAnswers?: Record<string, string> | null;
   /** Discovery questions explicitly skipped — mirrors skippedSectionIds. */
   skippedDiscoveryIds?: string[] | null;
-  /**
-   * Conversational Create Entrance (2026-08-06) — "How would you like to
-   * work?" captured before Begin. Hook field, unused by any Build Type's
-   * Current Focus pacing today. See lib/createWorkflowState.ts.
-   */
-  entrySupportChoice?: CreateWorkflowState["entrySupportChoice"];
   createdAt: string;
   updatedAt: string;
 };
@@ -312,8 +306,6 @@ export function ensureRuntimeCreationRecord(
     // applyDiscoveryAnswerToRuntimeCreationRecord.
     discoveryAnswers: existing?.discoveryAnswers ?? null,
     skippedDiscoveryIds: existing?.skippedDiscoveryIds ?? null,
-    entrySupportChoice:
-      workflow.entrySupportChoice ?? existing?.entrySupportChoice ?? null,
     createdAt: existing?.createdAt ?? now,
     updatedAt: now,
   });

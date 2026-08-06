@@ -50,14 +50,11 @@ describe("Create polish 130 certification", () => {
     expect(createConfirmPrimaryLabel("Blog Post")).toBe("Create Blog Post");
   });
 
-  it("entrance wires the confirm gate from the conversation's discovery path + Cancel", () => {
+  it("entrance wires catalog confirm from every discovery path + Cancel", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
-    // Conversational Create Entrance (2026-08-06) — the catalog-click path
-    // (requestCatalogConfirm/resolveCatalogCreateConfirm) was removed along
-    // with Browse Categories; the conversation is now the sole discovery
-    // path, converging on the same resolveCreateBeginOutcome → confirm gate.
-    expect(panel).toContain("resolveCreateBeginOutcome");
-    expect(panel).not.toContain("requestCatalogConfirm");
+    expect(panel).toContain("resolveCatalogCreateConfirm");
+    expect(panel).toContain("requestCatalogConfirm");
+    expect(panel).toContain("onRequestCreate={requestCatalogConfirm}");
     expect(panel).not.toContain("requestFrameworkConfirm");
     expect(panel).toContain("create-estate-confirm-cancel");
     expect(panel).toContain("createConfirmPrimaryLabel");
@@ -140,6 +137,9 @@ describe("Create polish 130 certification", () => {
   it("preserves 127/129 confirm gate and hierarchy", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     expect(panel).toContain("create-estate-intent-confirm");
+    // Entrance Cleanup (2026-08) — renamed from "Browse More", now the
+    // single category-picker mount nested in Start With Guidance.
+    expect(panel).toContain("create-estate-browse-categories");
     expect(panel).toContain("CreateWorkspaceResumeList");
   });
 });

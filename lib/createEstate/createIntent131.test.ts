@@ -76,18 +76,17 @@ describe("Spec 131 — Create intent intelligence", () => {
     ).toEqual(["Workshop", "Event Plan", "Email"]);
   });
 
-  it("Rule 11 — Continue Working omitted when empty; Rule 7 layers constant unchanged", () => {
+  it("Rule 11 — Continue Working omitted when empty; Rule 7 layers capped", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     expect(panel).toContain("hasWorkspaces ? (");
     expect(panel).toContain('data-testid="create-estate-continue"');
     expect(panel).not.toContain("create-estate-continue-empty");
     expect(panel).toContain("create-estate-also-considered");
     expect(panel).toContain("switchCreateBeginConfirmType");
-    // Conversational Create Entrance (2026-08-06) — Browse Categories is no
-    // longer wired into the entrance at all, so Rule 7's decision-layer cap
-    // no longer applies there; the constant itself is unchanged and still
-    // governs CreateBrowseCategoriesPanel.tsx directly.
-    expect(panel).not.toContain("create-estate-browse-categories");
+    // Entrance Cleanup (2026-08) — renamed from "Browse More", now the
+    // single category-picker mount nested in Start With Guidance.
+    expect(panel).toContain("create-estate-browse-categories");
+    expect(panel).toContain("data-max-decision-layers=");
     expect(SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS).toBe(3);
   });
 
