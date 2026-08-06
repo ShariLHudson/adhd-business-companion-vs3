@@ -1,6 +1,10 @@
 # Chat-First Reasoning Experience — Development Handoff
 
-**Status:** Approved direction (Founder, 2026-08-06) · Implementation in progress
+**Status:** Approved direction (Founder, 2026-08-06) · Implementation
+**deferred** — founder review of the isolated preview
+(`/chat-first-reasoning-preview`) and the experience architecture
+(`CHAT_FIRST_REASONING_EXPERIENCE_ARCHITECTURE.md`) comes first (founder
+direction, 2026-08-06)
 **Supersedes:** `133_CREATE_DISCOVERY_EXPERIENCE_REDESIGN.md` — the "Show Me
 Categories" section only. Everything else in 133 (one search, one discovery
 experience, no parallel interfaces) remains in force.
