@@ -276,6 +276,25 @@ export function CreateEstateEntrancePanel({
     yes?.focus();
   }, [beginFeedbackKind, pendingConfirm]);
 
+  // Bug fix (2026-08-06) — every understanding question needs a visible,
+  // ready-to-use answer path the moment it appears, mirroring the confirm
+  // effect above. Without this, a question could render below the fold
+  // (the room's own scrollport, not the whole page — see the 133 scroll
+  // contract) with nothing focused: the member knew what to do, but the
+  // next action wasn't in view, and momentum stopped. `understanding` is a
+  // fresh session object on every question (never the same reference back),
+  // so this re-fires on each transition, not just the first question. UI
+  // state only — no discovery question, reasoning flow, recognition, or
+  // routing logic touched.
+  useEffect(() => {
+    if (beginFeedbackKind !== "understanding" || !understanding) return;
+    confirmRegionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+    });
+    promptInputRef.current?.focus();
+  }, [beginFeedbackKind, understanding]);
+
   const hasWorkspaces = activeWorkspaces.length > 0;
 
   function showConfirm(

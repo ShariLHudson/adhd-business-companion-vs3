@@ -4,7 +4,7 @@
  */
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CreateEstateEntrancePanel } from "@/components/companion/CreateEstateEntrancePanel";
 import { clearCreateDraftLibraryForTests } from "@/lib/createDraftLibrary";
 
@@ -15,6 +15,9 @@ describe("Create Simplification — default screen (Parts 1–3)", () => {
   beforeEach(() => {
     localStorage.clear();
     clearCreateDraftLibraryForTests();
+    // jsdom does not implement scrollIntoView; the understanding-question
+    // focus effect (2026-08-06 bug fix) calls it on every question.
+    window.HTMLElement.prototype.scrollIntoView = vi.fn();
     container = document.createElement("div");
     document.body.appendChild(container);
     root = createRoot(container);
