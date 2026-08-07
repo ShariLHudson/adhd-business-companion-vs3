@@ -29,7 +29,7 @@ import {
   type ChamberExpertRegistryEntryWithCategory,
 } from "./chamberExpertRegistry";
 import { resolveLegacyExpertIds } from "./legacyExpertAliasMap";
-import { phraseMatches, significantWords, tokenize } from "./textMatch";
+import { computeTopicMatch, tokenize } from "./textMatch";
 import type {
   ChamberExpertActivation,
   ChamberExpertActivationInput,
@@ -53,39 +53,16 @@ const PRIMARY_MIN_SIGNAL_GROUPS = 2;
 const MAX_SUPPORTING = 3;
 const MAX_POSSIBLE = 2;
 
-type TopicMatchResult = {
-  phraseMatch: boolean;
-  keywordMatch: boolean;
-};
-
-function computeTopicMatch(
-  entry: ChamberExpertRegistryEntryWithCategory,
-  textWords: Set<string>,
-): TopicMatchResult {
-  let phraseMatch = false;
-  let keywordMatch = false;
-
-  for (const signal of [...entry.activationSignals, ...entry.expertiseAreas]) {
-    const words = significantWords(signal);
-    if (words.length === 0) continue;
-    if (!phraseMatches(signal, textWords)) continue;
-    if (words.length >= 2) {
-      phraseMatch = true;
-    } else {
-      keywordMatch = true;
-    }
-  }
-
-  return { phraseMatch, keywordMatch };
-}
-
 function computeSignal(
   entry: ChamberExpertRegistryEntryWithCategory,
   input: ChamberExpertActivationInput,
   textWords: Set<string>,
   resolvedLegacyIds: readonly ChamberExpertId[],
 ): ChamberExpertSignalResult {
-  const { phraseMatch, keywordMatch } = computeTopicMatch(entry, textWords);
+  const { phraseMatch, keywordMatch } = computeTopicMatch(
+    [...entry.activationSignals, ...entry.expertiseAreas],
+    textWords,
+  );
   const topicMatch = phraseMatch || keywordMatch;
 
   const intentMatch = Boolean(

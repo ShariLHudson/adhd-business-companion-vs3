@@ -44,6 +44,38 @@ describe("chamberExpertRegistry", () => {
       expect(entry.possibleRelationships).not.toContain(entry.id);
     }
   });
+
+  it("V2-2: every entry has an expertCategory and a plain-language founder phrase", () => {
+    for (const entry of CHAMBER_EXPERT_REGISTRY) {
+      expect(["specialist", "generalist"]).toContain(entry.expertCategory);
+      expect(entry.founderPlainLanguagePhrase?.trim().length ?? 0).toBeGreaterThan(0);
+      // Decision table requirement: short, plain, never the expert's own
+      // internal name/title (a domain word overlapping the phrase, like
+      // "content" in Content Intelligence's phrase, is fine and expected
+      // — it's the literal "X Intelligence" name form that must never appear).
+      expect(entry.founderPlainLanguagePhrase!.split(" ").length).toBeLessThanOrEqual(8);
+      expect(entry.founderPlainLanguagePhrase!.toLowerCase()).not.toContain("intelligence");
+      expect(entry.founderPlainLanguagePhrase).not.toBe(entry.name);
+    }
+  });
+
+  it("V2-2: exactly Strategy, Momentum, and Horizons are generalists — everyone else is a specialist", () => {
+    const generalists = CHAMBER_EXPERT_REGISTRY.filter((e) => e.expertCategory === "generalist").map(
+      (e) => e.id,
+    );
+    expect(generalists.sort()).toEqual(["HOR", "MOM", "STR"]);
+  });
+
+  it("V2-2: outcomeSignals, where present, are genuine multi-word phrases (never a bare topic keyword)", () => {
+    for (const entry of CHAMBER_EXPERT_REGISTRY) {
+      for (const signal of entry.outcomeSignals ?? []) {
+        expect(
+          signal.trim().split(/\s+/).length,
+          `${entry.id}'s outcomeSignal "${signal}" should be a multi-word phrase, per its Tier-1 weighting`,
+        ).toBeGreaterThanOrEqual(2);
+      }
+    }
+  });
 });
 
 describe("legacyExpertAliasMap", () => {

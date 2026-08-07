@@ -11,6 +11,7 @@ import type { SelectedExpertContribution } from "./types";
 const ROLE_LABEL: Record<SelectedExpertContribution["role"], string> = {
   primary: "Leading perspective",
   supporting: "Also relevant",
+  "co-primary": "Equally central perspective",
 };
 
 export function renderSelectedContribution(selection: SelectedExpertContribution): string {

@@ -91,7 +91,15 @@ export type ChamberExpertIntelligence = {
   profilePath: string;
 };
 
-export type ChamberIntelligenceRole = "primary" | "supporting";
+/**
+ * V2-2 adds "co-primary" — used when Chamber Activation V2 (feature-
+ * flagged) determines two experts are both genuinely central to a
+ * request. Gets the same full-depth selection as "primary" (see
+ * selectExpertContribution.ts's `isPrimary` check), under its own,
+ * smaller per-expert budget so two co-primary contributions plus the
+ * mandatory header/footer/bridge still fit the 550-token whole-hint cap.
+ */
+export type ChamberIntelligenceRole = "primary" | "supporting" | "co-primary";
 
 export type SelectionContext = {
   userText: string;

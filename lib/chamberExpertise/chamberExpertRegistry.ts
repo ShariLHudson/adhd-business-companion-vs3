@@ -15,6 +15,20 @@
  *   are narrative prose written for humans. Kept short for matching.
  * - `expertiseAreas` are taken directly from each profile's §3 "Core
  *   expertise" line.
+ * - `outcomeSignals` (V2-2) are a second, deliverable/outcome-shaped
+ *   vocabulary — see types.ts's field doc and
+ *   docs/estate/CHAMBER_ACTIVATION_OUTCOME_LAYER_ANALYSIS.md §2/§3. Only
+ *   authored where a real activation gap was found (Finance, Marketing,
+ *   Systems, People & Culture) — empty for the rest, consistent with
+ *   keeping the remaining 21 experts' deeper migration (I-4) deferred.
+ * - `expertCategory` (V2-2) is "generalist" for Strategy, Momentum, and
+ *   Horizons (meta/direction-setting) and "specialist" for everyone else
+ *   — a tiebreak-only input, never a scoring multiplier. See
+ *   docs/estate/CHAMBER_ACTIVATION_OUTCOME_LAYER_ANALYSIS.md §5.2.
+ * - `founderPlainLanguagePhrase` (V2-2) is a short, plain-language phrase
+ *   naming what this expert helps a founder DO — used only when building
+ *   an "insufficient evidence" clarifying question, never in a normal
+ *   hint. See docs/estate/CHAMBER_ACTIVATION_DECISION_TABLE.md.
  * - `supportingRelationships` are curated from each profile's §11
  *   Cross-Chamber Collaboration section, ordered by general relevance —
  *   this order matters (see resolveChamberExpertActivation.ts).
@@ -81,6 +95,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "strategic tradeoffs",
       "vision to weekly action bridge",
     ],
+    expertCategory: "generalist",
+    founderPlainLanguagePhrase: "deciding the direction",
     supportingRelationships: ["SYS", "FIN", "MKT"],
     possibleRelationships: ["PM"],
     intentAffinities: ["decide", "plan", "build"],
@@ -105,7 +121,12 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "sop",
       "system",
       "handoffs fail",
+      "hand off a task",
       "tools multiply",
+      "tools talk to each other",
+      "wing it differently every time",
+      "same steps every time",
+      "explain the process",
     ],
     expertiseAreas: [
       "Repeatable steps and process design",
@@ -117,6 +138,15 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "quality gates",
       "delegation readiness",
     ],
+    outcomeSignals: [
+      "written down how we work",
+      "document how we work",
+      "write down our process",
+      "put our process in writing",
+      "how we do things isn't written down",
+    ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "creating the system",
     supportingRelationships: ["CR"],
     possibleRelationships: ["KMG", "PM"],
     intentAffinities: ["build", "organize", "execute"],
@@ -157,6 +187,9 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "nurture",
       "proof and trust assets",
     ],
+    outcomeSignals: ["how to market it", "how to market this", "get the word out", "figure out marketing"],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "getting customers",
     supportingRelationships: ["STR", "CR"],
     possibleRelationships: ["CNT", "SALES"],
     intentAffinities: ["plan", "build"],
@@ -195,6 +228,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "referrals",
       "repair after misses",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "keeping clients happy",
     supportingRelationships: ["STR", "MKT"],
     possibleRelationships: ["SYS", "SALES", "PC"],
     intentAffinities: ["organize", "execute", "understand", "decide"],
@@ -225,6 +260,16 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "cost of delivery",
       "hire or invest thresholds",
     ],
+    outcomeSignals: [
+      "stuck on pricing",
+      "what to charge",
+      "how much to charge",
+      "figure out pricing",
+      "don't know what to charge",
+      "pricing my offer",
+    ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "sorting out the money",
     supportingRelationships: ["STR", "SALES"],
     possibleRelationships: ["SYS", "PM"],
     intentAffinities: ["decide", "understand"],
@@ -256,6 +301,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "follow-up design",
       "sales pipeline hygiene",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "closing the sale",
     supportingRelationships: ["MKT", "CNT"],
     possibleRelationships: ["CR", "FIN"],
     intentAffinities: ["execute", "decide"],
@@ -288,6 +335,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "format selection",
       "repurposing",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "creating content that connects",
     supportingRelationships: ["MKT", "SALES"],
     possibleRelationships: ["CRE", "STR"],
     intentAffinities: ["build", "execute"],
@@ -322,6 +371,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "progress tracking",
       "risk planning",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "getting the project moving",
     supportingRelationships: ["STR", "SYS"],
     possibleRelationships: ["MOM", "AI"],
     intentAffinities: ["plan", "organize", "execute"],
@@ -353,6 +404,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "prompt or use-case translation",
       "technology sustainability",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "choosing the right tools",
     supportingRelationships: ["SYS", "STR"],
     possibleRelationships: ["PM", "RES"],
     intentAffinities: ["build", "understand", "decide"],
@@ -385,6 +438,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "uncertainty mapping",
       "insight translation",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "researching the answer",
     supportingRelationships: ["STR", "MKT"],
     possibleRelationships: ["AI", "CNT"],
     intentAffinities: ["understand", "learn"],
@@ -416,6 +471,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "creative briefs",
       "launch-ready asset decisions",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "designing how it looks and feels",
     supportingRelationships: ["MKT", "CNT"],
     possibleRelationships: ["STR", "CR"],
     intentAffinities: ["build", "execute"],
@@ -447,6 +504,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "funnel visibility",
       "business signal interpretation",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "understanding what the numbers say",
     supportingRelationships: ["FIN", "MKT"],
     possibleRelationships: ["SALES", "STR"],
     intentAffinities: ["understand", "decide"],
@@ -485,6 +544,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "event communications",
       "experience recovery",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "planning the event itself",
     supportingRelationships: ["MKT", "CR"],
     possibleRelationships: ["PM", "CRE"],
     intentAffinities: ["plan", "organize", "build"],
@@ -515,6 +576,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "aspiration-to-action bridges",
       "constraints and dependencies",
     ],
+    expertCategory: "generalist",
+    founderPlainLanguagePhrase: "seeing where this is headed",
     supportingRelationships: ["STR", "INN"],
     possibleRelationships: ["FIN", "LEAD"],
     intentAffinities: ["reflect", "decide", "plan"],
@@ -545,6 +608,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "learning loops",
       "innovation portfolio discipline",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "testing a new idea",
     supportingRelationships: ["STR", "RES"],
     possibleRelationships: ["DATA", "CRE"],
     intentAffinities: ["build", "decide"],
@@ -579,6 +644,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "archive design",
       "search and recall patterns",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "organizing what you already know",
     supportingRelationships: ["AI", "SYS"],
     possibleRelationships: ["DATA", "STR", "CNT"],
     intentAffinities: ["organize", "build"],
@@ -610,6 +677,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "team communication cadence",
       "founder leadership identity",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "leading and managing people",
     supportingRelationships: ["SYS", "PM"],
     possibleRelationships: ["CR", "STR"],
     intentAffinities: ["decide", "organize"],
@@ -640,6 +709,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "reflective learning",
       "transfer of learning",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "building a real skill",
     supportingRelationships: ["STR", "MOM"],
     possibleRelationships: ["PM", "CNT"],
     intentAffinities: ["learn", "organize"],
@@ -671,6 +742,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "capacity-sensitive action",
       "sustainable consistency",
     ],
+    expertCategory: "generalist",
+    founderPlainLanguagePhrase: "getting unstuck and moving",
     supportingRelationships: ["STR", "PM"],
     possibleRelationships: ["WELL", "SYS"],
     intentAffinities: ["execute", "restore"],
@@ -701,6 +774,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "contact context capture",
       "community participation",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "building real connections",
     supportingRelationships: ["SALES", "PART"],
     possibleRelationships: ["MKT", "CR"],
     intentAffinities: ["execute", "organize"],
@@ -732,6 +807,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "governance basics",
       "exit planning",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "structuring a partnership",
     supportingRelationships: ["NET", "SALES"],
     possibleRelationships: ["FIN", "PM"],
     intentAffinities: ["decide", "plan"],
@@ -765,6 +842,14 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "team norms",
       "culture measurement",
     ],
+    outcomeSignals: [
+      "hire my first team member",
+      "hiring my first employee",
+      "bring on my first hire",
+      "ready to hire someone",
+    ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "hiring and building the team",
     supportingRelationships: ["SYS", "PM"],
     possibleRelationships: ["STR", "WELL"],
     intentAffinities: ["decide", "organize"],
@@ -797,6 +882,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "rehearsal loops",
       "Q&A preparation",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "putting together a talk or pitch",
     supportingRelationships: ["CNT", "SALES"],
     possibleRelationships: ["STR", "CRE"],
     intentAffinities: ["build", "execute"],
@@ -828,6 +915,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "nervous-system-friendly planning",
       "sustainable founder operations",
     ],
+    expertCategory: "specialist",
+    founderPlainLanguagePhrase: "protecting your energy",
     supportingRelationships: ["MOM", "STR"],
     possibleRelationships: ["PC", "PM"],
     intentAffinities: ["restore", "reflect"],
@@ -863,6 +952,12 @@ export function assertChamberExpertRegistryIsWellFormed(): void {
     }
     if (entry.expertiseAreas.length === 0) {
       throw new Error(`Chamber Expert Registry entry ${id} has no expertiseAreas`);
+    }
+    if (!entry.expertCategory) {
+      throw new Error(`Chamber Expert Registry entry ${id} is missing expertCategory (V2-2)`);
+    }
+    if (!entry.founderPlainLanguagePhrase?.trim()) {
+      throw new Error(`Chamber Expert Registry entry ${id} is missing founderPlainLanguagePhrase (V2-2)`);
     }
     for (const related of [...entry.supportingRelationships, ...entry.possibleRelationships]) {
       if (related === id) {

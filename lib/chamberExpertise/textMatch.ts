@@ -72,7 +72,64 @@ export function anyPhraseMatches(phrases: readonly string[], textWords: Set<stri
   return phrases.some((phrase) => phraseMatches(phrase, textWords));
 }
 
+export type TopicMatchResult = {
+  phraseMatch: boolean;
+  keywordMatch: boolean;
+};
+
+/**
+ * Shared by resolveChamberExpertActivation.ts (V1) and
+ * resolveChamberExpertActivationV2.ts — a multi-word signal that matches
+ * is Tier-1 evidence (`phraseMatch`); a single-word signal that matches is
+ * weaker Tier-2 evidence (`keywordMatch`). One tokenizer, one tier
+ * definition, used everywhere phrases are scored against user text.
+ */
+export function computeTopicMatch(
+  signals: readonly string[],
+  textWords: Set<string>,
+): TopicMatchResult {
+  let phraseMatch = false;
+  let keywordMatch = false;
+
+  for (const signal of signals) {
+    const words = significantWords(signal);
+    if (words.length === 0) continue;
+    if (!phraseMatches(signal, textWords)) continue;
+    if (words.length >= 2) {
+      phraseMatch = true;
+    } else {
+      keywordMatch = true;
+    }
+  }
+
+  return { phraseMatch, keywordMatch };
+}
+
 /** Rough, deterministic token estimate for prompt-budget enforcement (~4 chars/token). */
 export function estimateTokens(text: string): number {
   return Math.ceil(text.length / 4);
+}
+
+/**
+ * V2-2: splits raw member text on coordinating conjunctions ("and", "but",
+ * "as well as", "plus") into independent clauses, so a structurally
+ * compound request ("pricing my course AND how to market it") can be
+ * scored clause-by-clause instead of as one bag of words — the only way
+ * to reliably detect a genuine co-primary request. Returns null when
+ * there's nothing to split (a single clause), so callers can fall back to
+ * whole-text scoring without a special case.
+ *
+ * Deliberately simple string splitting, not NLP — every corpus case this
+ * exists for uses a plain, everyday conjunction. See
+ * docs/estate/CHAMBER_ACTIVATION_OUTCOME_LAYER_ANALYSIS.md §4.
+ */
+const CONJUNCTION_SPLIT = /\s+(?:and|but|as well as|plus)\s+/gi;
+
+export function splitOnConjunctions(text: string): readonly string[] | null {
+  const parts = text
+    .split(CONJUNCTION_SPLIT)
+    .map((p) => p.trim())
+    .filter((p) => p.length > 0);
+  if (parts.length < 2) return null;
+  return parts;
 }

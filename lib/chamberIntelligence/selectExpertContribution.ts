@@ -35,10 +35,18 @@ export type SelectExpertContributionInput = {
   role: ChamberIntelligenceRole;
 };
 
-/** Hard per-role token budgets — see architecture doc §3 "Prompt budget". */
+/**
+ * Hard per-role token budgets — see architecture doc §3 "Prompt budget".
+ * `"co-primary"` (V2-2) is deliberately smaller than `"primary"` even
+ * though it gets the same full-depth selection treatment (see
+ * `isPrimary` below) — two co-primary contributions must fit alongside
+ * the mandatory header/footer/bridge inside the same 550-token whole-hint
+ * cap that a single primary + several supporting lines shares today.
+ */
 export const CHAMBER_INTELLIGENCE_BUDGET_TOKENS: Record<ChamberIntelligenceRole, number> = {
   primary: 220,
   supporting: 90,
+  "co-primary": 150,
 };
 
 /** Whole-hint cap across primary + all supporting experts + collaboration bridge + guardrails. */
@@ -82,7 +90,11 @@ export function selectExpertContribution(
 
   const textWords = tokenize(input.userText ?? "");
   const budget = CHAMBER_INTELLIGENCE_BUDGET_TOKENS[input.role];
-  const isPrimary = input.role === "primary";
+  // Co-primary (V2-2) gets the same full-depth facet/framework/question
+  // selection as primary — the decision table's whole point is that
+  // neither co-primary expert is "lighter" than the other. Only the
+  // token budget differs (smaller, so two fit under the whole-hint cap).
+  const isPrimary = input.role === "primary" || input.role === "co-primary";
 
   const facetCandidates = pickThinkingFacets(intelligence.thinkingPattern, isPrimary ? 2 : 1);
 

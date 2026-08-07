@@ -57,3 +57,48 @@ export function chamberCollaborationBridgeLine(
     "sequential handoffs, a panel of experts, or separate voices."
   );
 }
+
+/**
+ * V2-2, `confidence: "co-primary"` only. Deliberately does NOT use
+ * "lead"/"support" language at all — per
+ * CHAMBER_ACTIVATION_MODEL_SPECIFICATION.md §3, co-primary's whole point
+ * is that neither expert is subordinate to the other.
+ */
+export function chamberCoPrimaryBridgeLine(
+  idA: ChamberExpertId,
+  idB: ChamberExpertId,
+): string {
+  const labelA = expertLabel(idA);
+  const labelB = expertLabel(idB);
+  const focusA = focusPhrase(idA);
+  const focusB = focusPhrase(idB);
+  return (
+    `These are equally central, not sequential: this request genuinely needs both ${labelA}'s read ` +
+    `on ${focusA} AND ${labelB}'s read on ${focusB} at the same time. Weave both into one answer with ` +
+    `two lenses — never say "lead with X" or "Y also helps," and never present these as two experts ` +
+    "or a handoff. One voice, two lenses, addressed together."
+  );
+}
+
+/**
+ * V2-2, `confidence: "contested"` only. Replaces the confident
+ * collaboration-bridge framing with an internal note that this is a close
+ * call — per CHAMBER_ACTIVATION_MODEL_SPECIFICATION.md §3, Shari should
+ * hold the answer a little more loosely, never announce uncertainty to
+ * the member, and be ready to pivot smoothly if the founder's next words
+ * point the other way.
+ */
+export function chamberContestedFramingLine(
+  primaryId: ChamberExpertId,
+  runnerUpId: ChamberExpertId,
+): string {
+  const primaryLabel = expertLabel(primaryId);
+  const runnerUpLabel = expertLabel(runnerUpId);
+  return (
+    `This is a close call, held loosely, not a confident read: this reads as ${primaryLabel}-shaped for ` +
+    `now, though it could also turn out to be a ${runnerUpLabel} question. Answer with ${primaryLabel}'s ` +
+    "lens without over-asserting it, and stay genuinely ready to shift naturally if the founder's next " +
+    "words point the other way — never say \"I wasn't sure\" or restart/apologize if it turns out to be " +
+    "the other one, just continue from there."
+  );
+}

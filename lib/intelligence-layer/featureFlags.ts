@@ -12,6 +12,7 @@ const LS_DIAGNOSTICS = "companion-flag-signal-bus-diagnostics";
 const LS_DEV_WARNINGS = "companion-flag-signal-bus-dev-warnings";
 const LS_TRUST_INSPECTOR = "companion-flag-trust-inspector";
 const LS_CHAMBER_INTELLIGENCE_PILOT = "companion-flag-chamber-intelligence-pilot";
+const LS_CHAMBER_ACTIVATION_V2 = "companion-flag-chamber-activation-v2";
 
 function readLocalStorageFlag(key: string): boolean | null {
   if (typeof window === "undefined") return null;
@@ -88,6 +89,21 @@ export function isChamberIntelligencePilotEnabled(): boolean {
   return envTrue("NEXT_PUBLIC_CHAMBER_INTELLIGENCE_PILOT");
 }
 
+/**
+ * Chamber Activation V2 (V2-2) — gates the corrected eligibility rule,
+ * outcomeSignals scoring, generalist tiebreak, and contested/co-primary
+ * detection in resolveChamberExpertActivationV2. Default: false. When
+ * off, chamberExpertiseHintForChat calls V1 (resolveChamberExpertActivation)
+ * exactly as before — zero behavior change. See
+ * docs/estate/CHAMBER_ACTIVATION_MODEL_SPECIFICATION.md and
+ * docs/estate/CHAMBER_ACTIVATION_OUTCOME_LAYER_ANALYSIS.md.
+ */
+export function isChamberActivationV2Enabled(): boolean {
+  const override = readLocalStorageFlag(LS_CHAMBER_ACTIVATION_V2);
+  if (override !== null) return override;
+  return envTrue("NEXT_PUBLIC_CHAMBER_ACTIVATION_V2");
+}
+
 export const PROFILE_LEARNING_FLAG_KEYS = {
   profileLearning: LS_PROFILE_LEARNING,
 } as const;
@@ -98,6 +114,10 @@ export const TRUST_INSPECTOR_FLAG_KEYS = {
 
 export const CHAMBER_INTELLIGENCE_PILOT_FLAG_KEYS = {
   chamberIntelligencePilot: LS_CHAMBER_INTELLIGENCE_PILOT,
+} as const;
+
+export const CHAMBER_ACTIVATION_V2_FLAG_KEYS = {
+  chamberActivationV2: LS_CHAMBER_ACTIVATION_V2,
 } as const;
 
 export const SIGNAL_BUS_FLAG_KEYS = {
