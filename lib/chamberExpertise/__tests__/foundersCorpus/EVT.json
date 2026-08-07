@@ -1,0 +1,92 @@
+[
+  {
+    "text": "I want to plan a two-day ADHD business retreat.",
+    "expectedPrimary": "EVT",
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "The original retreat scenario from the I-2 review. Baseline sanity check.",
+    "source": "review-simulation"
+  },
+  {
+    "text": "I'm hosting a workshop next month and the agenda keeps growing.",
+    "expectedPrimary": "EVT",
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Growing-agenda scenario. Originally mis-activated to Strategy before the review's registry fix (added 'hosting a workshop' / 'agenda keeps growing'). Regression-locks that fix.",
+    "source": "review-simulation"
+  },
+  {
+    "text": "I always crash after events and forget to follow up with people.",
+    "expectedPrimary": "EVT",
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Post-event crash scenario. Originally mis-activated to Sales before the review's registry fix (added 'crash after events' / 'after the event'). Regression-locks that fix. Contrast with cross-expert.json's genuinely ambiguous bare 'follow up' case, which still favors Sales.",
+    "source": "review-simulation"
+  },
+  {
+    "text": "I want to run a webinar but I have no idea how to structure the hour.",
+    "expectedPrimary": "EVT",
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Structural uncertainty framing for a specific event format.",
+    "source": "constructed"
+  },
+  {
+    "text": "I'm planning a launch event and I keep adding more to the agenda out of nerves.",
+    "expectedPrimary": "EVT",
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Anxiety-driven agenda sprawl framing, directly matching the Event Promise Anchor's real-world pattern.",
+    "source": "constructed"
+  },
+  {
+    "text": "I want my guest experience to feel intentional, not chaotic like last time.",
+    "expectedPrimary": "EVT",
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Direct guest-experience framing tied to a past chaotic event.",
+    "source": "constructed"
+  },
+  {
+    "text": "I'm hosting a retreat and I have no idea how to pace the two days so people aren't exhausted.",
+    "expectedPrimary": "EVT",
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Energy/pacing-specific framing for a multi-day retreat.",
+    "source": "constructed"
+  },
+  {
+    "text": "I want to plan an event that actually feels held for people, not just logistics on a schedule.",
+    "expectedPrimary": "EVT",
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Emotional-experience framing rather than a bare logistics request.",
+    "source": "constructed"
+  },
+  {
+    "text": "I'm planning a business retreat and I don't know what to do about hospitality details.",
+    "expectedPrimary": "EVT",
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Hospitality-specific framing for a retreat.",
+    "source": "constructed"
+  },
+  {
+    "text": "I want to host a workshop but I'm scared I'll pack it too full again.",
+    "expectedPrimary": "EVT",
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Self-aware overbuilding framing for a workshop.",
+    "source": "constructed"
+  }
+]

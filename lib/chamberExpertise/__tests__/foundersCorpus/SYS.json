@@ -1,0 +1,92 @@
+[
+  {
+    "text": "I need to create a client onboarding process.",
+    "expectedPrimary": "SYS",
+    "intentCategory": "build",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "The original onboarding scenario from the I-2 review. Baseline sanity check.",
+    "source": "review-simulation"
+  },
+  {
+    "text": "I keep reinventing the same steps every time a new client signs up.",
+    "expectedPrimary": "SYS",
+    "intentCategory": "organize",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Reinventing-steps scenario. Activates correctly today, but matched no framework/ADHD translation trigger — a documented I-2 review finding about framework coverage narrowness, not an activation defect.",
+    "source": "review-simulation"
+  },
+  {
+    "text": "My team doesn't know what to do when I'm not around to explain the process.",
+    "expectedPrimary": "SYS",
+    "intentCategory": "organize",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Bus-factor scenario from the I-2 review.",
+    "source": "review-simulation"
+  },
+  {
+    "text": "Every time I hand off a task, something important gets missed.",
+    "expectedPrimary": "SYS",
+    "intentCategory": "organize",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Handoff failure framing, matching the 'handoffs fail' trigger naturally.",
+    "source": "constructed"
+  },
+  {
+    "text": "I want a checklist so I stop forgetting steps when I'm rushed.",
+    "expectedPrimary": "SYS",
+    "intentCategory": "build",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Direct checklist request tied to a rushed-forgetting pain point.",
+    "source": "constructed"
+  },
+  {
+    "text": "I have five different tools and none of them talk to each other.",
+    "expectedPrimary": "SYS",
+    "intentCategory": "organize",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Tool sprawl framing, matching the 'tools multiply' trigger naturally.",
+    "source": "constructed"
+  },
+  {
+    "text": "I want to document our workflow before I bring on a contractor.",
+    "expectedPrimary": "SYS",
+    "intentCategory": "build",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Forward-looking documentation request tied to a hiring trigger, but framed as a process need first.",
+    "source": "constructed"
+  },
+  {
+    "text": "Every time a new project starts, I wing it differently and can never remember what worked last time.",
+    "expectedPrimary": "SYS",
+    "intentCategory": "organize",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Inconsistency-across-cycles framing, natural restatement of 'same process every time'. First draft of this entry used the phrase 'client onboarding' and legitimately activated Client Relationships instead (that phrase is a genuine CR trigger too) -- reworded to isolate the process-consistency angle from the client-relationship angle so this entry tests Systems specifically.",
+    "source": "constructed"
+  },
+  {
+    "text": "I built an elaborate system once and it fell apart within a month.",
+    "expectedPrimary": "SYS",
+    "intentCategory": "build",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Abandoned-system framing, matching Boredom Survival Design's real-world pattern without naming it.",
+    "source": "constructed"
+  },
+  {
+    "text": "I need a standard process for how we deliver work so quality doesn't depend on my mood.",
+    "expectedPrimary": "SYS",
+    "intentCategory": "build",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Quality-consistency framing tied to the 'standard process' trigger.",
+    "source": "constructed"
+  }
+]

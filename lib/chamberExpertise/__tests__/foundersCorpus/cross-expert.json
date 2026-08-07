@@ -1,0 +1,48 @@
+[
+  {
+    "text": "I keep meaning to follow up but I never do.",
+    "expectedContestedCandidates": ["SALES", "EVT"],
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "contested",
+    "note": "The historical 'follow up' case from the I-2 review, reconstructed as a bare, context-free statement (deliberately without the event-specific words 'crash after events' / 'after the event' that were added to fix the original, more specific sentence — see EVT.json's post-event-crash entry, which now correctly resolves to Events). This bare phrasing is genuinely ambiguous to a human reader (sales follow-up? event follow-up? client follow-up? networking follow-up?) even though V1 today confidently answers Sales. This is exactly the class of case Chamber Activation V2's 'contested' state is designed to flag as a close call rather than a confident answer — this entry exists to make that gap visible and trackable, not to assert V1 already handles it correctly.",
+    "source": "quality-standard-example"
+  },
+  {
+    "text": "I want to launch a digital course but I'm stuck on pricing and how to actually market it.",
+    "expectedCoPrimaryCandidates": ["FIN", "MKT"],
+    "intentCategory": "decide",
+    "estateCategory": "business",
+    "classification": "co-primary",
+    "note": "From the Quality Standard's worked example: pricing (Finance) and positioning/marketing (Marketing) are independently load-bearing here, not one subordinate to the other. If you removed either expert's contribution, the founder still could not launch. V1 has no co-primary concept and will name a single primary; this entry documents which two experts a human reviewer judges should both be full-depth once V2 ships.",
+    "source": "quality-standard-example"
+  },
+  {
+    "text": "I'm about to hire my first team member and I still haven't written down how we actually do the work.",
+    "expectedCoPrimaryCandidates": ["PC", "SYS"],
+    "intentCategory": "build",
+    "estateCategory": "business",
+    "classification": "co-primary",
+    "note": "From the Quality Standard's worked example: hiring readiness (People & Culture) and process documentation for training (Systems) are two separate, equally necessary jobs. A great hire with no documented process fails the same way a documented process with no hiring plan does.",
+    "source": "quality-standard-example"
+  },
+  {
+    "text": "I'm hosting a two-day retreat that's also meant to sell my high-ticket program, and I don't know which part to focus on more.",
+    "expectedCoPrimaryCandidates": ["EVT", "SALES"],
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "co-primary",
+    "note": "From the Quality Standard's worked example: the event IS the sales mechanism here — Events' experience design and Sales' conversion architecture are not sequential, they're the same event designed from two angles at once. Under V1's current registry, Sales may not even reach eligibility for this exact phrasing (no literal Sales trigger word present) — an honest, expected limitation this entry documents rather than hides, pending either a Sales-side vocabulary addition or V2's broader matching.",
+    "source": "quality-standard-example"
+  },
+  {
+    "text": "I need to create a client onboarding process.",
+    "expectedPrimary": "SYS",
+    "expectedSupporting": ["CR"],
+    "intentCategory": "build",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Deliberate CONTRAST case from the Quality Standard §5: this is genuinely single-primary-plus-supporting, not co-primary, because Systems alone still gives a complete answer to 'create a process' — Client Relationships enriches it but isn't independently load-bearing the way Finance/Marketing or People & Culture/Systems are in the co-primary examples above. Included here (not just in SYS.json) specifically to sit beside the co-primary entries as the negative example.",
+    "source": "quality-standard-example"
+  }
+]
