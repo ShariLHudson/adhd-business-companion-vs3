@@ -1192,6 +1192,10 @@ import {
   type FrictionlessActionDecision,
 } from "@/lib/frictionlessActionLayer";
 import {
+  isWorkRecognitionFirstRefusalEnabled,
+  resolveWorkRecognitionFirstRefusal,
+} from "@/lib/estateBrain/workRecognitionFallthrough";
+import {
   clearPendingChoice,
   hasActivePendingChoice,
   isCreateWorkflowContinuation,
@@ -15283,6 +15287,66 @@ export default function CompanionPageClient() {
             navigateEffect.label ?? command.entry?.name ?? null,
           );
           runDirectEstateRoomNavigation(command, trimmed, navLine);
+        }
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
+    // Phase T-1, first slice (2026-08-07) — Work Intent Ownership
+    // Convergence. Feature-flagged (default OFF); see
+    // docs/create-experience/WORK_INTENT_TARGET_ARCHITECTURE.md §6 and
+    // docs/create-experience/WORK_INTENT_OWNERSHIP_AUDIT.md. Gives Work
+    // Recognition first refusal on a work-shaped message, before the
+    // legacy blockedCreateGuard intercept immediately below (the audit's
+    // single highest-blast-radius legacy interceptor — it fully bypasses
+    // resolveFrictionlessAction and opens the legacy content-generator
+    // panel directly). Purely additive: when the flag is off, or when none
+    // of Work Recognition's own existing detectors match, this block is a
+    // no-op and the turn falls through to the exact same precedence order
+    // as before. Exceptions kept outside workRecognitionFallthrough.ts
+    // itself (see that module's own doc comment): explicit navigation is
+    // handled inside resolveWorkRecognitionResumption already; the three
+    // checks below cover an active Chamber/Board conversation and any
+    // already-owned pending flow, so this can never compete with those.
+    if (
+      isWorkRecognitionFirstRefusalEnabled() &&
+      !awaitingUserConfirmationRef.current?.active &&
+      !hasActivePendingChoice() &&
+      !isChamberMemberConversationActive({
+        activeSection: activeSectionRef.current,
+        activeMemberId: activeChamberMemberIdRef.current,
+      })
+    ) {
+      const workRecognitionResult = resolveWorkRecognitionFirstRefusal(
+        trimmed,
+        lastAssistantForPrimary,
+      );
+      if (workRecognitionResult) {
+        lastUserTextRef.current = trimmed;
+        const userMessage: Message = { role: "user", content: trimmed };
+        if (fresh) clearConversation();
+        const voicedWorkRecognitionReply = finalizeMemberFacingAssistantText(
+          workRecognitionResult.message,
+          "work_recognition_first_refusal",
+        );
+        setMessages((prev) => [
+          ...(fresh ? [] : prev),
+          userMessage,
+          { role: "assistant", content: voicedWorkRecognitionReply },
+        ]);
+        setInput("");
+        if (
+          workRecognitionResult.kind === "understood" &&
+          workRecognitionResult.openWorkspace
+        ) {
+          // Same function the Create entrance catalog's own confirm click
+          // calls — no new workspace-opening mechanism (Phase C-2).
+          startFreshCreateFromEstate({
+            artifactType: workRecognitionResult.openWorkspace.artifactType,
+            initialPrompt: workRecognitionResult.openWorkspace.initialPrompt,
+          });
         }
         finishEarlyChatTurn();
         finishLatencyTurn({ localReply: true });

@@ -497,3 +497,67 @@ export function resolveCreateFoundationRecognition(
   );
   return applyStep(step, acknowledgmentFor("create"));
 }
+
+// ---------------------------------------------------------------------------
+// Phase T-1, first slice (2026-08-07) — Work Intent Ownership Convergence.
+// See docs/create-experience/WORK_INTENT_TARGET_ARCHITECTURE.md §6 (smallest
+// safe first change) and docs/create-experience/WORK_INTENT_OWNERSHIP_AUDIT.md
+// (the full precedence map this slice starts converging).
+// ---------------------------------------------------------------------------
+
+/**
+ * Feature flag — defaults OFF (deliberately, unlike this codebase's other
+ * flags such as isConversationStabilizationEnabled/isEstateIntelligenceRuntimeEnabled,
+ * which default to enabled). This flag reorders which of ~9 competing
+ * systems gets first refusal on a work-shaped message — a genuinely
+ * higher-risk change than either of those — so it ships opt-in until
+ * verified, not opt-out.
+ */
+export function isWorkRecognitionFirstRefusalEnabled(): boolean {
+  if (typeof process === "undefined") return false;
+  return process.env.NEXT_PUBLIC_WORK_RECOGNITION_FIRST_REFUSAL === "1";
+}
+
+/**
+ * Called from CompanionPageClient.tsx's handleSend, immediately before the
+ * legacy blockedCreateGuard early-return (WORK_INTENT_OWNERSHIP_AUDIT.md
+ * Part 1, row 3 — the single highest-blast-radius legacy interceptor: it
+ * fully bypasses resolveFrictionlessAction, including every internal branch
+ * inside it, and opens the legacy content-generator panel directly).
+ *
+ * No new classifier, no new engine: tries the exact three entry points
+ * already built and tested this session (Phase A/B/C-1/C-2), in the same
+ * priority order they already use inside resolveFrictionlessActionImpl —
+ * resumption first (an in-flight journey always wins over fresh
+ * recognition, per the AT-5.7 priority fix), then Create Foundation
+ * classification, then shape-based new recognition. Purely additive:
+ * returns null (unchanged behavior) whenever none of the three match —
+ * which already excludes emotional/stuck language (none of the three
+ * detectors recognize "I'm stuck"/"overwhelmed" phrasing as work-shaped)
+ * and dormant-work resume phrasing (SIMPLE_CREATE_VERB_RE/EXPLICIT_VERB_RE
+ * don't match "continue my X" — no create/plan/develop/build/improve verb
+ * — so that text falls through unchanged to the existing registry-driven
+ * resume detection later in the pipeline).
+ *
+ * Caller is responsible for the exceptions that live outside this module's
+ * own detectors — explicit navigation intent, an active Chamber/Board
+ * lock, and any already-owned pending flow (awaiting confirmation, an
+ * active pending-choice menu) — this function does not and should not
+ * duplicate those checks (see WORK_INTENT_TARGET_ARCHITECTURE.md §3,
+ * exceptions E1/E2/E7).
+ */
+export function resolveWorkRecognitionFirstRefusal(
+  userText: string,
+  lastAssistantText: string | null,
+): WorkRecognitionTurnResult | null {
+  const text = userText.trim();
+  if (!text) return null;
+
+  const resumption = resolveWorkRecognitionResumption(text, lastAssistantText);
+  if (resumption) return resumption;
+
+  const foundation = resolveCreateFoundationRecognition(text);
+  if (foundation) return foundation;
+
+  return resolveWorkRecognitionNewRecognition(text);
+}

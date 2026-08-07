@@ -13,9 +13,11 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   clearWorkRecognitionSession,
   detectWorkRecognitionShape,
+  isWorkRecognitionFirstRefusalEnabled,
   isWorkRecognitionMessage,
   resetWorkRecognitionSessionForTests,
   resolveCreateFoundationRecognition,
+  resolveWorkRecognitionFirstRefusal,
   resolveWorkRecognitionNewRecognition,
   resolveWorkRecognitionResumption,
 } from "./workRecognitionFallthrough";
@@ -624,5 +626,111 @@ describe("Phase C-2 — confirmed understanding becomes a work object (transitio
     // "Checklist" — the same catalog label a dropdown pick of "Checklist"
     // would carry into startFreshCreateFromEstate's artifactType.
     expect(opened.openWorkspace?.artifactType).toBe("Checklist");
+  });
+});
+
+describe("Phase T-1 first slice — resolveWorkRecognitionFirstRefusal (golden conversation tests)", () => {
+  // @see docs/create-experience/WORK_INTENT_TARGET_ARCHITECTURE.md §6
+  // @see docs/create-experience/WORK_INTENT_OWNERSHIP_AUDIT.md
+  //
+  // These test the DECISION this function produces for the founder's own
+  // five worked examples — traced against the CURRENT pipeline before
+  // writing these assertions (not assumed), matching what
+  // resolveCreateFoundationClassification/detectWorkRecognitionShape
+  // actually classify each message as today.
+
+  it("Test 1 — process creation: recognizes work, no blocking question, no Strategy routing", () => {
+    const result = resolveWorkRecognitionFirstRefusal(
+      "I want to develop a process for new clients.",
+      null,
+    );
+    expect(result?.kind).toBe("question");
+    if (result?.kind !== "question") return;
+    // Warm acknowledgment + one question — never "what's blocking you" /
+    // "what's getting in your way" / murky-style support-mode language.
+    expect(result.message).not.toMatch(/blocking|getting in (?:your|the) way|murky/i);
+    expect(result.message).not.toMatch(/strategy/i);
+    expect(result.message).toMatch(/love to help you create/i);
+  });
+
+  it("Test 2 — workshop: recognizes workshop creation, asks toward purpose/outcome, never generic advice", () => {
+    const result = resolveWorkRecognitionFirstRefusal(
+      "I want to create a one-hour workshop about the ADHD ecosystem.",
+      null,
+    );
+    expect(result?.kind).toBe("question");
+    if (result?.kind !== "question") return;
+    expect(result.message).toMatch(/what would you like this to accomplish/i);
+    expect(result.message).not.toMatch(/blocking|getting in (?:your|the) way|murky/i);
+    expect(result.session.topic).toBeTruthy();
+  });
+
+  it("Test 3 — event/birthday party: recognizes planning request, never activates Strategy/Momentum", () => {
+    const result = resolveWorkRecognitionFirstRefusal(
+      "I want to plan a birthday party for a staff member.",
+      null,
+    );
+    expect(result?.kind).toBe("question");
+    if (result?.kind !== "question") return;
+    expect(result.message).not.toMatch(/strategy|momentum|business plan/i);
+    expect(result.message).not.toMatch(/blocking|getting in (?:your|the) way/i);
+  });
+
+  it("Test 4 — support mode: stuck/overwhelm language is never claimed, stays available for Friction First", () => {
+    const result = resolveWorkRecognitionFirstRefusal(
+      "I'm stuck trying to figure out my workshop.",
+      null,
+    );
+    // Null is the correct, intended outcome — Work Recognition must never
+    // force a creation workflow onto a genuine support-mode message. The
+    // caller (CompanionPageClient.tsx) falls through unchanged to Friction
+    // First, exactly as it already does today.
+    expect(result).toBeNull();
+  });
+
+  it("Test 5 — resume: never hijacks an existing-work resume request", () => {
+    const result = resolveWorkRecognitionFirstRefusal("Continue my newsletter.", null);
+    // Null — no create/plan/develop/build/improve verb in "continue my X",
+    // so this falls through unchanged to the existing registry-driven
+    // resume detection (lib/activeWorkspaceRegistry), which creates
+    // nothing new and resumes the named work instead.
+    expect(result).toBeNull();
+  });
+
+  it("Build Mode vs Support Mode — the same underlying distinction, stated directly", () => {
+    // Build Mode: recognized, no blocking question.
+    for (const text of [
+      "I want to create a newsletter.",
+      "I want to develop a better onboarding flow.",
+      "I want to plan a retreat.",
+    ]) {
+      const result = resolveWorkRecognitionFirstRefusal(text, null);
+      expect(result, text).not.toBeNull();
+      if (result?.kind === "question") {
+        expect(result.message, text).not.toMatch(/what is getting in your way/i);
+      }
+    }
+    // Support Mode: never claimed here — stays available for the system
+    // that actually owns emotional/stuck turns (Friction First).
+    for (const text of [
+      "I'm stuck.",
+      "I'm overwhelmed.",
+      "I don't know where to start.",
+    ]) {
+      expect(resolveWorkRecognitionFirstRefusal(text, null), text).toBeNull();
+    }
+  });
+
+  it("the feature flag defaults OFF", () => {
+    delete process.env.NEXT_PUBLIC_WORK_RECOGNITION_FIRST_REFUSAL;
+    expect(isWorkRecognitionFirstRefusalEnabled()).toBe(false);
+  });
+
+  it("the feature flag turns on only with the explicit '1' value", () => {
+    process.env.NEXT_PUBLIC_WORK_RECOGNITION_FIRST_REFUSAL = "1";
+    expect(isWorkRecognitionFirstRefusalEnabled()).toBe(true);
+    process.env.NEXT_PUBLIC_WORK_RECOGNITION_FIRST_REFUSAL = "true";
+    expect(isWorkRecognitionFirstRefusalEnabled()).toBe(false);
+    delete process.env.NEXT_PUBLIC_WORK_RECOGNITION_FIRST_REFUSAL;
   });
 });
