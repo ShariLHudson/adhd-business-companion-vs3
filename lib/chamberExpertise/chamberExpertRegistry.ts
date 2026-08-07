@@ -469,6 +469,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "guest experience",
       "webinar",
       "hosting a workshop",
+      "host a workshop",
+      "hosting a retreat",
       "agenda keeps growing",
       "crash after events",
       "after the event",
