@@ -39,6 +39,7 @@
 
 import {
   advanceEntranceUnderstanding,
+  armEntranceUnderstandingHandoff,
   startEntranceUnderstanding,
   startEntranceUnderstandingForCatalogType,
   type EntranceUnderstandingSession,
@@ -230,7 +231,50 @@ export type WorkRecognitionTurnResult =
       message: string;
       session: EntranceUnderstandingSession;
     }
-  | { kind: "understood"; message: string };
+  | {
+      kind: "understood";
+      message: string;
+      /**
+       * Phase C-2 (2026-08-07) — set only once the member has given the
+       * explicit go-ahead after the confirm message (see
+       * CREATE_FOUNDATION_READY_LINE below). Present only for typed
+       * (catalogTypeLabel) sessions — Work Recognition's own untyped path
+       * still never opens a workspace, unchanged from Phase 1. Consumed by
+       * lib/frictionlessActionLayer.ts -> FrictionlessActionDecision's
+       * immediateCreateFoundationOpen -> CompanionPageClient.tsx's
+       * startFreshCreateFromEstate — the SAME function the Create entrance
+       * catalog's own confirm click already calls.
+       */
+      openWorkspace?: { artifactType: string; initialPrompt: string };
+    };
+
+// Fixed, markable closing line for a typed (Create Foundation) confirm —
+// distinct from the generic "When you're ready..." line below so a
+// follow-up reply can be recognized as answering THIS specific prompt.
+// The 130 One Creation Rule / entranceUnderstanding.ts's own header
+// comment ("this module only ever returns the classifier's own
+// confirm/clarify outcomes — it cannot open Work") means an explicit
+// member gesture is required before startFreshCreateFromEstate runs — this
+// line, and the member's reply to it, is that gesture's chat-side
+// equivalent to CreateEstateEntrancePanel.tsx's confirm button click.
+const CREATE_FOUNDATION_READY_LINE =
+  "Say the word and I'll get your workspace ready.";
+
+function isCreateFoundationReadyMessage(text: string): boolean {
+  return text.includes(CREATE_FOUNDATION_READY_LINE);
+}
+
+// Deliberately NOT importing frictionlessActionLayer.ts's own
+// isFrictionlessAffirmation/AFFIRMATION_RE — that file imports FROM this
+// one (resolveCreateFoundationRecognition et al.), so importing back would
+// be circular. A small, self-contained pattern, same spirit as the other
+// locally-defined shape regexes in this file.
+const SIMPLE_AFFIRMATION_RE =
+  /^(?:yes(?:\s+please)?|yep|yeah|yup|sure|ok(?:ay)?|please|do that|let'?s do (?:it|that)|go ahead|sounds good|that works|start|create it|open it)\.?$/i;
+
+function isSimpleAffirmation(text: string): boolean {
+  return SIMPLE_AFFIRMATION_RE.test(text.trim());
+}
 
 function messageForConfirmLikeOutcome(
   outcome: Extract<
@@ -271,8 +315,27 @@ function applyStep(
     return { kind: "question", message, session: step.session };
   }
 
-  // classify — recognition + confirmation only. Never opens a workspace;
-  // that convergence is Step 2, explicitly deferred.
+  // Phase C-2 — a typed (Create Foundation) confirm is one explicit "yes"
+  // away from opening the workspace. Keep the session alive (do not clear)
+  // so resolveWorkRecognitionResumption can recognize that reply next
+  // turn; the untyped Work Recognition path below is completely unchanged.
+  if (step.session.catalogTypeLabel && step.outcome.kind === "confirm") {
+    saveWorkRecognitionSession(step.session);
+    const message = [
+      step.acknowledgment,
+      messageForConfirmLikeOutcome(step.outcome),
+      CREATE_FOUNDATION_READY_LINE,
+    ]
+      .filter((p) => Boolean(p?.trim()))
+      .join("\n\n");
+    return { kind: "understood", message };
+  }
+
+  // classify — Work Recognition's own untyped path. Recognition +
+  // confirmation only, never opens a workspace (unchanged from Phase 1 —
+  // this module still has no way to know what the member meant well
+  // enough to open Work on its own for a non-catalog, non-classified
+  // request).
   clearWorkRecognitionSession();
   const message = [
     step.acknowledgment,
@@ -315,7 +378,33 @@ export function resolveWorkRecognitionResumption(
 ): WorkRecognitionTurnResult | null {
   const text = userText.trim();
   if (!text) return null;
-  if (!lastAssistantText || !isWorkRecognitionMessage(lastAssistantText)) {
+  if (!lastAssistantText) return null;
+
+  // Phase C-2 — the explicit "yes" to a typed confirm's ready-line is what
+  // actually arms the handoff and opens the workspace. Checked BEFORE the
+  // question-marker check below: the ready-line is not one of
+  // DISCOVERY_QUESTIONS' prompts, so isWorkRecognitionMessage would reject
+  // it otherwise. A non-affirmative reply (or no stored session) falls
+  // through to null — normal chat routing handles it, and the session is
+  // left in place rather than force-opened or silently discarded.
+  if (isCreateFoundationReadyMessage(lastAssistantText)) {
+    const stored = loadWorkRecognitionSession();
+    if (stored?.catalogTypeLabel && isSimpleAffirmation(text)) {
+      armEntranceUnderstandingHandoff(stored);
+      clearWorkRecognitionSession();
+      return {
+        kind: "understood",
+        message: `Opening your ${stored.catalogTypeLabel} now.`,
+        openWorkspace: {
+          artifactType: stored.catalogTypeLabel,
+          initialPrompt: stored.originalText || "",
+        },
+      };
+    }
+    return null;
+  }
+
+  if (!isWorkRecognitionMessage(lastAssistantText)) {
     return null;
   }
   const stored = loadWorkRecognitionSession();

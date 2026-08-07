@@ -531,6 +531,35 @@ export type FrictionlessActionDecision = {
   immediateCartographersStudioOpen?: boolean;
   immediateCreateOpen?: ImmediateCreateOpenPayload;
   immediateCreateProjectOpen?: ImmediateCreateProjectOpenPayload;
+  /**
+   * Phase C-2 (2026-08-07) — set once a chat-originated Create Foundation
+   * conversation (lib/estateBrain/workRecognitionFallthrough.ts's
+   * resolveCreateFoundationRecognition / resolveWorkRecognitionResumption)
+   * receives its explicit go-ahead. Consumed by
+   * app/companion/CompanionPageClient.tsx by calling
+   * startFreshCreateFromEstate — the SAME function the Create entrance
+   * catalog's own confirm click already calls. No new workspace-opening
+   * mechanism.
+   */
+  immediateCreateFoundationOpen?: { artifactType: string; initialPrompt: string };
+  /**
+   * Phase C-2 (2026-08-07) — true for EVERY Work Recognition / Create
+   * Foundation decision (both the question and understood kinds), not
+   * only the moment it opens a workspace. Found via live verification:
+   * lib/shariAnswerFirst/turnAuthority.ts independently classifies many
+   * explicit "I want to create X" messages as turn owner "create_execution"
+   * (decision.explicitCreationRequested) BEFORE frictionless's own
+   * localReply/immediate-open handlers ever run — CompanionPageClient.tsx's
+   * frictionlessBlockedByTurnAuthority gate skips presentFrictionlessLocalReply
+   * entirely unless frictionlessIsCreatePresentation is true, and that check
+   * previously only recognized category === "universal_creation". Without
+   * this marker, Work Recognition's own reply (including this whole
+   * journey, not just C-2's open step) was silently replaced by the legacy
+   * content-generator workspace's own arrival message for the exact
+   * phrasings this session's Phase B/C-1/C-2 work targets — a pre-existing
+   * gap this discovery surfaced, not something introduced here.
+   */
+  isWorkRecognitionJourney?: boolean;
   immediateMomentumOpen?: ImmediateMomentumOpenPayload;
   immediateResearchOpen?: ImmediateResearchOpenPayload;
   immediateEstateCoachingOpen?: ImmediateEstateCoachingOpenPayload;
@@ -2090,6 +2119,8 @@ function buildWorkRecognitionDecision(
   result: NonNullable<ReturnType<typeof resolveWorkRecognitionResumption>>,
   routing: IntentRoutingDecision,
 ): FrictionlessActionDecision {
+  const openWorkspace =
+    result.kind === "understood" ? result.openWorkspace : undefined;
   return {
     category: "estate_discovery",
     suppressRelationship: true,
@@ -2098,12 +2129,16 @@ function buildWorkRecognitionDecision(
     responseHint:
       result.kind === "question"
         ? "WORK RECOGNITION: understanding conversation in progress — ask ONE thoughtful question, never a form."
-        : "WORK RECOGNITION: understanding complete — recognition and confirmation only, do not open a workspace.",
+        : openWorkspace
+          ? "WORK RECOGNITION: understanding complete, member confirmed — opening the workspace."
+          : "WORK RECOGNITION: understanding complete — recognition and confirmation only, do not open a workspace.",
     localReply: result.message,
     pendingAction: null,
     toolSuggestion: null,
     workspaceOffer: null,
     intentRouting: routing,
+    immediateCreateFoundationOpen: openWorkspace,
+    isWorkRecognitionJourney: true,
   };
 }
 

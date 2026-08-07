@@ -20,6 +20,7 @@ import {
   resolveWorkRecognitionResumption,
 } from "./workRecognitionFallthrough";
 import {
+  consumeEntranceUnderstandingHandoff,
   resetEntranceUnderstandingForTests,
   startEntranceUnderstandingForCatalogType,
 } from "@/lib/createEstate/entranceUnderstanding";
@@ -510,5 +511,118 @@ describe("Phase C-1 — Create Foundation convergence (resolveCreateFoundationRe
     expect(resolveCreateFoundationRecognition("")).toBeNull();
     expect(resolveCreateFoundationRecognition("How are you today?")).toBeNull();
     expect(resolveCreateFoundationRecognition("What is Loom?")).toBeNull();
+  });
+});
+
+describe("Phase C-2 — confirmed understanding becomes a work object (transition map)", () => {
+  // @see docs/create-experience/CREATE_FOUNDATION_TRANSITION_MAP.md
+  // @see docs/create-experience/CREATE_FOUNDATION_PHASE_C_PLAN.md
+
+  /** Walk a typed Create Foundation conversation to its ready-to-open confirm. */
+  function walkToReadyLine(openingText: string): {
+    lastMessage: string;
+  } {
+    let step = resolveCreateFoundationRecognition(openingText);
+    if (step?.kind !== "question") throw new Error("expected a question");
+    let lastMessage = step.message;
+    for (let i = 0; i < 8 && step?.kind === "question"; i++) {
+      const next = resolveWorkRecognitionResumption(
+        "A clear, simple answer for this step.",
+        lastMessage,
+      );
+      if (!next) throw new Error("expected the conversation to continue");
+      step = next;
+      lastMessage = step.message;
+    }
+    if (step?.kind !== "understood") {
+      throw new Error("expected the conversation to reach confirm");
+    }
+    return { lastMessage };
+  }
+
+  it("reaching the confirm step alone does NOT open a workspace — an explicit 'yes' is still required (130 One Creation Rule)", () => {
+    const { lastMessage } = walkToReadyLine(
+      "I want to create a newsletter.",
+    );
+    expect(lastMessage).toMatch(/say the word/i);
+    // No workspace open payload yet — confirm-only, matching
+    // entranceUnderstanding.ts's own "cannot open Work" header comment.
+    expect(consumeEntranceUnderstandingHandoff()).toBeNull();
+  });
+
+  it("an explicit 'yes' after the ready-line opens the workspace: correct artifactType + initialPrompt, Working Memory armed", () => {
+    const { lastMessage } = walkToReadyLine(
+      "I want to create a newsletter.",
+    );
+    const opened = resolveWorkRecognitionResumption("yes", lastMessage);
+    expect(opened?.kind).toBe("understood");
+    if (opened?.kind !== "understood") return;
+    expect(opened.openWorkspace).toEqual({
+      artifactType: "Newsletter",
+      initialPrompt: "I want to create a newsletter.",
+    });
+    expect(opened.message).toMatch(/opening your newsletter now/i);
+
+    // Working Memory: the SAME one-shot handoff CreateEstateEntrancePanel.tsx's
+    // own confirm click arms is now armed for consumption by
+    // startFreshCreateFromEstate — proving the answers gathered in chat are
+    // not lost, exactly like the catalog path.
+    const handoff = consumeEntranceUnderstandingHandoff();
+    expect(handoff).not.toBeNull();
+    expect(Object.keys(handoff?.answers ?? {}).length).toBeGreaterThan(0);
+    // One-shot — a second read is empty, matching the catalog path's own
+    // "consuming clears" contract.
+    expect(consumeEntranceUnderstandingHandoff()).toBeNull();
+  });
+
+  it("a non-affirmative reply to the ready-line does not open the workspace, and does not discard the session", () => {
+    const { lastMessage } = walkToReadyLine("I want to create a proposal.");
+    const notYet = resolveWorkRecognitionResumption(
+      "Actually wait, what should I include?",
+      lastMessage,
+    );
+    expect(notYet).toBeNull();
+    expect(consumeEntranceUnderstandingHandoff()).toBeNull();
+    // The session survived — a genuine "yes" afterward still works.
+    const opened = resolveWorkRecognitionResumption("yes", lastMessage);
+    expect(opened?.kind).toBe("understood");
+    if (opened?.kind !== "understood") return;
+    expect(opened.openWorkspace?.artifactType).toBe("Proposal");
+  });
+
+  it("the untyped Work Recognition path (develop/build/improve) still NEVER opens a workspace — Phase 1's boundary is unchanged", () => {
+    let step = resolveWorkRecognitionNewRecognition(
+      "I need help organizing my client files.",
+    );
+    if (step?.kind !== "question") throw new Error("expected a question");
+    let lastMessage = step.message;
+    for (let i = 0; i < 8 && step?.kind === "question"; i++) {
+      const next = resolveWorkRecognitionResumption(
+        "A clear folder structure everyone follows",
+        lastMessage,
+      );
+      if (!next) throw new Error("expected the conversation to continue");
+      step = next;
+      if (step.kind === "question") lastMessage = step.message;
+    }
+    expect(step?.kind).toBe("understood");
+    if (step?.kind !== "understood") return;
+    expect(step.message).not.toMatch(/say the word/i);
+    expect(step.message).toContain("When you're ready");
+    expect(step.openWorkspace).toBeUndefined();
+    // Nothing was armed — this path structurally cannot open Work.
+    expect(consumeEntranceUnderstandingHandoff()).toBeNull();
+  });
+
+  it("doorway convergence still holds after the confirm-to-open change: chat and catalog produce the same artifactType", () => {
+    const { lastMessage } = walkToReadyLine(
+      "I want to create a checklist for onboarding.",
+    );
+    const opened = resolveWorkRecognitionResumption("yes please", lastMessage);
+    expect(opened?.kind).toBe("understood");
+    if (opened?.kind !== "understood") return;
+    // "Checklist" — the same catalog label a dropdown pick of "Checklist"
+    // would carry into startFreshCreateFromEstate's artifactType.
+    expect(opened.openWorkspace?.artifactType).toBe("Checklist");
   });
 });

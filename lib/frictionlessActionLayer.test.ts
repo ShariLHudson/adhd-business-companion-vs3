@@ -378,6 +378,41 @@ describe("frictionlessActionLayer", () => {
     expect(setup.localReply).not.toMatch(/murky/i);
   });
 
+  it("newsletter Create Foundation, end-to-end through resolveFrictionlessAction: questions -> confirm -> explicit yes -> immediateCreateFoundationOpen", () => {
+    // Phase C-2 (2026-08-07) — @see docs/create-experience/CREATE_FOUNDATION_TRANSITION_MAP.md
+    let decision = resolveFrictionlessAction({
+      userText: "I need to create a newsletter",
+      currentTurn: 1,
+    });
+    expect(decision.immediateCreateFoundationOpen).toBeUndefined();
+    let lastAssistantText = decision.localReply ?? "";
+
+    // Walk the 5-question conversation to its confirm/ready-line.
+    for (let turn = 2; turn < 10; turn++) {
+      decision = resolveFrictionlessAction({
+        userText: "A clear, simple answer for this step.",
+        currentTurn: turn,
+        lastAssistantText,
+      });
+      lastAssistantText = decision.localReply ?? "";
+      if (/say the word/i.test(lastAssistantText)) break;
+    }
+    expect(lastAssistantText).toMatch(/say the word/i);
+    expect(decision.immediateCreateFoundationOpen).toBeUndefined();
+
+    // The explicit "yes" — this is what actually opens the workspace.
+    const opened = resolveFrictionlessAction({
+      userText: "yes",
+      currentTurn: 10,
+      lastAssistantText,
+    });
+    expect(opened.immediateCreateFoundationOpen).toEqual({
+      artifactType: "Newsletter",
+      initialPrompt: "I need to create a newsletter",
+    });
+    expect(opened.localReply).toMatch(/opening your newsletter now/i);
+  });
+
   it("yes-clear-my-mind resolves brain-dump pending", () => {
     const setup = resolveFrictionlessAction({
       userText: "I have too many ideas.",

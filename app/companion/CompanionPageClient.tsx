@@ -14376,6 +14376,7 @@ export default function CompanionPageClient() {
       blockImmediateForAnswerFirst &&
       (frictionlessAction.immediateCreateOpen ||
         frictionlessAction.immediateCreateProjectOpen ||
+        frictionlessAction.immediateCreateFoundationOpen ||
         frictionlessAction.immediateResearchOpen ||
         frictionlessAction.immediateEstateHowToGuideOpen ||
         frictionlessAction.immediateVisualOpen ||
@@ -14395,7 +14396,8 @@ export default function CompanionPageClient() {
     const frictionlessCreateOwned =
       frictionlessAction.category === "universal_creation" ||
       Boolean(frictionlessAction.immediateCreateOpen) ||
-      Boolean(frictionlessAction.immediateCreateProjectOpen);
+      Boolean(frictionlessAction.immediateCreateProjectOpen) ||
+      Boolean(frictionlessAction.immediateCreateFoundationOpen);
     const frictionlessNavOnly = Boolean(
       frictionlessAction.immediateEstatePlaceNavigate ||
         frictionlessAction.immediateVisualOpen ||
@@ -14495,6 +14497,27 @@ export default function CompanionPageClient() {
       completeImmediateCreateProjectOpen(
         frictionlessAction.immediateCreateProjectOpen,
       );
+      setInput("");
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return true;
+    }
+
+    // Phase C-2 (2026-08-07) — Create Foundation convergence. Reuses
+    // startFreshCreateFromEstate unchanged: the SAME function the Create
+    // entrance catalog's own confirm click calls (see
+    // docs/create-experience/CREATE_FOUNDATION_TRANSITION_MAP.md). No new
+    // persistence or workspace model — this is the tail of the existing
+    // confirm-to-open flow, triggered from chat instead of a button click.
+    if (
+      !chamberMemberConversationLocked &&
+      frictionlessAction.immediateCreateFoundationOpen &&
+      !blockImmediateForAnswerFirst
+    ) {
+      startFreshCreateFromEstate({
+        artifactType: frictionlessAction.immediateCreateFoundationOpen.artifactType,
+        initialPrompt: frictionlessAction.immediateCreateFoundationOpen.initialPrompt,
+      });
       setInput("");
       finishEarlyChatTurn();
       finishLatencyTurn({ localReply: true });
@@ -18999,8 +19022,21 @@ export default function CompanionPageClient() {
     const frictionlessIsCreatePresentation =
       frictionlessAction.category === "universal_creation" &&
       turnAuthority.allowCreatePresentation;
+    // Phase C-2 (2026-08-07) — found via live verification: turnAuthority
+    // independently classifies explicit "I want to create X" text as owner
+    // "create_execution" (decision.explicitCreationRequested) before this
+    // gate is even reached, for the same phrasings Work Recognition (Phase
+    // B/C-1/C-2) targets. Without this, Work Recognition's own reply —
+    // including its questions, not just C-2's open step — was silently
+    // replaced by the legacy content-generator workspace's arrival
+    // message. Kept as a SEPARATE flag from frictionlessIsCreatePresentation
+    // (below) so the "universal_creation_present" annotation stays accurate
+    // to what actually happened.
+    const frictionlessBypassesTurnAuthority =
+      frictionlessIsCreatePresentation ||
+      Boolean(frictionlessAction.isWorkRecognitionJourney);
     const frictionlessBlockedByTurnAuthority =
-      !frictionlessIsCreatePresentation &&
+      !frictionlessBypassesTurnAuthority &&
       !turnAuthority.allowOverwhelmFrictionless &&
       (turnAuthority.owner === "create_execution" ||
         Boolean(loadUniversalCreationSession()));
