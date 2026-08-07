@@ -50,13 +50,14 @@ export {
 } from "./canonicalStatus";
 
 export {
-  ACTIVE_WORKSPACE_RESUME_RE,
   buildActiveWorkspaceClarifyGuidance,
   buildActiveWorkspaceResumeGuidance,
   findActiveWorkspaceByHumanTitle,
   isActiveWorkspaceResumeRequest,
   matchActiveWorkspaceResume,
   matchActiveWorkspaceResumeDetailed,
+  referencesCreationType,
+  resetTypeReferenceCacheForTests,
   type ActiveWorkspaceMatchResult,
 } from "./matchResumeIntent";
 
