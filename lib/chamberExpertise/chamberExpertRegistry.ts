@@ -140,6 +140,11 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "audience",
       "campaign",
       "launch",
+      "nobody knows i exist",
+      "what to post",
+      "know what to post",
+      "wipes me out",
+      "launch fatigue",
     ],
     expertiseAreas: [
       "Audience clarity",
@@ -463,6 +468,10 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "launch event",
       "guest experience",
       "webinar",
+      "hosting a workshop",
+      "agenda keeps growing",
+      "crash after events",
+      "after the event",
     ],
     expertiseAreas: [
       "Attendee transformation",
