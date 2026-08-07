@@ -116,3 +116,15 @@ Core principles: Intelligence Paradox (simple surface, deep backend), Companion 
 
 Before every sprint: What is this object? What might it become? Which engines benefit? What metadata exists now unused? Will this support unimagined features?
 <!-- END:intelligence-ready-architecture -->
+
+<!-- BEGIN:subagent-safety-rule -->
+# Subagent Safety Rule (BINDING)
+
+**Read-only investigations — including every subagent dispatched to explore, trace, or audit this repo — may never run destructive or working-tree-mutating git commands.** No exceptions for "I'll undo it after."
+
+Forbidden in a read-only investigation: `git checkout <ref> -- <path>` (or bare `git checkout <ref>`), `git reset --hard`, `git reset --mixed`/`--soft` past HEAD, `git stash` (pop/drop/apply), `git clean`, `git restore`, or any command that writes to the working tree or index.
+
+Read-only investigations must use only: `git status`, `git diff`, `git show <ref>:<path>` (inspect an old file's content without checking it out), `git log` / `git log -p`, and ordinary `grep`/file-read tools. To compare against a baseline, use a separate `git worktree` (see `git-stash-baseline-risk` memory) — never mutate the shared working tree, which may hold another session's uncommitted, unstaged edits that git has no copy of and cannot recover.
+
+This rule exists because a subagent's `git checkout <old-sha> -- .` followed by `git reset --hard HEAD` permanently destroyed another session's uncommitted documentation edits and an untracked file (2026-08-06) — uncommitted changes were never in git's object store, so there was no way to recover them afterward.
+<!-- END:subagent-safety-rule -->
