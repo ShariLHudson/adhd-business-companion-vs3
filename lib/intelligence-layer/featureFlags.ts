@@ -11,6 +11,7 @@ const LS_DEDUP = "companion-flag-signal-bus-dedup";
 const LS_DIAGNOSTICS = "companion-flag-signal-bus-diagnostics";
 const LS_DEV_WARNINGS = "companion-flag-signal-bus-dev-warnings";
 const LS_TRUST_INSPECTOR = "companion-flag-trust-inspector";
+const LS_CHAMBER_INTELLIGENCE_PILOT = "companion-flag-chamber-intelligence-pilot";
 
 function readLocalStorageFlag(key: string): boolean | null {
   if (typeof window === "undefined") return null;
@@ -74,12 +75,29 @@ export function isTrustInspectorEnabled(): boolean {
   return envTrue("NEXT_PUBLIC_TRUST_INSPECTOR");
 }
 
+/**
+ * Chamber Intelligence pilot (I-1/I-2) — gates deep per-expert selection
+ * (frameworks, ADHD translations, knowledge-source flags) for Marketing,
+ * Systems, and Events only. Default: false. When off, chamberExpertiseHintForChat
+ * behaves exactly as it did before this pilot (thinking pattern + themes only).
+ * See docs/estate/CHAMBER_INTELLIGENCE_SYSTEM_ARCHITECTURE.md.
+ */
+export function isChamberIntelligencePilotEnabled(): boolean {
+  const override = readLocalStorageFlag(LS_CHAMBER_INTELLIGENCE_PILOT);
+  if (override !== null) return override;
+  return envTrue("NEXT_PUBLIC_CHAMBER_INTELLIGENCE_PILOT");
+}
+
 export const PROFILE_LEARNING_FLAG_KEYS = {
   profileLearning: LS_PROFILE_LEARNING,
 } as const;
 
 export const TRUST_INSPECTOR_FLAG_KEYS = {
   trustInspector: LS_TRUST_INSPECTOR,
+} as const;
+
+export const CHAMBER_INTELLIGENCE_PILOT_FLAG_KEYS = {
+  chamberIntelligencePilot: LS_CHAMBER_INTELLIGENCE_PILOT,
 } as const;
 
 export const SIGNAL_BUS_FLAG_KEYS = {
