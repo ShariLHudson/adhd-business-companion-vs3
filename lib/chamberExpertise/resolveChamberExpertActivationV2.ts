@@ -51,7 +51,25 @@ const SCORE = {
   outcomeMatch: 35,
   intent: 25,
   estateCategory: 20,
-  legacyExpertId: 40,
+  /**
+   * Deliberately equal to topicPhrase/outcomeMatch (35), not V1's 40.
+   *
+   * Finding (live end-to-end test, "I want to create a two-day ADHD
+   * business retreat."): Estate Brain's capability-level legacyExpertIds
+   * are, for broad capabilities like "business.strategy", a FIXED set of
+   * 3 generic roles handed to every request in that bucket — not
+   * per-request evidence the way a genuine text-phrase match is. At the
+   * old weight (40 + estateCategory's 20 = 60), that fixed list
+   * systematically outranked Events' genuine "two day retreat" phrase
+   * match (35 + 20 = 55), so a request that should activate Events
+   * activated Strategy/Marketing/Sales instead, with Events entirely
+   * absent from supporting/possible. Equal weighting restores the V2
+   * proposal's own original framing ("already Tier-1-STRENGTH today" —
+   * i.e. equally strong, never stronger) and, combined with the tiebreak
+   * reordering below, lets a real match on THIS request's own words
+   * outrank a generic capability-level default when the two are close.
+   */
+  legacyExpertId: 35,
 } as const;
 
 /** CHAMBER_ACTIVATION_MODEL_SPECIFICATION.md §2.1 — calibrated against observed scores, not arbitrary. */
@@ -150,18 +168,34 @@ function tier1EvidenceCount(signal: ChamberExpertSignalResult): number {
   return (signal.topicPhraseMatch ? 1 : 0) + (signal.outcomeMatch ? 1 : 0) + (signal.estateExpertIdMatch ? 1 : 0);
 }
 
+function hasGenuineTextEvidence(signal: ChamberExpertSignalResult): boolean {
+  return Boolean(signal.topicPhraseMatch) || Boolean(signal.outcomeMatch);
+}
+
 /**
- * Exact tiebreak order per CHAMBER_ACTIVATION_MODEL_SPECIFICATION.md §2.3,
- * with the generalist-deprioritization step inserted per
- * CHAMBER_ACTIVATION_OUTCOME_LAYER_ANALYSIS.md §5.2. Array order is never
- * an input — the id-alphabetical fallback at the end only fires when
- * every other criterion is truly, fully tied, and exists purely for
- * deterministic output, not as a relevance judgment.
+ * Tiebreak order per CHAMBER_ACTIVATION_MODEL_SPECIFICATION.md §2.3 and
+ * CHAMBER_ACTIVATION_OUTCOME_LAYER_ANALYSIS.md §5.2's generalist step,
+ * with one correction from the same live test that motivated the
+ * legacyExpertId score change above: genuine text evidence (a real
+ * phrase/outcome match against THIS request's own words) is checked
+ * BEFORE legacy-ID-only evidence, not after. A legacy expert ID match
+ * with no text evidence at all is exactly the "generic capability
+ * default" case that must not beat a candidate who is actually named in
+ * the request. When a candidate has BOTH, it still wins either way, so
+ * this only changes the outcome when the two forms of evidence disagree
+ * about who's really being asked about. Array order is never an input —
+ * the id-alphabetical fallback at the end only fires when every other
+ * criterion is truly, fully tied, and exists purely for deterministic
+ * output, not as a relevance judgment.
  */
 function tiebreak(
   a: ChamberExpertSignalResult,
   b: ChamberExpertSignalResult,
 ): ChamberExpertId {
+  const textA = hasGenuineTextEvidence(a);
+  const textB = hasGenuineTextEvidence(b);
+  if (textA !== textB) return textA ? a.id : b.id;
+
   if (a.estateExpertIdMatch !== b.estateExpertIdMatch) {
     return a.estateExpertIdMatch ? a.id : b.id;
   }
@@ -295,7 +329,16 @@ export function resolveChamberExpertActivationV2(
   );
   const signalsById = new Map(signals.map((s) => [s.id, s] as const));
 
-  const eligible = signals.filter(isEligibleV2).sort((a, b) => b.score - a.score);
+  // Never let array (registry) order break a score tie — that is exactly
+  // the "contentless tie, resolved by array position" failure mode this
+  // whole delivery exists to close (CHAMBER_ACTIVATION_OUTCOME_LAYER_ANALYSIS.md
+  // §0). Equal scores are resolved by the same principled tiebreak used
+  // for the top-vs-runnerUp decision below, not by whichever entry
+  // happens to appear first in CHAMBER_EXPERT_REGISTRY.
+  const eligible = signals.filter(isEligibleV2).sort((a, b) => {
+    if (a.score !== b.score) return b.score - a.score;
+    return tiebreak(a, b) === a.id ? -1 : 1;
+  });
 
   if (eligible.length === 0) {
     const weakHints = signals
@@ -361,6 +404,11 @@ export function resolveChamberExpertActivationV2(
   // 3. Contested: close race, but not both strong — genuine ambiguity, not dual strength.
   if (runnerUp && marginRatio < CONTESTED_MARGIN_RATIO) {
     const primaryId = tiebreak(top, runnerUp);
+    // Expose whichever of the two was NOT chosen — tiebreak can pick
+    // either side, so this must never just default to runnerUp.id (that
+    // was a real bug: it could equal primaryId when tiebreak swaps the
+    // winner, making primary and runnerUp the same expert).
+    const exposedRunnerUpId = primaryId === top.id ? runnerUp.id : top.id;
     const { supporting, possible } = buildSupportingAndPossible(primaryId, signalsById);
     return {
       primary: primaryId,
@@ -369,7 +417,7 @@ export function resolveChamberExpertActivationV2(
       confidence: "contested",
       signals,
       coPrimary: null,
-      runnerUp: runnerUp.id,
+      runnerUp: exposedRunnerUpId,
       clarifyingQuestion: null,
     };
   }

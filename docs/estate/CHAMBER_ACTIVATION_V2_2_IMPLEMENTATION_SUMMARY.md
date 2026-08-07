@@ -56,7 +56,21 @@
 - Full project test suite: no new failures attributable to this change (one pre-existing, unrelated failure in `estateArrivalExperience.test.ts` confirmed via `git stash` to predate this work).
 - `tsc --noEmit` and `eslint` clean on all changed files.
 
-## 5. Still deferred (unchanged from the model specification)
+## 5. Combined-experience validation (post-implementation, live pipeline test)
+
+Ran the exact production call path (`resolveIntentRouting` → `resolveEstateIntelligenceRoute` → `resolveChamberExpertActivationV2` → `chamberExpertiseHintForChat`, matching `CompanionPageClient.tsx`'s own call site) against a real request: *"I want to create a two-day ADHD business retreat."* This surfaced and fixed three real defects the corpus (which never exercises `legacyExpertIds`) could not have caught:
+
+1. **`runnerUp` exposure bug** — in the contested branch, `tiebreak(top, runnerUp)` can pick either candidate as primary, but the code always exposed `runnerUp.id` regardless, so `primary` and `runnerUp` could end up identical. Fixed: expose whichever of the two was NOT chosen.
+2. **Array order breaking score ties** — `eligible.sort((a,b) => b.score - a.score)` left equal scores in registry order (a stable sort), silently reintroducing the exact "array order as a tiebreak" failure mode this whole delivery exists to eliminate. Fixed: ties are now resolved by the same principled `tiebreak()` function used everywhere else.
+3. **Legacy expert ID over-weighting** — Estate Brain's capability-level `legacyExpertIds` are, for broad capabilities like `business.strategy`, a **fixed set of 3 generic roles** (`business-strategist`, `marketing-expert`, `sales-expert`) handed to every request in that bucket, not per-request evidence. At the original weight (40 + estateCategory's 20 = 60), that fixed list systematically outranked Events' genuine `"two day retreat"` phrase match (35 + 20 = 55) — Strategy/Marketing/Sales activated and Events was entirely absent, for a request that is unambiguously about planning an event. Fixed two ways: (a) `SCORE.legacyExpertId` reduced from 40 to 35 — equal to a genuine phrase match, matching the V2 proposal's own original framing ("already Tier-1-*strength*", not stronger; V1's `SCORE.legacyExpertId` is untouched at 40); (b) the tiebreak order now checks genuine text evidence (`topicPhraseMatch`/`outcomeMatch`) *before* legacy-ID-only evidence, so a real match on the request's own words outranks a generic capability default when the two are otherwise close.
+
+**Result after all three fixes**: `primary: "EVT"`, `supporting: ["MKT", "CR"]`, `confidence: "contested"` (Events narrowly ahead of Marketing — an honest, defensible read for a retreat that could lean either logistics or launch-vehicle) — matching the requested council (Events, Marketing, Client Relationships) instead of a generic Strategy default. The composed hint reads as one companion voice throughout (verified: never names an expert as a separate persona, contains the full guardrail language, stays at 535/550 tokens).
+
+**Important caveat, stated plainly**: this outcome requires `isChamberActivationV2Enabled()` to be ON. Today's default (flag off) still produces the old `primary: "STR"` result with Events absent — this is documented, not hidden, as its own test case (`combinedExperienceEndToEnd.test.ts`). Flipping the default is a separate, explicit decision, not made in this delivery.
+
+Permanent regression test: `lib/chamberExpertise/__tests__/combinedExperienceEndToEnd.test.ts`.
+
+## 6. Still deferred (unchanged from the model specification)
 
 - The remaining 20 experts' `outcomeSignals` and deep intelligence modules (I-4).
 - Journey stage and Working Memory continuity as activation signals (flagged, not built, in the V2 proposal).
