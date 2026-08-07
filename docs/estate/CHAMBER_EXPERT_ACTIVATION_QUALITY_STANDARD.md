@@ -231,3 +231,29 @@ lib/chamberExpertise/__tests__/foundersCorpus/
 - No change to the remaining-21-experts deferral.
 - No implementation of `coPrimary` field, budget rebalancing, or composer rendering changes — proposed at the design level only (§7), pending explicit authorization.
 - No selection-layer business-context feature is designed or authorized here — §4.3 states only that it has a *legitimate future home*, not a design for building it.
+
+---
+
+## 11. Governing principle: Expertise follows purpose, not keywords
+
+**Added 2026-08-07**, from `WORK_RECOGNITION_CHAMBER_INTEGRATION_VALIDATION.md` — surfaced by testing the full Work Recognition → Chamber chain, not just Chamber activation in isolation.
+
+**The object named in a request does not, by itself, determine which expert helps. The intended outcome does.**
+
+The same object routinely serves entirely different purposes:
+
+| Object named | Could mean (purpose-dependent) |
+|---------------|----------------------------------|
+| "Newsletter" | Marketing (visibility) · Client education · Community building · Sales nurture · Relationship building |
+| "Process" | Systems (repeatability) · Client experience · Employee training · Quality control |
+| "Workshop" | Events (experience design) · Marketing (a launch vehicle) · pure content delivery |
+
+**What this means in practice, already demonstrated by this thread's own fixes:**
+
+- Client Relationships correctly joined the "develop a process for new clients" council not because "clients" alone is a trigger, but because the *purpose* of that process is a client-facing outcome — Systems' own curated collaboration structure already knew this (`supportingRelationships: ["CR"]`), once Systems itself became reachable.
+- Client Relationships correctly does **not** insert itself into "I need to create a workshop" (no client context stated) but correctly **does** once client context is present ("...for my existing clients") — see `CHAMBER_ACTIVATION_V2_VALIDATION_SET.md` §7. The lens activates on evidence of purpose, never on the presence of a keyword alone.
+- "Grow my business" needed no separate Client Relationships trigger authored at all — once Marketing became reachable via its own outcome vocabulary, Marketing's *existing* curated relationship to Client Relationships and Strategy did the rest. Purpose-based collaboration structures, authored once, generalize; keyword lists alone do not.
+
+**The test this pillar adds, alongside the existing four:** before authoring a new activation signal, ask *what outcome is this phrase evidence of* — not *what noun does it contain*. A signal that only matches because a word is present, with no bearing on what the founder is trying to accomplish, is exactly the "collection of keyword-matched personas" failure mode this whole Chamber effort exists to avoid.
+
+**Recommended promotion:** this principle applies beyond Chamber — the same "array-order default, no purpose signal" failure mode was found in Estate's own capability routing during the same validation (`WORK_RECOGNITION_CHAMBER_INTEGRATION_VALIDATION.md` §4.2). It is proposed here as a candidate for the Universal Experience Standards (Spec 103) or Relationship Constitution level; this document does not unilaterally amend either — that promotion remains an explicit decision for the constitution's own owners.
