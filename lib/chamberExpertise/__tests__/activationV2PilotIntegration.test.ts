@@ -1,11 +1,12 @@
 /**
  * Chamber Activation V2 (V2-2) — composer integration.
  *
- * Verifies the feature-flag gate itself: flag off leaves
- * chamberExpertiseHintForChat byte-for-byte driven by V1
- * (resolveChamberExpertActivation), unchanged from pre-V2-2 behavior.
- * Flag on additionally exercises the co-primary, contested, and
- * insufficient-evidence hint shapes from
+ * Verifies the feature-flag gate itself. As of
+ * docs/estate/CHAMBER_ACTIVATION_V2_DEFAULT_FLIP.md, V2 is the default —
+ * explicitly setting the flag to "false" is the documented rollback path
+ * to V1 (resolveChamberExpertActivation), unchanged from pre-V2-2
+ * behavior. The default-on path additionally exercises the co-primary,
+ * contested, and insufficient-evidence hint shapes from
  * docs/estate/CHAMBER_ACTIVATION_DECISION_TABLE.md, each still under the
  * 550-token whole-hint cap.
  */
@@ -27,7 +28,18 @@ afterEach(() => {
 });
 
 describe("Chamber Activation V2 — feature flag gate", () => {
-  it("defaults OFF: hint is driven by V1, no co-primary/contested language appears", () => {
+  it("defaults ON as of the flip: co-primary/fusion language appears without setting any env var", () => {
+    const hint = chamberExpertiseHintForChat({
+      userText: "I want to launch a digital course but I'm stuck on pricing and how to actually market it.",
+      intentCategory: "decide",
+      estateCategory: "business",
+    });
+    expect(hint).toBeDefined();
+    expect(hint).toContain("equally central");
+  });
+
+  it("explicit rollback (NEXT_PUBLIC_CHAMBER_ACTIVATION_V2=false) restores V1 behavior, no co-primary/contested language", () => {
+    vi.stubEnv("NEXT_PUBLIC_CHAMBER_ACTIVATION_V2", "false");
     const hint = chamberExpertiseHintForChat({
       userText: "I want to launch a digital course but I'm stuck on pricing and how to actually market it.",
       intentCategory: "decide",
@@ -40,12 +52,13 @@ describe("Chamber Activation V2 — feature flag gate", () => {
     expect(hint).not.toContain("close call");
   });
 
-  it("flag OFF and flag ON produce identical output for an ordinary, unambiguous request", () => {
+  it("flag OFF (explicit rollback) and flag ON (default) produce identical output for an ordinary, unambiguous request", () => {
     const input = {
       userText: "I need to create a client onboarding process.",
       intentCategory: "build" as const,
       estateCategory: "business" as const,
     };
+    vi.stubEnv("NEXT_PUBLIC_CHAMBER_ACTIVATION_V2", "false");
     const off = chamberExpertiseHintForChat(input);
     vi.stubEnv("NEXT_PUBLIC_CHAMBER_ACTIVATION_V2", "true");
     const on = chamberExpertiseHintForChat(input);

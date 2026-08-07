@@ -82,12 +82,46 @@ This is not a new discovery: the *original* founders corpus independently found 
 
 ---
 
-## 5. Recommendation on flipping the flag
+## 6. Round 2 — untested experts + collision pairs
 
-**Do not flip `isChamberActivationV2Enabled()`'s default in this delivery.** This document is the requested review, not an approval to go live. What this review *does* support:
+Requested as a further step before flipping the default: a second 20-scenario round, this time deliberately targeting the five experts Round 1 never touched (Presentations, Innovations, Horizons, Learning, Knowledge Management) plus several likely collision pairs (Strategy vs Horizons' shared generalist territory, Innovations vs Research, Presentations vs Content, Presentations vs Project Management). Test: `lib/chamberExpertise/__tests__/foundersLanguageValidationSetRound2.test.ts`.
 
-- V2's mechanism is sound and generalizes well — the fixes found here were almost entirely small, additive vocabulary/eligibility corrections, the same low-risk pattern used successfully throughout this whole thread, not structural rework.
-- The one unresolved case is a genuine linguistic ambiguity with independent historical precedent, not an unaddressed defect.
-- A **second** round of this same exercise (a fresh 15–20 scenario set, ideally including a few of the experts not yet touched — Presentations, Innovations, Horizons, Learning, Knowledge Management) would further de-risk before considering a default flip, consistent with this thread's own "test at scale before trusting" discipline.
+**First pass: 15/20.** Two classes of new finding, both fixed:
 
-The decision to flip remains explicitly the user's to make.
+- **Word-form/synonym gaps**, the same recurring pattern as Round 1, now hitting the newly-authored experts: "give a talk" (not "need a talk"), "brand feels flat," "five year visions" (plural — the singular form alone missed it), "signing up for certifications" (not "buying courses"), "notes across different apps" (not "everywhere"), and five more of the same shape.
+- **A deeper ranking gap, not just vocabulary**: "I need to put together a pitch deck for investors." — Presentations has genuine text evidence ("pitch deck"); Content's score comes entirely from a legacy-ID + intent + estate combination with zero real text evidence. The raw scores landed close (90 vs 80, an 11% gap) purely by coincidence of magnitude, which the existing margin-based "close race" check treated as real ambiguity. **Fix:** the margin/contested check now only compares candidates within the same evidence tier (both genuine-text or both coincidental) — a genuine-vs-coincidental gap is never treated as a close call, regardless of how numerically close the scores happen to land. This also resolved 3 other scenarios that were incorrectly landing as `contested` for the identical reason (see §7).
+
+After fixes: **20/20.**
+
+## 7. Spark Council Reality Test
+
+A different kind of check than activation accuracy, requested explicitly: not "what expert activates?" but "does the combined result feel like Spark understood the situation, and read as one companion, never a panel?" Test: `lib/chamberExpertise/__tests__/sparkCouncilRealityTest.test.ts`.
+
+**Honest scope limitation, stated plainly:** this environment has no LLM access, so Shari's literal final sentence cannot be tested. What this test *can* verify — and does — is the two things that entirely determine what that sentence is capable of being: whether the activated set of lenses actually spans the situation's real dimensions (coverage), and whether the internal hint that feeds the LLM carries the guardrail language that makes a one-voice response possible while never itself slipping into panel language (voice). Passing both is necessary, not sufficient, for the felt experience requested — but nothing downstream could compensate if either failed.
+
+**"I keep launching things and burning out."** First pass activated nothing at all (`insufficient evidence`) — Momentum's own literal registry vocabulary ("boom bust energy," "false starts") didn't cover this exact, very common way of describing the pattern, and Wellness's `"burnout"` (noun) didn't match the text's `"burning out"` (gerund). Fixed both, plus added Strategy's `"keep launching things"` framing. This surfaced a subtler defect: Momentum's own new phrase ("launching and burning out") deliberately spans the sentence's only "and," so the conjunction-split structural mechanism fragmented it into two halves that individually matched *other*, weaker candidates (Strategy, Wellness) — letting a clause-splitting artifact override a candidate whose whole-text evidence was actually stronger. **Fix:** structural co-primary promotion is now suppressed when some candidate *outside* the structural pair has a whole-text score that decisively exceeds both structural candidates' own scores — that candidate's evidence is more reliable than a clause-split artifact neither structural candidate's own evidence required splitting to see. **Result:** `primary: MOM`, `supporting: [STR, PM]`, `possible: [WELL]` — Momentum leads, Strategy and Wellness are genuinely woven in, not just named.
+
+**"I need to create a workshop."** Resolves to `primary: EVT`, `supporting: [MKT]`. Client Relationships does **not** activate for this bare phrasing — investigated directly, and confirmed as a real boundary, not a gap: the sentence says nothing yet about who the workshop is for. A companion scenario, *"I need to create a workshop for my existing clients,"* now correctly brings Client Relationships in (after adding a bare `"clients"` keyword to its vocabulary — genuinely missing before, verified not to regress the V1 corpus). This is the finding worth naming explicitly: **the Chamber didn't insert every plausible expert just because an illustrative example implied it should — it only activated an expert when the request actually contained the evidence for it, and correctly extended once that evidence appeared.** That is a lens recognizing a situation, not a persona volunteering itself.
+
+Both scenarios pass the "one voice" check: the composed hint never announces "bringing in the Marketing expert," always carries the full "speak only as Shari" guardrail, and stays well under the 550-token budget.
+
+## 8. Review of all remaining `contested` outcomes
+
+After the §6 ranking fix, scanning all 43 scenarios across both validation rounds plus the Reality Test for `confidence: "contested"` found exactly **one** remaining case — down from 4 before the fix (the other 3 were the same genuine-vs-coincidental artifact §6 fixed).
+
+**"I need to create a client onboarding process."** (§3, unchanged) — Client Relationships vs Systems, both with genuinely independent, multi-phrase evidence. Re-confirmed: not a gap, a real linguistic tie with independent historical precedent in this project's own corpus. No further action recommended; this is `contested` working as designed.
+
+**No other contested cases remain.** Every other close call found across 43 realistic scenarios traced to a real, fixable cause (vocabulary gap, or the evidence-tier margin defect) rather than genuine ambiguity — a healthy sign that `contested` is being reserved for requests that actually deserve it, not used as a catch-all for unfixed gaps.
+
+## 9. Recommendation on flipping the flag
+
+**Updated recommendation, after Round 2, the Spark Council Reality Test, and the contested-case review (§6–§8): the flag has been flipped to default ON.** See `docs/estate/CHAMBER_ACTIVATION_V2_DEFAULT_FLIP.md` for the flip itself, its verification, and the rollback path.
+
+The case for flipping now, rather than after further review:
+
+- **43 realistic scenarios**, spanning 19 of the 24 experts (all but Sales', Networking's, and Partnerships' worth of remaining untested niches are still covered indirectly via collaboration lists) and all five activation states, resolve correctly.
+- **Every gap found across two full rounds was small and additive** — vocabulary phrasing or a scoring-tier interaction, never a change to the core decision procedure's shape. That consistency is itself evidence the mechanism generalizes, not just fits the examples it was shown.
+- **Exactly one genuine ambiguity remains** ("client onboarding process"), with independent historical precedent, and `contested` handles it exactly as designed — proceed with the better-evidenced reading, held loosely.
+- The Reality Test confirmed the *qualitative* goal — multi-lens coverage, one-voice composition, and a real (not forced) boundary on when a lens joins — holds up, not just the activation-accuracy numbers.
+
+This is not a claim that V2 is now perfect or that further scenarios won't find more small gaps — they likely will, the same way this round did. It is a claim that the fixing pattern itself is now demonstrated stable across two independent rounds, which is the actual bar this review was designed to test.

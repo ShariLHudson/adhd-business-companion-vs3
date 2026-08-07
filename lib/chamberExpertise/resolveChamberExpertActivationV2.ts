@@ -384,7 +384,21 @@ export function resolveChamberExpertActivationV2(
   // §0). Equal scores are resolved by the same principled tiebreak used
   // for the top-vs-runnerUp decision below, not by whichever entry
   // happens to appear first in CHAMBER_EXPERT_REGISTRY.
+  // Round-2 validation finding (docs/estate/CHAMBER_ACTIVATION_V2_VALIDATION_SET.md
+  // §2, "pitch deck"/"validate a new offer idea" scenarios): a bare
+  // intent+estate combination (45) already exceeds a single genuine
+  // phrase match (35) — so even after the legacy-ID fixes, a
+  // coincidentally-well-corroborated candidate with ZERO real text
+  // evidence could still outrank genuine evidence by raw score alone,
+  // not just on a literal tie. Genuine text evidence (a real phrase/
+  // outcome match against THIS request's own words) now ranks as its
+  // own tier, ABOVE any eligible candidate that has none, before score
+  // is even compared — the same principle already applied inside
+  // tiebreak(), now applied to the primary ranking itself, not just ties.
   const eligible = signals.filter(isEligibleV2).sort((a, b) => {
+    const textA = hasGenuineTextEvidence(a);
+    const textB = hasGenuineTextEvidence(b);
+    if (textA !== textB) return textA ? -1 : 1;
     if (a.score !== b.score) return b.score - a.score;
     return tiebreak(a, b) === a.id ? -1 : 1;
   });
@@ -409,7 +423,21 @@ export function resolveChamberExpertActivationV2(
 
   const top = eligible[0];
   const runnerUp = eligible[1] ?? null;
-  const marginRatio = runnerUp ? (top.score - runnerUp.score) / Math.max(top.score, 1) : 1.0;
+
+  // Round-2 validation finding ("pitch deck for investors" — PRES:90 vs
+  // CNT:80, an 11% raw-score gap): when top has genuine text evidence and
+  // runnerUp does not, a narrow numeric margin does NOT mean a close
+  // call — it means a real, request-specific match happened to land
+  // numerically near a generic, coincidental one (legacy-ID + intent +
+  // estate, with nothing from the request's own words). That is exactly
+  // the kind of "confident wrong answer" this whole delivery exists to
+  // prevent being treated as uncertainty it isn't. Only compare margins
+  // between candidates in the SAME evidence tier — a genuine top-vs-
+  // genuine-runnerUp closeness still IS real ambiguity (handled below,
+  // unchanged); a genuine-vs-coincidental gap is not, regardless of size.
+  const sameEvidenceTier = runnerUp ? hasGenuineTextEvidence(top) === hasGenuineTextEvidence(runnerUp) : true;
+  const marginRatio =
+    runnerUp && sameEvidenceTier ? (top.score - runnerUp.score) / Math.max(top.score, 1) : 1.0;
 
   // 1. Magnitude co-primary: both strong, close, genuinely different domains.
   if (
@@ -434,20 +462,47 @@ export function resolveChamberExpertActivationV2(
 
   // 2. Structural co-primary: compound "X and Y" request, either half of
   // which may not clear STRONG_EVIDENCE_THRESHOLD alone.
+  //
+  // Spark Council Reality Test finding (docs/estate/
+  // CHAMBER_ACTIVATION_V2_VALIDATION_SET.md §7): "I keep launching things
+  // and burning out." — Momentum's own whole-text evidence ("launching
+  // and burning out") deliberately spans the sentence's only "and", so
+  // splitting on it fragments Momentum's phrase into two halves, NEITHER
+  // of which alone reaches Momentum's own signal — while Strategy and
+  // Wellness's shorter, single-clause phrases each survive the split
+  // untouched. The structural mechanism then "wins" against a candidate
+  // whose genuine whole-text evidence was stronger than either structural
+  // candidate alone, purely as an artifact of where the split landed.
+  // Guard: don't let structural promotion override a candidate OUTSIDE
+  // the structural pair whose whole-text score decisively (by the same
+  // margin used everywhere else) exceeds both structural candidates' own
+  // whole-text scores — that candidate's evidence is more reliable than a
+  // clause-split artifact that neither structural candidate's own
+  // evidence required splitting to see.
   const structural = detectStructuralCoPrimary(userText);
   if (structural) {
     const [a, b] = structural;
-    const { supporting, possible } = buildSupportingAndPossible(a, signalsById);
-    return {
-      primary: a,
-      supporting,
-      possible,
-      confidence: "co-primary",
-      signals,
-      coPrimary: [a, b],
-      runnerUp: null,
-      clarifyingQuestion: null,
-    };
+    const structuralPairMax = Math.max(signalsById.get(a)?.score ?? 0, signalsById.get(b)?.score ?? 0);
+    const dominatedByOutsideCandidate = eligible.some(
+      (s) =>
+        s.id !== a &&
+        s.id !== b &&
+        s.score > structuralPairMax &&
+        (s.score - structuralPairMax) / s.score >= CONTESTED_MARGIN_RATIO,
+    );
+    if (!dominatedByOutsideCandidate) {
+      const { supporting, possible } = buildSupportingAndPossible(a, signalsById);
+      return {
+        primary: a,
+        supporting,
+        possible,
+        confidence: "co-primary",
+        signals,
+        coPrimary: [a, b],
+        runnerUp: null,
+        clarifyingQuestion: null,
+      };
+    }
   }
 
   // 3. Contested: close race, but not both strong — genuine ambiguity, not dual strength.

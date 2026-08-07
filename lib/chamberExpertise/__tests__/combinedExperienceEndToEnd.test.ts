@@ -97,15 +97,24 @@ describe("Combined experience — 'I want to create a two-day ADHD business retr
     expect(estimateTokens(hint!)).toBeLessThanOrEqual(550);
   });
 
-  it("V1 (flag off, today's production default) does NOT yet reach this outcome — documented honestly, not hidden", () => {
-    // This is the pre-V2-2 status quo: Strategy wins via the same
-    // contentless legacy-ID tie this delivery's V2 path fixes, and Events
-    // never appears anywhere in the hint. Recorded here so the gap between
-    // "V2 implemented" and "V2 enabled by default" stays visible rather
-    // than assumed.
+  it("V1 (explicit rollback path) does NOT reach this outcome — documented honestly, not hidden", () => {
+    // As of the default flip (docs/estate/CHAMBER_ACTIVATION_V2_DEFAULT_FLIP.md),
+    // V2 is now the production default — this test exists to document
+    // what a rollback (NEXT_PUBLIC_CHAMBER_ACTIVATION_V2=false) would look
+    // like, not what today's default does. V1's pre-fix status quo:
+    // Strategy wins via the same contentless legacy-ID tie V2 fixes, and
+    // Events never appears anywhere in the hint.
+    vi.stubEnv("NEXT_PUBLIC_CHAMBER_ACTIVATION_V2", "false");
     const input = resolveViaProductionPath(RETREAT_REQUEST);
     const hint = chamberExpertiseHintForChat(input);
     expect(hint).toBeDefined();
     expect(hint).not.toContain("Events Intelligence");
+  });
+
+  it("V2 is the default as of the flip — no env var needed", () => {
+    const input = resolveViaProductionPath(RETREAT_REQUEST);
+    const hint = chamberExpertiseHintForChat(input);
+    expect(hint).toBeDefined();
+    expect(hint).toContain("Events Intelligence");
   });
 });

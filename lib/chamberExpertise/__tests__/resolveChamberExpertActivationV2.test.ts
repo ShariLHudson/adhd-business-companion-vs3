@@ -185,6 +185,24 @@ describe("resolveChamberExpertActivationV2 — contested", () => {
   });
 });
 
+describe("resolveChamberExpertActivationV2 — genuine evidence beats a close-but-coincidental score", () => {
+  it("a candidate with real text evidence is a CLEAR win over a higher-or-close-scoring candidate with none, never 'contested'", () => {
+    // "pitch deck" gives Presentations genuine text evidence; Content's
+    // score comes entirely from legacy-ID + intent + estate (a broad,
+    // request-independent combination) with zero real text evidence — a
+    // narrow raw-score gap between these two is not real ambiguity.
+    const result = resolveChamberExpertActivationV2({
+      userText: "I need to put together a pitch deck for investors.",
+      intentCategory: "build",
+      estateCategory: "create",
+      legacyExpertIds: ["writing-coach"],
+    });
+    expect(result.primary).toBe("PRES");
+    expect(result.confidence).not.toBe("contested");
+    expect(result.coPrimary ?? null).toBeNull();
+  });
+});
+
 describe("resolveChamberExpertActivationV2 — insufficient evidence", () => {
   it("returns primary: null, confidence: low, and a plain-language clarifying question when nothing clears real eligibility but some faint signal exists", () => {
     const result = resolveChamberExpertActivationV2({

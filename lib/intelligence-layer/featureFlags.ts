@@ -92,16 +92,21 @@ export function isChamberIntelligencePilotEnabled(): boolean {
 /**
  * Chamber Activation V2 (V2-2) — gates the corrected eligibility rule,
  * outcomeSignals scoring, generalist tiebreak, and contested/co-primary
- * detection in resolveChamberExpertActivationV2. Default: false. When
- * off, chamberExpertiseHintForChat calls V1 (resolveChamberExpertActivation)
- * exactly as before — zero behavior change. See
- * docs/estate/CHAMBER_ACTIVATION_MODEL_SPECIFICATION.md and
- * docs/estate/CHAMBER_ACTIVATION_OUTCOME_LAYER_ANALYSIS.md.
+ * detection in resolveChamberExpertActivationV2.
+ *
+ * Default: TRUE as of 2026-08-07, after two rounds of founder-language
+ * validation (43 realistic scenarios) plus the Spark Council Reality
+ * Test — see docs/estate/CHAMBER_ACTIVATION_V2_VALIDATION_SET.md and
+ * docs/estate/CHAMBER_ACTIVATION_V2_DEFAULT_FLIP.md. Set
+ * NEXT_PUBLIC_CHAMBER_ACTIVATION_V2=false (or "0") to roll back to V1
+ * (resolveChamberExpertActivation) — zero behavior change from before
+ * this flip when rolled back.
  */
 export function isChamberActivationV2Enabled(): boolean {
   const override = readLocalStorageFlag(LS_CHAMBER_ACTIVATION_V2);
   if (override !== null) return override;
-  return envTrue("NEXT_PUBLIC_CHAMBER_ACTIVATION_V2");
+  const raw = process.env.NEXT_PUBLIC_CHAMBER_ACTIVATION_V2;
+  return raw !== "false" && raw !== "0";
 }
 
 export const PROFILE_LEARNING_FLAG_KEYS = {

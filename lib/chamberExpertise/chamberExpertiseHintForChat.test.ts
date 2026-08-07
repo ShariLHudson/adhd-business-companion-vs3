@@ -1,5 +1,13 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { chamberExpertiseHintForChat } from "./chamberExpertiseHintForChat";
+
+beforeEach(() => {
+  vi.unstubAllEnvs();
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 describe("chamberExpertiseHintForChat", () => {
   it("returns undefined for empty text", () => {
@@ -7,11 +15,23 @@ describe("chamberExpertiseHintForChat", () => {
     expect(chamberExpertiseHintForChat({ userText: "   " })).toBeUndefined();
   });
 
-  it("returns undefined when confidence is low (no forced activation)", () => {
+  it("returns undefined when there is zero signal anywhere (no forced activation)", () => {
     expect(chamberExpertiseHintForChat({ userText: "hello there" })).toBeUndefined();
-    expect(
-      chamberExpertiseHintForChat({ userText: "system" }),
-    ).toBeUndefined();
+  });
+
+  it("V2 (default as of the flip): a single weak keyword asks a clarifying question instead of staying silent", () => {
+    // "system" alone is real but weak (single-keyword) signal for Systems
+    // — V2's insufficient-evidence state builds a clarifying question
+    // from it rather than V1's old silent `undefined`. See
+    // docs/estate/CHAMBER_ACTIVATION_DECISION_TABLE.md.
+    const hint = chamberExpertiseHintForChat({ userText: "system" });
+    expect(hint).toBeDefined();
+    expect(hint).toMatch(/ask ONE grounded clarifying question/i);
+  });
+
+  it("V1 (explicit rollback): the same weak keyword stays silent, matching pre-V2-2 behavior", () => {
+    vi.stubEnv("NEXT_PUBLIC_CHAMBER_ACTIVATION_V2", "false");
+    expect(chamberExpertiseHintForChat({ userText: "system" })).toBeUndefined();
   });
 
   it("returns a hint naming the primary expert when confidence is high enough", () => {
