@@ -65,6 +65,10 @@ const VALUABLE_SCENARIOS: Array<{ label: string; expertId: ChamberExpertId; user
   { label: "Events — retreat planning", expertId: "EVT", userText: "I want to plan a two-day ADHD business retreat." },
   { label: "Events — growing agenda", expertId: "EVT", userText: "I'm hosting a workshop next month and the agenda keeps growing." },
   { label: "Events — post-event crash", expertId: "EVT", userText: "I always crash after events and forget to follow up with people." },
+  { label: "Strategy — too many priorities", expertId: "STR", userText: "I have three different offers and I don't know which one to focus on." },
+  { label: "Strategy — 12-month plan trap", expertId: "STR", userText: "I want to build a 12-month strategic plan for my business." },
+  { label: "Client Relationships — ghosting pattern", expertId: "CR", userText: "My clients keep ghosting me right after they onboard." },
+  { label: "Client Relationships — scope creep", expertId: "CR", userText: "I have a client asking for more and more that's outside our original scope." },
 ];
 
 describe("Expert Value Test — on-topic requests genuinely benefit from the expert's intelligence", () => {

@@ -54,7 +54,23 @@ describe("Chamber Intelligence pilot — feature flag gate", () => {
   it("when enabled, a non-pilot expert falls back to the existing format unchanged", () => {
     vi.stubEnv("NEXT_PUBLIC_CHAMBER_INTELLIGENCE_PILOT", "true");
 
-    // Finance has no migrated intelligence module yet.
+    // Sales has no migrated intelligence module yet.
+    const hint = chamberExpertiseHintForChat({
+      userText: "I hate doing sales calls, they feel so pushy.",
+      intentCategory: "execute",
+      estateCategory: "business",
+    });
+
+    expect(hint).toBeDefined();
+    // Sales is primary here (no pilot module) — should read as a "Bring
+    // in:" fallback line, not "Apply <framework>".
+    expect(hint).toContain("Bring in:");
+    expect(hint).not.toContain("Apply ");
+  });
+
+  it("mixed activation: pilot expert (Strategy) enriched, non-pilot supporting expert (Finance) falls back", () => {
+    vi.stubEnv("NEXT_PUBLIC_CHAMBER_INTELLIGENCE_PILOT", "true");
+
     const hint = chamberExpertiseHintForChat({
       userText: "I want to build a business strategy.",
       intentCategory: "build",
@@ -62,26 +78,16 @@ describe("Chamber Intelligence pilot — feature flag gate", () => {
     });
 
     expect(hint).toBeDefined();
-    // Strategy is primary here (no pilot module) and Finance is one of the
-    // supporting experts (also no pilot module) — both should still read
-    // as "Bring in:" fallback lines, not "Apply <framework>".
-    expect(hint).toContain("Bring in:");
-  });
-
-  it("mixed activation: pilot expert (Systems) enriched, non-pilot supporting expert (Client Relationships) falls back", () => {
-    vi.stubEnv("NEXT_PUBLIC_CHAMBER_INTELLIGENCE_PILOT", "true");
-
-    const hint = chamberExpertiseHintForChat({
-      userText: "I need to create a client onboarding process.",
-      intentCategory: "build",
-      estateCategory: "business",
-    });
-
-    expect(hint).toBeDefined();
-    expect(hint).toContain("Apply Minimum Viable Process");
-    // Client Relationships is supporting here and is not a migrated pilot
-    // expert — it must still read in the existing fallback format.
-    expect(hint).toMatch(/Also relevant: Client Relationships Intelligence — Notices/);
+    // Strategy is primary and migrated — its deep-selection facets and
+    // ADHD translation appear, not the plain "Bring in:" theme list.
+    expect(hint).toMatch(/Instead of "12-month strategic plan"/);
+    expect(hint).not.toMatch(/Leading perspective: Strategy Intelligence — Notices when busy/);
+    // Finance is supporting here and is not (yet) a migrated expert — it
+    // must still read in the existing fallback format. (Systems and
+    // Marketing, also supporting here, are now migrated too — see
+    // docs/estate/CHAMBER_ACTIVATION_V2_NEXT_BATCH.md — so this test
+    // deliberately checks Finance specifically, not "any supporting line".)
+    expect(hint).toMatch(/Also relevant: Finance Intelligence — Notices/);
   });
 
   it("never exceeds the whole-hint token budget with the pilot enabled", () => {

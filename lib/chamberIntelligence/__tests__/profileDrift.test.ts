@@ -16,6 +16,8 @@ import { describe, expect, it } from "vitest";
 import { MKT_INTELLIGENCE } from "../experts/MKT";
 import { SYS_INTELLIGENCE } from "../experts/SYS";
 import { EVT_INTELLIGENCE } from "../experts/EVT";
+import { STR_INTELLIGENCE } from "../experts/STR";
+import { CR_INTELLIGENCE } from "../experts/CR";
 import type { ChamberExpertIntelligence } from "../types";
 
 const REPO_ROOT = join(__dirname, "..", "..", "..");
@@ -49,6 +51,8 @@ describe.each([
   ["Marketing", MKT_INTELLIGENCE],
   ["Systems", SYS_INTELLIGENCE],
   ["Events", EVT_INTELLIGENCE],
+  ["Strategy", STR_INTELLIGENCE],
+  ["Client Relationships", CR_INTELLIGENCE],
 ])("profile drift — %s", (_label, intelligence) => {
   const markdown = readProfileMarkdown(intelligence);
 
