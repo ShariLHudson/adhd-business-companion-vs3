@@ -29,47 +29,13 @@ import {
   type ChamberExpertRegistryEntryWithCategory,
 } from "./chamberExpertRegistry";
 import { resolveLegacyExpertIds } from "./legacyExpertAliasMap";
+import { phraseMatches, significantWords, tokenize } from "./textMatch";
 import type {
   ChamberExpertActivation,
   ChamberExpertActivationInput,
   ChamberExpertId,
   ChamberExpertSignalResult,
 } from "./types";
-
-const STOPWORDS = new Set([
-  "a",
-  "an",
-  "the",
-  "to",
-  "of",
-  "for",
-  "and",
-  "or",
-  "my",
-  "our",
-  "your",
-  "is",
-  "are",
-  "i",
-  "we",
-  "you",
-  "it",
-  "this",
-  "that",
-  "need",
-  "want",
-  "on",
-  "in",
-  "with",
-  "do",
-  "does",
-  "help",
-  "me",
-  "just",
-  "please",
-  "can",
-  "could",
-]);
 
 const SCORE = {
   topicPhrase: 35,
@@ -86,32 +52,6 @@ const PRIMARY_MIN_SIGNAL_GROUPS = 2;
 /** Caps keep the hint short (Phase C) — never a full team roster. */
 const MAX_SUPPORTING = 3;
 const MAX_POSSIBLE = 2;
-
-function normalize(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, " ")
-    .replace(/-/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function tokenize(text: string): Set<string> {
-  return new Set(normalize(text).split(" ").filter(Boolean));
-}
-
-function significantWords(phrase: string): string[] {
-  return normalize(phrase)
-    .split(" ")
-    .filter((w) => w && !STOPWORDS.has(w));
-}
-
-/** A phrase matches when every one of its significant words appears in the text. */
-function phraseMatches(phrase: string, textWords: Set<string>): boolean {
-  const words = significantWords(phrase);
-  if (words.length === 0) return false;
-  return words.every((w) => textWords.has(w));
-}
 
 type TopicMatchResult = {
   phraseMatch: boolean;
