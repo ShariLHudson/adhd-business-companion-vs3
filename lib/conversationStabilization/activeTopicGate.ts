@@ -146,6 +146,40 @@ function specialtyClarifyQuestion(domain: string): string | null {
   return SPECIALTY_CLARIFY[domain] ?? null;
 }
 
+/**
+ * Phase A — murky-fallback fix. "What's murky?" and equivalent
+ * uncertainty-toned questions (SPECIALTY_CLARIFY and its generic sibling)
+ * may only fire when the member's own words show genuine uncertainty —
+ * confusion, being stuck, not knowing, or overwhelm. They must never
+ * replace a clear create/plan/develop/build/improve request with a
+ * question that presumes the member doesn't know what they want.
+ * See docs/create-experience/CHAT_REASONING_JOURNEY_GAP_REVIEW.md.
+ */
+const GENUINE_UNCERTAINTY_RE =
+  /\b(?:don'?t know|not sure|no idea|unsure|uncertain|confus(?:ed|ing|ion)|stuck|overwhelm(?:ed|ing)?|lost|can'?t figure out|not clear|unclear)\b/i;
+
+export function expressesGenuineUncertainty(text: string): boolean {
+  return GENUINE_UNCERTAINTY_RE.test(text);
+}
+
+/** Clear work-intent verb used as an actual request, not a stray noun. */
+const CLEAR_WORK_INTENT_RE =
+  /\b(?:i(?:'m| am)?\s+(?:want|need|trying|going|ready)\s+to|i'?d like to|let'?s|help me|we should)\s+(?:create|creating|plan|planning|develop|developing|build|building|improve|improving)\b|^(?:create|creating|plan|planning|develop|developing|build|building|improve|improving)\b/i;
+
+export function expressesClearWorkIntent(text: string): boolean {
+  return CLEAR_WORK_INTENT_RE.test(text.trim());
+}
+
+const CLEAR_INTENT_FORWARD_LINE =
+  "Got it — tell me a bit more about what you're going for, and let's get moving.";
+
+/** True when an uncertainty-toned clarify question must be suppressed this turn. */
+function blocksUncertaintyPrompt(userText: string | undefined): boolean {
+  const t = userText?.trim() ?? "";
+  if (!t) return false;
+  return expressesClearWorkIntent(t) && !expressesGenuineUncertainty(t);
+}
+
 export function isExplicitTopicChangeRequest(userText: string): boolean {
   return EXPLICIT_TOPIC_CHANGE_RE.test(userText.trim());
 }
@@ -370,13 +404,19 @@ export function topicPreservingFallbackLine(
     );
   }
 
+  // Phase A — a clear work request must never be answered with an
+  // uncertainty-presuming question. Compute once against the live turn.
+  const suppressUncertaintyPrompt = blocksUncertaintyPrompt(userText);
+
   // Specialty clarify in the active companion's voice — never a mismatched domain default.
   if (domain && (!need || needMatchesDomain(need, domain))) {
+    if (suppressUncertaintyPrompt) return safe(CLEAR_INTENT_FORWARD_LINE);
     const specialty = specialtyClarifyQuestion(domain);
     if (specialty) return safe(specialty);
   }
 
   if (need) {
+    if (suppressUncertaintyPrompt) return safe(CLEAR_INTENT_FORWARD_LINE);
     // Latest message exists but doesn't map cleanly — ask in-voice, not canned domain.
     const specialty = specialtyClarifyQuestion(domain);
     if (specialty) {

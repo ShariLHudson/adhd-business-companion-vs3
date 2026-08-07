@@ -105,6 +105,8 @@ export {
 export {
   acceptClarificationForActiveTopic,
   chamberNavigateGateForText,
+  expressesClearWorkIntent,
+  expressesGenuineUncertainty,
   isBlockedGenericFallbackText,
   isExplicitTopicChangeRequest,
   isNewConversationalSubject,
