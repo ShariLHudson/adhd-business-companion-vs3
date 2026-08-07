@@ -401,6 +401,7 @@ import {
   EMOTION_LABELS,
   type EmotionalState,
 } from "@/lib/companionEmotions";
+import { resolveSupportGate, softenResponse } from "@/lib/workStatePriority/resolveSupportGate";
 import {
   EMOTION_SHELL_CLASS,
   getStateHint,
@@ -10636,12 +10637,28 @@ export default function CompanionPageClient() {
         conversationPriority?.winner === "continue_creation") &&
       !isVagueHelpRequest(trimmed);
 
-    if (isSimpleCreateRequest(trimmed) || universalCreationContinuation) {
+    // Work State Priority Model, Phase 2 (docs/estate/WORK_STATE_PRIORITY_MODEL.md):
+    // emotional state was already computed on every Create Fast Path turn
+    // below, but never consulted for whether this turn should enter
+    // creation at all. PAUSE blocks Create Fast Path entirely this turn —
+    // the message falls through to the existing downstream intent/estate
+    // routing, which already correctly resolves overwhelm-flavored text
+    // toward a restore/support destination. SOFTEN and PROCEED are
+    // unaffected here (softening happens below, once a reply exists to
+    // soften) — this is strictly an additive new branch, never a change
+    // to existing PROCEED/SOFTEN behavior.
+    const createTurnEmotionalState = detectEmotionalState(trimmed);
+    const supportGate = resolveSupportGate(trimmed, createTurnEmotionalState);
+
+    if (
+      (isSimpleCreateRequest(trimmed) || universalCreationContinuation) &&
+      supportGate !== "pause"
+    ) {
       const createRouting = resolveIntentRouting({
         userText: trimmed,
         workspace: workspacePanel,
-        emotionalState: detectEmotionalState(trimmed),
-        overwhelmed: detectEmotionalState(trimmed) === "overwhelmed",
+        emotionalState: createTurnEmotionalState,
+        overwhelmed: createTurnEmotionalState === "overwhelmed",
       });
       const createDocType = detectUniversalDocumentType(trimmed);
       const createFastPathAction = runReliableSyncLayer(
@@ -10678,6 +10695,16 @@ export default function CompanionPageClient() {
       );
 
       if (createFastPathAction?.localReply) {
+        // Work State Priority Model, Phase 2, SOFTEN tier: blend a brief
+        // acknowledgment into the reply Create Fast Path already produced
+        // — never a different question, never a separate detour. See
+        // resolveSupportGate.ts's own doc comment.
+        if (supportGate === "soften") {
+          createFastPathAction.localReply = softenResponse(
+            createFastPathAction.localReply,
+            trimmed,
+          );
+        }
         logConversationPipelineDiagnostic({
           turn: chatTurnRef.current,
           userText: trimmed,
