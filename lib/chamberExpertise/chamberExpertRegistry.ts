@@ -86,6 +86,9 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "growth plan",
       "strategy",
       "priorities",
+      "which one to focus on",
+      "different offers",
+      "too many offers",
     ],
     expertiseAreas: [
       "Opportunity filtering",
@@ -144,6 +147,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "write down our process",
       "put our process in writing",
       "how we do things isn't written down",
+      "figure out how we operate",
+      "how we actually operate",
     ],
     expertCategory: "specialist",
     founderPlainLanguagePhrase: "creating the system",
@@ -175,6 +180,9 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "know what to post",
       "wipes me out",
       "launch fatigue",
+      "promote my workshop",
+      "promoting my workshop",
+      "help promoting",
     ],
     expertiseAreas: [
       "Audience clarity",
@@ -187,7 +195,14 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "nurture",
       "proof and trust assets",
     ],
-    outcomeSignals: ["how to market it", "how to market this", "get the word out", "figure out marketing"],
+    outcomeSignals: [
+      "how to market it",
+      "how to market this",
+      "get the word out",
+      "figure out marketing",
+      "how to sell it",
+      "how to sell this",
+    ],
     expertCategory: "specialist",
     founderPlainLanguagePhrase: "getting customers",
     supportingRelationships: ["STR", "CR"],
@@ -211,6 +226,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "client chaos",
       "unclear expectations",
       "ghosted a client",
+      "clients ghosting",
+      "keep ghosting me",
       "clients not staying",
       "clients not engaged",
       "client retention",
@@ -284,11 +301,13 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "Notices the moment interest stops being guided toward a real decision. Hears when a founder is explaining value instead of learning what the buyer still needs to trust. Turns follow-up into a clear, kind next step before the lead goes cold.",
     activationSignals: [
       "hate selling",
+      "hate sales calls",
       "sales conversation",
       "leads go cold",
       "discovery call",
       "follow up",
       "feels pushy",
+      "feel pushy",
       "close the sale",
     ],
     expertiseAreas: [
@@ -323,6 +342,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "content calendar",
       "write a post",
       "newsletter",
+      "turn ideas into a post",
+      "ideas into a blog post",
     ],
     expertiseAreas: [
       "Idea capture",
@@ -426,6 +447,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "too many tabs open",
       "research is delaying",
       "look this up",
+      "is this market viable",
+      "enough information to know",
     ],
     expertiseAreas: [
       "Research question framing",
@@ -460,6 +483,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "too many aesthetics",
       "campaign assets",
       "design this",
+      "brand feels flat",
+      "find a visual direction",
     ],
     expertiseAreas: [
       "Creative direction",
@@ -666,6 +691,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "over functioning",
       "delegation",
       "accountability",
+      "avoiding the conversation",
+      "doesn't know what's expected",
     ],
     expertiseAreas: [
       "Role clarity",
@@ -731,6 +758,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "restarting feels harder",
       "project stalled",
       "stuck again",
+      "losing momentum",
+      "keep starting projects",
     ],
     expertiseAreas: [
       "Momentum initiation",
@@ -763,6 +792,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "collects contacts",
       "wants referrals",
       "networking event",
+      "never followed up",
+      "met people at a conference",
     ],
     expertiseAreas: [
       "Event selection",
@@ -796,6 +827,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "joint venture",
       "affiliate partnership",
       "referral partnership",
+      "talked about roles",
+      "roles or who gets what",
     ],
     expertiseAreas: [
       "Partner fit assessment",
@@ -844,6 +877,7 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
     ],
     outcomeSignals: [
       "hire my first team member",
+      "hired my first employee",
       "hiring my first employee",
       "bring on my first hire",
       "ready to hire someone",
@@ -904,6 +938,8 @@ export const CHAMBER_EXPERT_REGISTRY: readonly ChamberExpertRegistryEntryWithCat
       "sleep strain",
       "sensory overload",
       "unsustainable pace",
+      "running on fumes",
+      "ignoring every signal",
     ],
     expertiseAreas: [
       "Capacity planning",

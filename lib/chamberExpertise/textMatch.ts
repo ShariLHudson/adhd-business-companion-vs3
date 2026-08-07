@@ -112,18 +112,26 @@ export function estimateTokens(text: string): number {
 
 /**
  * V2-2: splits raw member text on coordinating conjunctions ("and", "but",
- * "as well as", "plus") into independent clauses, so a structurally
- * compound request ("pricing my course AND how to market it") can be
- * scored clause-by-clause instead of as one bag of words — the only way
- * to reliably detect a genuine co-primary request. Returns null when
- * there's nothing to split (a single clause), so callers can fall back to
- * whole-text scoring without a special case.
+ * "or", "as well as", "plus") into independent clauses, so a structurally
+ * compound request ("pricing my course AND how to market it", "don't know
+ * what to charge OR how to sell it") can be scored clause-by-clause
+ * instead of as one bag of words — the only way to reliably detect a
+ * genuine co-primary request. Returns null when there's nothing to split
+ * (a single clause), so callers can fall back to whole-text scoring
+ * without a special case.
+ *
+ * "or" was added after the founder-language validation set
+ * (docs/estate/CHAMBER_ACTIVATION_V2_VALIDATION_SET.md) found it's just
+ * as common a way founders phrase two coordinated needs ("I don't know X
+ * or Y") as "and"/"but" — the existing false-positive guard (both
+ * clauses must clear a real threshold AND resolve to different experts)
+ * protects this addition the same way it already protects the others.
  *
  * Deliberately simple string splitting, not NLP — every corpus case this
  * exists for uses a plain, everyday conjunction. See
  * docs/estate/CHAMBER_ACTIVATION_OUTCOME_LAYER_ANALYSIS.md §4.
  */
-const CONJUNCTION_SPLIT = /\s+(?:and|but|as well as|plus)\s+/gi;
+const CONJUNCTION_SPLIT = /\s+(?:and|but|or|as well as|plus)\s+/gi;
 
 export function splitOnConjunctions(text: string): readonly string[] | null {
   const parts = text

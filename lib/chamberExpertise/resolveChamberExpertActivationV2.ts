@@ -49,6 +49,21 @@ const SCORE = {
   topicKeywordOnly: 15,
   bothTopicHitBonus: 10,
   outcomeMatch: 35,
+  /**
+   * Founder-language validation set finding
+   * (docs/estate/CHAMBER_ACTIVATION_V2_VALIDATION_SET.md): "create a
+   * client onboarding process" matches both Client Relationships'
+   * "client onboarding" AND Systems' "onboarding process" AND Systems'
+   * separate "create a process" — three genuine phrase matches, two of
+   * them Systems', one of them CR's — but the boolean topicPhraseMatch
+   * flag treats "one matching phrase" and "three matching phrases" as
+   * identical evidence, so ties broke on alphabetical id order (CR < SYS)
+   * rather than genuine specificity. Rewards a SECOND (or further)
+   * independently-matching topic/outcome phrase from the same expert —
+   * real additional textual overlap, not a new signal type — same
+   * magnitude as bothTopicHitBonus, deliberately not larger.
+   */
+  multiplePhraseMatchBonus: 10,
   intent: 25,
   estateCategory: 20,
   /**
@@ -102,6 +117,19 @@ function computeOutcomeMatch(
   });
 }
 
+/** Count of INDEPENDENTLY-matching multi-word phrases across topic + outcome vocabulary — see SCORE.multiplePhraseMatchBonus. */
+function countDistinctPhraseMatches(
+  entry: ChamberExpertRegistryEntryWithCategory,
+  textWords: Set<string>,
+): number {
+  let count = 0;
+  for (const phrase of [...entry.activationSignals, ...entry.expertiseAreas, ...(entry.outcomeSignals ?? [])]) {
+    const words = significantWords(phrase);
+    if (words.length >= 2 && phraseMatches(phrase, textWords)) count++;
+  }
+  return count;
+}
+
 function computeSignalV2(
   entry: ChamberExpertRegistryEntryWithCategory,
   input: ChamberExpertActivationInput,
@@ -127,6 +155,7 @@ function computeSignalV2(
   if (topicPhraseMatch) score += SCORE.topicPhrase;
   else if (topicKeywordMatch) score += SCORE.topicKeywordOnly;
   if (topicPhraseMatch && topicKeywordMatch) score += SCORE.bothTopicHitBonus;
+  if (countDistinctPhraseMatches(entry, textWords) >= 2) score += SCORE.multiplePhraseMatchBonus;
   if (outcomeMatch) score += SCORE.outcomeMatch;
   if (intentMatch) score += SCORE.intent;
   if (estateCategoryMatch) score += SCORE.estateCategory;
@@ -156,16 +185,36 @@ function computeSignalV2(
  * topic keyword). Estate category (Tier 3) never counts toward
  * eligibility alone or paired with only one Tier-2 match.
  */
+/**
+ * Corrected a second time by the founder-language validation set
+ * (docs/estate/CHAMBER_ACTIVATION_V2_VALIDATION_SET.md): a bare legacy
+ * expert ID match, with NO genuine text evidence at all, is no longer
+ * treated as sufficient Tier-1 evidence on its own. Estate Brain's
+ * capability-level legacyExpertIds are, for broad capabilities, a fixed,
+ * generic list handed to many different requests — real per-request
+ * evidence (a genuine phrase/outcome match against THIS request's own
+ * words) is what should be able to stand alone; a bare legacy-ID match
+ * now needs a second, independent Tier-2 signal (intent, or a topic
+ * keyword) to reach eligibility, same as any other single weak signal.
+ * When a legacy-ID match IS accompanied by genuine text evidence, it was
+ * already eligible via that text evidence anyway — this only changes the
+ * outcome for the "legacy-ID-only" case the validation set found
+ * repeatedly producing a false primary (e.g. "I need help with my
+ * business." confidently activating Marketing instead of asking a
+ * clarifying question).
+ */
 function isEligibleV2(signal: ChamberExpertSignalResult): boolean {
-  const tier1Present = Boolean(signal.topicPhraseMatch) || Boolean(signal.outcomeMatch) || signal.estateExpertIdMatch;
-  if (tier1Present) return true;
+  const hasGenuineTextEvidence = Boolean(signal.topicPhraseMatch) || Boolean(signal.outcomeMatch);
+  if (hasGenuineTextEvidence) return true;
   const topicKeywordOnly = signal.topicMatch && !signal.topicPhraseMatch && !signal.outcomeMatch;
-  const tier2Count = (signal.intentMatch ? 1 : 0) + (topicKeywordOnly ? 1 : 0);
+  const tier2Count =
+    (signal.intentMatch ? 1 : 0) + (topicKeywordOnly ? 1 : 0) + (signal.estateExpertIdMatch ? 1 : 0);
   return tier2Count >= 2;
 }
 
+/** Genuine text evidence only — legacy ID match is corroborating (see isEligibleV2), not primary evidence. */
 function tier1EvidenceCount(signal: ChamberExpertSignalResult): number {
-  return (signal.topicPhraseMatch ? 1 : 0) + (signal.outcomeMatch ? 1 : 0) + (signal.estateExpertIdMatch ? 1 : 0);
+  return (signal.topicPhraseMatch ? 1 : 0) + (signal.outcomeMatch ? 1 : 0);
 }
 
 function hasGenuineTextEvidence(signal: ChamberExpertSignalResult): boolean {
