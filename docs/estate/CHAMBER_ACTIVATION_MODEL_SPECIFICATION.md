@@ -35,10 +35,15 @@ PRIMARY_MIN_SIGNAL_GROUPS = 2          // unchanged from V1 (Phase B)
 
 ### 2.2 Decision procedure (exact, in order)
 
+> **Correction (2026-08-07, see `CHAMBER_ACTIVATION_OUTCOME_LAYER_ANALYSIS.md` §6):** step 2 below restates V1's original "any 2 signal groups" rule. That was an unintentional drift from this same thread's earlier, correct design in `CHAMBER_ACTIVATION_V2_PROPOSAL.md` §4 ("Tier-1 OR two Tier-2 matches" — Tier-3-only combinations, including `intent + estateCategory` alone, must **not** be sufficient). Diagnostic evidence (the outcome-layer analysis §0) shows the uncorrected rule as written below produces a six-expert tie with zero topical evidence on real corpus examples. **Treat "eligible" in step 2 as the corrected Tier-1-OR-two-Tier-2 rule, not the literal "any 2 groups" text left below for change-history clarity.**
+
 ```
 1. Score all 24 experts (V1's existing computeSignal — unchanged).
 2. eligible = experts with signalGroupsMatched >= PRIMARY_MIN_SIGNAL_GROUPS,
    sorted by score descending.
+   [SUPERSEDED — see correction note above: this must be Tier-1 OR two-Tier-2,
+   not any-2-groups. estateCategory is Tier 3 and never counts as one of the
+   "two Tier-2" matches on its own.]
 
 3. If eligible is empty:
      → state = LOW.  primary = null.  (unchanged from V1)
