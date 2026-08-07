@@ -83,6 +83,84 @@ describe("explicit develop/build/improve verbs (recognized nowhere else today)",
   });
 });
 
+describe("Phase B — create/plan verbs (Work Recognition Acceptance Tests)", () => {
+  // @see docs/create-experience/WORK_RECOGNITION_ACCEPTANCE_TESTS.md
+  it('"I want to create a workshop." is recognized as work intent, not a factual/casual message', () => {
+    const match = detectWorkRecognitionShape("I want to create a workshop.");
+    expect(match?.verb).toBe("create");
+    expect(match?.acknowledgment).toMatch(/love to help you create/i);
+  });
+
+  it('"I want to create a workshop." begins the understanding journey and never asks a murky/uncertainty question', () => {
+    const result = resolveWorkRecognitionNewRecognition(
+      "I want to create a workshop.",
+    );
+    expect(result?.kind).toBe("question");
+    if (result?.kind !== "question") return;
+    expect(result.message).not.toMatch(/murky/i);
+    expect(result.message).not.toMatch(/what feels like the hardest part/i);
+    expect(result.session.topic).toBeTruthy();
+  });
+
+  it('"I need to plan a two-day ADHD business retreat." is recognized as planning work and begins the journey', () => {
+    const match = detectWorkRecognitionShape(
+      "I need to plan a two-day ADHD business retreat.",
+    );
+    expect(match?.verb).toBe("plan");
+
+    const result = resolveWorkRecognitionNewRecognition(
+      "I need to plan a two-day ADHD business retreat.",
+    );
+    expect(result?.kind).toBe("question");
+    if (result?.kind !== "question") return;
+    expect(result.message).not.toMatch(/murky/i);
+    expect(result.session.topic).toBeTruthy();
+  });
+
+  it('the create/plan verbs stay confined to their existing lead-in phrasing — no runaway matches', () => {
+    // A bare noun use of "plan"/"create" must not be swept in — same
+    // discipline as the pre-existing develop/build/improve verbs.
+    expect(detectWorkRecognitionShape("That plan didn't work out.")).toBeNull();
+    expect(detectWorkRecognitionShape("The creation myth is interesting.")).toBeNull();
+  });
+
+  it('known gap (not fixed by this seam): "I want to create a newsletter." — the module itself recognizes it, but the live chat pipeline never reaches this module for it', () => {
+    // detectWorkRecognitionShape is a pure function and correctly recognizes
+    // the shape in isolation...
+    expect(
+      detectWorkRecognitionShape("I want to create a newsletter.")?.verb,
+    ).toBe("create");
+    // ...but in the actual chat pipeline (lib/frictionlessActionLayer.ts),
+    // newsletter/SOP/proposal/checklist requests are claimed several steps
+    // EARLIER by the Create Foundation direct-routing gate
+    // (isSimpleCreateRequest → resolveCreateFoundationClassification
+    // .routeDirectlyToCreateFoundation, frictionlessActionLayer.ts:4269-4281)
+    // and never reach resolveWorkRecognitionNewRecognition's late
+    // fallthrough at all. That gate currently steps aside to a "Create
+    // Foundation" hand-off that no UI code completes for a bare chat
+    // message, so the newsletter case is a distinct, larger-blast-radius
+    // gap — tracked in WORK_RECOGNITION_ACCEPTANCE_TESTS.md, not fixed
+    // here. See that doc before touching the Create Foundation gate: it is
+    // shared by Create continuity, CREATE_FAST_PATH, and frictionless, per
+    // lib/creationIdentity/createFoundationRouting.ts's own header comment.
+  });
+});
+
+describe("Phase B — preserving the uncertainty/clear-intent distinction", () => {
+  it('"I\'m stuck trying to figure out my workshop." is never recognized as new work — support/clarification stays owned elsewhere (Friction First)', () => {
+    expect(
+      detectWorkRecognitionShape(
+        "I'm stuck trying to figure out my workshop.",
+      ),
+    ).toBeNull();
+    expect(
+      resolveWorkRecognitionNewRecognition(
+        "I'm stuck trying to figure out my workshop.",
+      ),
+    ).toBeNull();
+  });
+});
+
 describe("factual questions are never recognized as work", () => {
   it("'What is Loom?' — pure definitional, excluded before any shape check", () => {
     expect(detectWorkRecognitionShape("What is Loom?")).toBeNull();

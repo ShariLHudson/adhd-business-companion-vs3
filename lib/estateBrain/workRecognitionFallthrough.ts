@@ -87,11 +87,25 @@ const BUILD_SYSTEM_HELP_RE =
 const BUILD_SYSTEM_FOR_RE =
   /\bi (?:need|want) (?:a|an) (?:system|process|workflow|routine|structure) for\b/i;
 
-// Explicit develop/build/improve verbs — today recognized NOWHERE (the
-// existing goal classifier has "create" and "plan_strategy" categories but
-// none for these three; confirmed in the architecture analysis).
+// Explicit create/plan/develop/build/improve verbs, checked here ONLY at
+// the last-resort fallthrough — by construction (see file header) this can
+// only fire when nothing earlier in the pipeline already claimed the turn.
+//
+// Phase B (2026-08-07) — added create/plan. Confirmed by direct pipeline
+// trace before landing: "I want to create a workshop." and "I need to plan
+// a...retreat." both fall through completely unclaimed today (event-domain
+// requests are explicitly excluded from lib/universalCreation's document
+// classification — see orchestrator.ts's detectUniversalDocumentType — and
+// have no other positive claimant), so widening this regex is safe for
+// those shapes. It does NOT reach every create-shaped request: a request
+// whose document type resolves to Create Foundation directly (newsletter,
+// SOP, proposal, checklist, ...) is claimed several steps earlier in
+// lib/frictionlessActionLayer.ts (the isSimpleCreateRequest / Create
+// Foundation gate) and never reaches this file at all — a distinct,
+// larger-blast-radius gap tracked separately, not fixed here.
+// See docs/create-experience/WORK_RECOGNITION_ACCEPTANCE_TESTS.md.
 const EXPLICIT_VERB_RE =
-  /\b(?:i (?:need|want)(?: to)?|help me|i'?d like to)\s+(develop|build|improve)\b/i;
+  /\b(?:i (?:need|want)(?: to)?|help me|i'?d like to)\s+(create|plan|develop|build|improve)\b/i;
 
 function acknowledgmentFor(verb: WorkRecognitionVerb): string {
   switch (verb) {
