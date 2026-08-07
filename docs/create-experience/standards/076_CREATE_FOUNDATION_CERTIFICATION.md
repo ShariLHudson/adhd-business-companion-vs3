@@ -6,6 +6,35 @@
 **Extends:** [059 Discovery → Workspace](./059_DISCOVERY_TO_WORKSPACE_TRANSITION_STANDARD.md) · [070 Authoritative Truth](./070_AUTHORITATIVE_TRUTH_STANDARD.md) · [071 Continuity](./071_WORKSPACE_CONTINUITY_STANDARD.md) · [073 Human-Readable Identity](./073_HUMAN_READABLE_WORKSPACE_IDENTITY_STANDARD.md) · [074 Production Hardening](./074_PRODUCTION_HARDENING_PERSISTENCE_AND_RELIABILITY.md)  
 **Does not redesign:** Universal Creation Platform 045–065 · Create Foundation workspace runtime · Checklist question copy
 
+> **Superseded implementation notice (2026-08-07, Phase C-1):** the specific
+> mechanism this document certifies below — `CREATE_FOUNDATION_HANDOFF` /
+> `openUniversalCreationFromText` → `startFreshCreateFromEstate`, bootstrapping
+> the workspace directly from classified text with no question conversation
+> — no longer exists in `app/companion/CompanionPageClient.tsx` (confirmed:
+> a direct grep and a full test run against `checklistCreateFoundationHandoff.test.ts`
+> both show it absent, prior to any Phase C work). It was superseded by the
+> canonical Create journey (Recognition → `entranceUnderstanding.ts` →
+> Working Memory → Current Focus), which requires the 5-question
+> understanding conversation to run first for every entry point — the
+> opposite of this document's certified "skip discovery" design.
+>
+> **What still holds, unchanged, from this certification's Ownership Rule
+> below:** Create Foundation document types must never be owned,
+> intercepted, or resumed by Universal Creation discovery. That constraint
+> is still enforced today by `shouldRouteDirectlyToCreateFoundation`/
+> `resolveCreateFoundationClassification`
+> (`lib/creationIdentity/createFoundationRouting.ts`) — the "Authoritative
+> helper" this document already names — now reached, for chat text, via
+> `resolveCreateFoundationRecognition`
+> (`lib/estateBrain/workRecognitionFallthrough.ts`), which hands off to
+> `entranceUnderstanding.ts`'s typed conversation instead of step 3 below.
+>
+> See `docs/create-experience/CREATE_FOUNDATION_PHASE_C_PLAN.md` and
+> `docs/create-experience/CREATE_FOUNDATION_CONVERGENCE_REVIEW.md` for the
+> current architecture. This document is kept as a historical record of
+> what the 2026-07-20 certification actually proved (browser-verified,
+> real evidence) — not deleted, but no longer describes live code below.
+
 ---
 
 ## Mission

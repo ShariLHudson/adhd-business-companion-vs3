@@ -121,6 +121,20 @@ export function shouldRouteDirectlyToCreateFoundation(input: {
   return false;
 }
 
+// "Landing page" collides with the website UC plugin's own detectPatterns
+// (documentRegistry.ts's website plugin matches "website copy|web copy|
+// homepage|home page|landing page|site copy"), so universalDocumentType
+// resolves to "website" — a PRE_WORKSPACE_DISCOVERY_UC_TYPES member — and
+// shouldRouteDirectlyToCreateFoundation's ucType check (line 94 above)
+// short-circuits to false before the CREATE_FOUNDATION_DIRECT_LABELS check
+// (line 106) is ever reached, even though "landing page" is explicitly on
+// that list. Separately, "landing page" is not one of deriveCreationIdentity's
+// ARTIFACT_KIND_RE nouns, so classificationType never resolves to it either
+// — there is no signal anywhere that a "landing page" label was asked for.
+// Recognized explicitly here, narrowly (this exact phrase only — a plain
+// "website copy" request must still reach UC's website discovery unchanged).
+const LANDING_PAGE_RE = /\blanding\s+page\b/i;
+
 /**
  * Resolve classification before continuity / CREATE_FAST_PATH / frictionless.
  */
@@ -129,16 +143,20 @@ export function resolveCreateFoundationClassification(
 ): CreateFoundationClassification {
   const originalRequest = userText.trim();
   const identity = deriveCreationIdentity({ originalRequest });
-  const classificationType = classificationTypeFromWorkingIntent(
-    identity.workingIntent,
-  );
-  const universalDocumentType =
-    detectDocumentTypeForFoundationRouting(originalRequest);
-  const routeDirectlyToCreateFoundation = shouldRouteDirectlyToCreateFoundation({
-    classificationType,
-    universalDocumentType,
-    workingIntent: identity.workingIntent,
-  });
+  const isLandingPageRequest = LANDING_PAGE_RE.test(originalRequest);
+  const classificationType = isLandingPageRequest
+    ? "Landing Page"
+    : classificationTypeFromWorkingIntent(identity.workingIntent);
+  const universalDocumentType = isLandingPageRequest
+    ? null
+    : detectDocumentTypeForFoundationRouting(originalRequest);
+  const routeDirectlyToCreateFoundation = isLandingPageRequest
+    ? true
+    : shouldRouteDirectlyToCreateFoundation({
+        classificationType,
+        universalDocumentType,
+        workingIntent: identity.workingIntent,
+      });
 
   return {
     originalRequest,

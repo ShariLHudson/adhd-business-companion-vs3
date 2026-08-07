@@ -156,10 +156,14 @@ describe("frictionlessActionLayer", () => {
       userText: "help me create an SOP",
       currentTurn: 3,
     });
-    // CompanionPageClient owns Foundation handoff; frictionless must not open UC.
+    // Frictionless must not open UC discovery — still true, still the point.
     expect(decision.category).not.toBe("universal_creation");
-    expect(decision.localReply).toBeNull();
     expect(decision.immediateCreateOpen).toBeUndefined();
+    // Phase C-1 (2026-08-07) — frictionless itself now hands off to the
+    // typed understanding conversation instead of a dead null reply. See
+    // docs/create-experience/CREATE_FOUNDATION_PHASE_C_PLAN.md.
+    expect(decision.localReply).toBeTruthy();
+    expect(decision.localReply).not.toMatch(/murky/i);
   });
 
   it("routes new project creation to Create not Momentum", () => {
@@ -367,7 +371,11 @@ describe("frictionlessActionLayer", () => {
     });
     expect(setup.category).not.toBe("universal_creation");
     expect(setup.pendingAction).toBeNull();
-    expect(setup.localReply).toBeNull();
+    // Phase C-1 (2026-08-07) — the founder's original reported case. No
+    // longer a dead null reply; the typed understanding conversation
+    // begins instead. See WORK_RECOGNITION_ACCEPTANCE_TESTS.md case 2.
+    expect(setup.localReply).toBeTruthy();
+    expect(setup.localReply).not.toMatch(/murky/i);
   });
 
   it("yes-clear-my-mind resolves brain-dump pending", () => {

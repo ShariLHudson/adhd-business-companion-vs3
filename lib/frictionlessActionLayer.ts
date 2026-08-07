@@ -125,6 +125,7 @@ import {
   shouldEnterDiscoveryMode,
 } from "./estateBrain/discoveryMode";
 import {
+  resolveCreateFoundationRecognition,
   resolveWorkRecognitionNewRecognition,
   resolveWorkRecognitionResumption,
 } from "./estateBrain/workRecognitionFallthrough";
@@ -2139,6 +2140,24 @@ function tryWorkRecognitionFallthrough(
   if (!userText) return null;
 
   const result = resolveWorkRecognitionNewRecognition(userText);
+  if (!result) return null;
+  return buildWorkRecognitionDecision(result, routing);
+}
+
+/**
+ * Phase C-1 (2026-08-07) — Create Foundation convergence. Reuses
+ * buildWorkRecognitionDecision unchanged: resolveCreateFoundationRecognition
+ * returns the same WorkRecognitionTurnResult shape as Work Recognition's own
+ * resolvers, so the decision-building is identical, not duplicated.
+ */
+function tryCreateFoundationHandoff(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  if (!userText) return null;
+
+  const result = resolveCreateFoundationRecognition(userText);
   if (!result) return null;
   return buildWorkRecognitionDecision(result, routing);
 }
@@ -4278,6 +4297,13 @@ function resolveFrictionlessActionImpl(
     if (
       resolveCreateFoundationClassification(userText).routeDirectlyToCreateFoundation
     ) {
+      // Phase C-1 (2026-08-07) — hand off to the same typed understanding
+      // conversation the Create entrance catalog already uses, instead of
+      // the dead "none" decision this used to be. See
+      // resolveCreateFoundationRecognition's own doc comment and
+      // docs/create-experience/CREATE_FOUNDATION_PHASE_C_PLAN.md.
+      const foundationFlow = tryCreateFoundationHandoff(input, routing);
+      if (foundationFlow) return foundationFlow;
       return finish({ ...none, intentRouting: routing });
     }
     return buildCreateFastPathRecoveryDecision(input, routing);

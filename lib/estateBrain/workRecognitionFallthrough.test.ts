@@ -15,11 +15,17 @@ import {
   detectWorkRecognitionShape,
   isWorkRecognitionMessage,
   resetWorkRecognitionSessionForTests,
+  resolveCreateFoundationRecognition,
   resolveWorkRecognitionNewRecognition,
   resolveWorkRecognitionResumption,
 } from "./workRecognitionFallthrough";
-import { resetEntranceUnderstandingForTests } from "@/lib/createEstate/entranceUnderstanding";
+import {
+  resetEntranceUnderstandingForTests,
+  startEntranceUnderstandingForCatalogType,
+} from "@/lib/createEstate/entranceUnderstanding";
 import { clearRuntimeCreationRecordsForTests } from "@/lib/currentFocus/creationRecord";
+import { resolveCreateFoundationClassification } from "@/lib/creationIdentity/createFoundationRouting";
+import { shouldEnterUniversalCreation } from "@/lib/universalCreation/orchestrator";
 import { DISCOVERY_QUESTIONS } from "./discoveryRegistry";
 
 beforeEach(() => {
@@ -362,5 +368,147 @@ describe("marker regex tracks the live question prompts (never hand-copied)", ()
     expect(
       isWorkRecognitionMessage("Here's a summary of your day so far."),
     ).toBe(false);
+  });
+});
+
+describe("Phase C-1 — Create Foundation convergence (resolveCreateFoundationRecognition)", () => {
+  // @see docs/create-experience/CREATE_FOUNDATION_PHASE_C_PLAN.md
+  // @see docs/create-experience/WORK_RECOGNITION_ACCEPTANCE_TESTS.md case 2
+
+  it("the founder's original case: \"I want to create a newsletter.\" is recognized and begins the understanding conversation, never a murky question", () => {
+    const result = resolveCreateFoundationRecognition(
+      "I want to create a newsletter.",
+    );
+    expect(result?.kind).toBe("question");
+    if (result?.kind !== "question") return;
+    expect(result.session.catalogTypeLabel).toBe("Newsletter");
+    expect(result.message).not.toMatch(/murky/i);
+  });
+
+  it("full label coverage: every already-catalog-pickable Create Foundation label reaches the typed conversation via chat text", () => {
+    const cases: Array<[string, string]> = [
+      ["I want to create a newsletter.", "Newsletter"],
+      ["I want to create a sop for onboarding.", "Sop"],
+      ["I want to create a proposal.", "Proposal"],
+      // "Lead magnet" isn't one of deriveCreationIdentity's recognized
+      // artifact nouns, so classificationType collapses to the generic
+      // "Document" fallback — verified via resolveCreateFoundationClassification
+      // directly, not assumed. Still routes correctly (never a silent
+      // no-op), just under a broader label than the specific request.
+      ["I want to create a lead magnet.", "Document"],
+      ["I want to create an offer.", "Document"],
+    ];
+    for (const [text, expectedLabel] of cases) {
+      resetWorkRecognitionSessionForTests();
+      resetEntranceUnderstandingForTests();
+      const result = resolveCreateFoundationRecognition(text);
+      expect(result?.kind, `expected a question for "${text}"`).toBe(
+        "question",
+      );
+      if (result?.kind !== "question") continue;
+      // The exact label may collapse to a broader classification (e.g.
+      // "Sop" case-shape, "lead magnet" -> guide, "offer" -> document) — see
+      // CREATE_FOUNDATION_CONVERGENCE_REVIEW.md's classifier duplication
+      // finding. What matters here is that it's consistent and never a
+      // silent no-op, never a murky question.
+      expect(result.session.catalogTypeLabel, text).toBe(expectedLabel);
+      expect(result.message).not.toMatch(/murky/i);
+    }
+  });
+
+  it("the landing-page precedence fix: \"I want to create a landing page.\" no longer routes into Universal Creation's discovery interview", () => {
+    expect(
+      shouldEnterUniversalCreation("I want to create a landing page."),
+    ).toBe(false);
+    const classification = resolveCreateFoundationClassification(
+      "I want to create a landing page.",
+    );
+    expect(classification.routeDirectlyToCreateFoundation).toBe(true);
+    expect(classification.classificationType).toBe("Landing Page");
+    const result = resolveCreateFoundationRecognition(
+      "I want to create a landing page.",
+    );
+    expect(result?.kind).toBe("question");
+    if (result?.kind !== "question") return;
+    expect(result.session.catalogTypeLabel).toBe("Landing Page");
+  });
+
+  it("a genuine 'website copy' request is unaffected by the landing-page fix — still Universal Creation's own discovery", () => {
+    expect(
+      resolveCreateFoundationClassification("I want website copy.")
+        .routeDirectlyToCreateFoundation,
+    ).toBe(false);
+  });
+
+  it("doorway convergence: the same creation request reaches the same reasoning journey from chat text and from a catalog pick", () => {
+    // Chat entry point.
+    const chatResult = resolveCreateFoundationRecognition(
+      "I want to create a newsletter.",
+    );
+    expect(chatResult?.kind).toBe("question");
+    if (chatResult?.kind !== "question") return;
+
+    resetEntranceUnderstandingForTests();
+
+    // Dropdown/catalog entry point — the exact function
+    // CreateEstateEntrancePanel.tsx's requestCatalogConfirm already calls.
+    const catalogStep = startEntranceUnderstandingForCatalogType(
+      "Newsletter",
+      null,
+    );
+    expect(catalogStep.kind).toBe("question");
+    if (catalogStep.kind !== "question") return;
+
+    // Same topic, same catalog type, same first question — one journey,
+    // not two independent copies that happen to look similar.
+    expect(chatResult.session.topic).toBe(catalogStep.session.topic);
+    expect(chatResult.session.catalogTypeLabel).toBe(
+      catalogStep.session.catalogTypeLabel,
+    );
+    expect(chatResult.message).toContain(catalogStep.question.prompt);
+  });
+
+  it("the 6 PRE_WORKSPACE_DISCOVERY_UC_TYPES are unaffected — still route through Universal Creation's own interview", () => {
+    for (const text of [
+      // Email's own detectPatterns require write/draft/compose/send/craft —
+      // not "create" — verified directly; this is the phrasing that
+      // actually stays on the UC-discovery path.
+      "I need to write an email to a client.",
+      "I want to create a sales funnel.",
+      "I want to create a presentation.",
+      "I want to create a business plan.",
+      "I want to create a social post.",
+    ]) {
+      expect(
+        resolveCreateFoundationClassification(text)
+          .routeDirectlyToCreateFoundation,
+        text,
+      ).toBe(false);
+      expect(resolveCreateFoundationRecognition(text), text).toBeNull();
+    }
+  });
+
+  it("previous work recognition wins: an active Work Recognition session is not hijacked by a Create Foundation-classified message", () => {
+    const first = resolveWorkRecognitionNewRecognition(
+      "I want to build a strategy for organizing my filing system.",
+    );
+    if (first?.kind !== "question") throw new Error("expected a question");
+
+    // A Create-Foundation-shaped reply arrives mid-journey — resumption
+    // (the early priority check) must claim it, not a fresh recognition.
+    const second = resolveWorkRecognitionResumption(
+      "I want to create a newsletter about it instead.",
+      first.message,
+    );
+    expect(second).not.toBeNull();
+    expect(second?.kind === "question" || second?.kind === "understood").toBe(
+      true,
+    );
+  });
+
+  it("empty text and non-creation text return null, never a false positive", () => {
+    expect(resolveCreateFoundationRecognition("")).toBeNull();
+    expect(resolveCreateFoundationRecognition("How are you today?")).toBeNull();
+    expect(resolveCreateFoundationRecognition("What is Loom?")).toBeNull();
   });
 });

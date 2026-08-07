@@ -40,11 +40,14 @@
 import {
   advanceEntranceUnderstanding,
   startEntranceUnderstanding,
+  startEntranceUnderstandingForCatalogType,
   type EntranceUnderstandingSession,
   type EntranceUnderstandingStep,
 } from "@/lib/createEstate/entranceUnderstanding";
 import { DISCOVERY_QUESTIONS } from "@/lib/estateBrain/discoveryRegistry";
 import { isExplicitNavigationIntent } from "@/lib/conversationStabilization/goalClassifier";
+import { resolveCreateFoundationClassification } from "@/lib/creationIdentity/createFoundationRouting";
+import { SIMPLE_CREATE_VERB_RE } from "@/lib/universalCreation/createFastPath";
 
 // ---------------------------------------------------------------------------
 // Shape detection — request shapes, not keywords.
@@ -348,4 +351,60 @@ export function resolveWorkRecognitionNewRecognition(
   const step = startEntranceUnderstanding(text);
   if (!step) return null;
   return applyStep(step, shape.acknowledgment);
+}
+
+/**
+ * Phase C-1 (2026-08-07) — Create Foundation convergence. A chat message
+ * that resolveCreateFoundationClassification classifies as a Create
+ * Foundation direct type (newsletter, SOP, checklist, proposal, ...)
+ * previously reached a dead "none" decision several steps before this
+ * module's own shape-based fallthrough ever got a chance (see
+ * EXPLICIT_VERB_RE's own comment, and
+ * docs/create-experience/WORK_RECOGNITION_ACCEPTANCE_TESTS.md case 2).
+ *
+ * This hands off to the SAME typed conversation the working Create-entrance
+ * catalog pick already uses (startEntranceUnderstandingForCatalogType) —
+ * no new classifier, no new conversation logic, no new engine. The
+ * classification label IS the catalog label; it is trusted, never
+ * re-derived, exactly like a real catalog pick.
+ *
+ * Safety: resolveCreateFoundationClassification alone is NOT a safe gate on
+ * its own — deriveCreationIdentity's fallback classifies literally any text
+ * as at least "Document" (a Create Foundation direct label), so this
+ * function requires SIMPLE_CREATE_VERB_RE (an explicit create/plan/
+ * develop/build/... + article verb phrase) rather than trusting the caller.
+ * Deliberately NOT the narrower isSimpleCreateRequest: that function's own
+ * ARTIFACT_INFERENCE list doesn't recognize "checklist" (or several other
+ * Create Foundation direct labels) as a document type at all, so gating on
+ * it would silently exclude legitimate Create Foundation types from ever
+ * reaching this function, even standalone. SIMPLE_CREATE_VERB_RE is
+ * imported, not re-derived — the same pattern createFastPath.ts's own
+ * broader permissive branch already relies on for the same reason.
+ *
+ * Scope, exactly as approved for C-1: only the hard-exit call site inside
+ * resolveFrictionlessActionImpl itself is wired to this function.
+ * resolveCreateFastPathAction (a separately certified boundary — see
+ * docs/create-experience/standards/076_CREATE_FOUNDATION_CERTIFICATION.md)
+ * and tryUniversalCreationFlow's own internal declines are deliberately
+ * left untouched — narrower than originally scoped in
+ * CREATE_FOUNDATION_PHASE_C_PLAN.md, once 076's certification weight on
+ * that function was found. Flagged as a possible follow-up, not required
+ * for the reported bug (a bare chat message reaches the hard-exit site
+ * this function is wired to).
+ */
+export function resolveCreateFoundationRecognition(
+  userText: string,
+): WorkRecognitionTurnResult | null {
+  const text = userText.trim();
+  if (!text) return null;
+  if (!SIMPLE_CREATE_VERB_RE.test(text)) return null;
+
+  const classification = resolveCreateFoundationClassification(text);
+  if (!classification.routeDirectlyToCreateFoundation) return null;
+
+  const step = startEntranceUnderstandingForCatalogType(
+    classification.classificationType,
+    text,
+  );
+  return applyStep(step, acknowledgmentFor("create"));
 }

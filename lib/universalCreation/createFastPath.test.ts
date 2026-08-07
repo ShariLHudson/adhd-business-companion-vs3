@@ -1,8 +1,14 @@
 /**
  * CREATE fast path — document creation only.
  * Sprint 2: Workshop / Webinar are Event Platform (045–065), not documents.
- * Create Foundation types (Checklist, SOP, Newsletter, …) leave frictionless
- * without UC discovery — CompanionPageClient owns the handoff.
+ * Create Foundation types (Checklist, SOP, Newsletter, …) leave UC discovery
+ * without entering it.
+ *
+ * Phase C-1 (2026-08-07) — frictionless itself now owns the hand-off (via
+ * resolveCreateFoundationRecognition, lib/estateBrain/workRecognitionFallthrough.ts),
+ * starting entranceUnderstanding.ts's typed conversation instead of the
+ * dead "none"/null decision this used to leave behind. See
+ * docs/create-experience/CREATE_FOUNDATION_PHASE_C_PLAN.md.
  */
 
 import { beforeEach, describe, expect, it } from "vitest";
@@ -149,9 +155,16 @@ describe("CREATE fast path — documents only (Sprint 2)", () => {
         userText: text,
         currentTurn: 1,
       });
+      // Still true, still the point of this test: Universal Creation's own
+      // discovery interview must never own a Create Foundation type.
       expect(frictionless.category).not.toBe("universal_creation");
-      expect(frictionless.localReply).toBeNull();
       expect(loadUniversalCreationSession()).toBeNull();
+      // Phase C-1 — no longer a dead "none" decision. A real reply: the
+      // typed understanding conversation (entranceUnderstanding.ts, the
+      // same one the Create entrance catalog already uses), never a
+      // murky/uncertainty-toned question.
+      expect(frictionless.localReply).toBeTruthy();
+      expect(frictionless.localReply).not.toMatch(/murky/i);
     },
   );
 
