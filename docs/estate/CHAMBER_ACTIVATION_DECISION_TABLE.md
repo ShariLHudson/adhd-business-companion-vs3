@@ -44,6 +44,33 @@ Both are forms of uncertainty, but they call for opposite postures, and conflati
 
 ---
 
+---
+
+## Acceptance tests per state (finalized — implemented in `resolveChamberExpertActivationV2.test.ts` / `chamberExpertiseHintForChat.test.ts`)
+
+| State | Acceptance test |
+|-------|---------------------|
+| **Clear primary** | A request with genuine Tier-1 evidence for one expert and nothing comparable for any other resolves to that `primary`, `confidence: "high"` or `"medium"`, no `coPrimary` set. Regression: all 31 existing corpus "clear" entries continue to pass unchanged under V2. |
+| **Supporting** | When a primary's curated collaborator also has real signal, it appears in `supporting`, and the composer's hint for it uses the existing "Also relevant" framing (never "Leading perspective," never its own separate paragraph). |
+| **Co-primary** | (a) *Score-magnitude path:* a constructed input where two different-category experts both independently clear `STRONG_EVIDENCE_THRESHOLD` with `marginRatio < CONTESTED_MARGIN_RATIO` resolves to `confidence: "co-primary"` with `coPrimary` containing both. (b) *Structural path:* the "digital course pricing and marketing" and "hire team member and haven't documented" corpus entries, once `outcomeSignals` are authored, resolve to `co-primary: [MKT, FIN]` and `co-primary: [PC, SYS]` respectively via the conjunction-split mechanism. (c) *False-positive guard:* "I need to write an email and send it" and "I want to plan and host a workshop" do **not** trigger co-primary (both sub-clauses resolve to the same expert). |
+| **Contested** | The reconstructed bare "I keep meaning to follow up but I never do." corpus entry resolves to `confidence: "contested"` with a `runnerUp` populated, `primary` chosen via the evidence-quality tiebreak (never array order). |
+| **Insufficient evidence** | A request with no real topical or outcome evidence for any expert (e.g. "I don't really know what I need help with today") resolves to `primary: null`, `confidence: "low"`, and a composer-level `clarifyingQuestion` built from up to 3 weakly-scoring candidates' plain-language phrases — never a forced primary, never more than one question. |
+
+---
+
+## Plain-language outcome vocabulary — requirement (finalized)
+
+Every one of the 24 Chamber Experts (not just the 3 pilots — this is a lightweight, activation-layer requirement, distinct from the much larger per-expert intelligence-module migration that remains deferred, §"Not decided here") must have a **`founderPlainLanguagePhrase`**: a short, plain-language phrase naming what working with this expert actually helps a founder *do*, written the way a founder would describe it to a friend, never the expert's internal name.
+
+**Requirements:**
+- 3–8 words, a verb phrase or short noun phrase ("getting customers," "creating the system," "deciding the direction") — not a sentence, not the expert's category or name.
+- Used **only** for insufficient-evidence clarifying questions (§ above) — never appears in a normal "clear primary" or "co-primary" hint, which continue to use the expert's real name and thinking pattern internally as they already do.
+- Authored once per expert, does not require the deeper framework/ADHD-translation/knowledge-source migration the remaining 21 experts are still waiting on — this is why it's in scope now without breaking the "21 remaining experts deferred" boundary.
+
+This requirement is satisfied for all 24 registry entries as part of V2-2's implementation (a one-line addition per expert), not deferred alongside the heavier per-expert intelligence work.
+
+---
+
 ## Not decided here
 
 - The exact founder-plain-language phrase per expert (mechanism note above) — content, not architecture, deferred to V2-2 authoring.
