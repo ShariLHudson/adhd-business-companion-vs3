@@ -41,7 +41,11 @@ const ARTIFACT_INFERENCE: ReadonlyArray<{
   { re: /\bmarketing plan\b/i, type: "business_plan" },
   { re: /\bbusiness plan\b/i, type: "business_plan" },
   { re: /\bnewsletter\b/i, type: "newsletter" },
-  { re: /\b(?:an? )?sop\b|standard operating procedure\b/i, type: "sop" },
+      { re: /\b(?:an? )?sop\b|standard operating procedure\b/i, type: "sop" },
+      {
+        re: /\b(?:develop|create|build|document|write(?: down)?|design)\s+(?:a |an |our |my |the |new )*process\b|\bprocess for (?:new |our )?clients\b/i,
+        type: "sop",
+      },
   { re: /\bproposal\b/i, type: "proposal" },
   { re: /\b(?:an? )?email\b/i, type: "email" },
   { re: /\bcourse\b/i, type: "course" },
