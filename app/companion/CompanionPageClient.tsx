@@ -402,6 +402,8 @@ import {
   type EmotionalState,
 } from "@/lib/companionEmotions";
 import { resolveSupportGate, softenResponse } from "@/lib/workStatePriority/resolveSupportGate";
+import { isWorkIdentityV1Enabled } from "@/lib/intelligence-layer/featureFlags";
+import { observeCommitmentGate } from "@/lib/workIdentity/observeCommitmentGate";
 import {
   EMOTION_SHELL_CLASS,
   getStateHint,
@@ -10649,6 +10651,23 @@ export default function CompanionPageClient() {
     // to existing PROCEED/SOFTEN behavior.
     const createTurnEmotionalState = detectEmotionalState(trimmed);
     const supportGate = resolveSupportGate(trimmed, createTurnEmotionalState);
+
+    // Work Identity, Slice 1A (docs/estate/WORK_IDENTITY_SLICE_0_REVIEW.md
+    // §5 — observe-only): compute the Commitment Recognition Gate's
+    // decision using the Support Gate tier already resolved above, and
+    // record it for diagnostics only. `observeCommitmentGate` returns
+    // void by design — nothing below this line, or anywhere else in this
+    // turn, can branch on its result. Never mints a WorkId, never writes
+    // storage, never calls routing or navigation — deliberately inert
+    // wiring, proving the gate against real turns before anything
+    // depends on its answer (Slice 1B).
+    if (isWorkIdentityV1Enabled()) {
+      observeCommitmentGate({
+        userText: trimmed,
+        supportGateTier: supportGate,
+        turn: chatTurnRef.current,
+      });
+    }
 
     if (
       (isSimpleCreateRequest(trimmed) || universalCreationContinuation) &&

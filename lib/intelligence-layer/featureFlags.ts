@@ -13,6 +13,7 @@ const LS_DEV_WARNINGS = "companion-flag-signal-bus-dev-warnings";
 const LS_TRUST_INSPECTOR = "companion-flag-trust-inspector";
 const LS_CHAMBER_INTELLIGENCE_PILOT = "companion-flag-chamber-intelligence-pilot";
 const LS_CHAMBER_ACTIVATION_V2 = "companion-flag-chamber-activation-v2";
+const LS_WORK_IDENTITY_V1 = "companion-flag-work-identity-v1";
 
 function readLocalStorageFlag(key: string): boolean | null {
   if (typeof window === "undefined") return null;
@@ -109,6 +110,26 @@ export function isChamberActivationV2Enabled(): boolean {
   return raw !== "false" && raw !== "0";
 }
 
+/**
+ * Work Identity — Commitment Recognition, Slice 1A (observe-only).
+ *
+ * Gates a single, additional call to `resolveCommitmentGate` at the
+ * existing Support Gate checkpoint in CompanionPageClient.tsx. When
+ * enabled, the gate's decision is computed from the same inputs Create
+ * Fast Path already has on hand and recorded to an in-memory-only
+ * diagnostic log (`lib/workIdentity/commitmentGateDiagnostics.ts`) —
+ * never localStorage, never a durable record. No WorkId is created, no
+ * storage is written, and no Create/Exploration/Research/Support
+ * behavior changes when this flag is on or off — see
+ * docs/estate/WORK_IDENTITY_SLICE_0_REVIEW.md §5 and
+ * docs/estate/WORK_IDENTITY_IMPLEMENTATION_PLAN.md. Default: false.
+ */
+export function isWorkIdentityV1Enabled(): boolean {
+  const override = readLocalStorageFlag(LS_WORK_IDENTITY_V1);
+  if (override !== null) return override;
+  return envTrue("NEXT_PUBLIC_WORK_IDENTITY_V1");
+}
+
 export const PROFILE_LEARNING_FLAG_KEYS = {
   profileLearning: LS_PROFILE_LEARNING,
 } as const;
@@ -123,6 +144,10 @@ export const CHAMBER_INTELLIGENCE_PILOT_FLAG_KEYS = {
 
 export const CHAMBER_ACTIVATION_V2_FLAG_KEYS = {
   chamberActivationV2: LS_CHAMBER_ACTIVATION_V2,
+} as const;
+
+export const WORK_IDENTITY_V1_FLAG_KEYS = {
+  workIdentityV1: LS_WORK_IDENTITY_V1,
 } as const;
 
 export const SIGNAL_BUS_FLAG_KEYS = {
