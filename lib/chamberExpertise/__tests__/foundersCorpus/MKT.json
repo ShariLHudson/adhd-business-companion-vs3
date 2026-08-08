@@ -1,0 +1,92 @@
+[
+  {
+    "text": "I need a marketing strategy.",
+    "expectedPrimary": "MKT",
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "The original broad-strategy scenario from the I-2 review. Baseline sanity check.",
+    "source": "review-simulation"
+  },
+  {
+    "text": "Nobody knows I exist and I don't know what to post anymore.",
+    "expectedPrimary": "MKT",
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Visibility overwhelm scenario. Originally mis-activated to Strategy before the review's registry fix (added 'nobody knows i exist' / 'know what to post' triggers). Regression-locks that fix.",
+    "source": "review-simulation"
+  },
+  {
+    "text": "I keep launching things and it wipes me out every single time.",
+    "expectedPrimary": "MKT",
+    "intentCategory": "build",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Launch fatigue scenario. Originally mis-activated to Strategy before the review's registry fix (added 'wipes me out'). Regression-locks that fix.",
+    "source": "review-simulation"
+  },
+  {
+    "text": "I think I need a solid marketing plan but I don't even know where to start.",
+    "expectedPrimary": "MKT",
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Direct planning request phrased with a starting-point uncertainty, not just the bare trigger phrase.",
+    "source": "constructed"
+  },
+  {
+    "text": "I want to get noticed online but everything I try falls flat.",
+    "expectedPrimary": "MKT",
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Frustration-framed visibility request.",
+    "source": "constructed"
+  },
+  {
+    "text": "My audience doesn't seem to convert no matter what I post.",
+    "expectedPrimary": "MKT",
+    "intentCategory": "build",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Conversion framing rather than a bare visibility complaint.",
+    "source": "constructed"
+  },
+  {
+    "text": "I keep trying new visibility strategies and nothing sticks.",
+    "expectedPrimary": "MKT",
+    "intentCategory": "plan",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Restlessness/novelty-chasing framing rather than a plain request.",
+    "source": "constructed"
+  },
+  {
+    "text": "I ran a launch and it flopped, and I honestly don't know what happened.",
+    "expectedPrimary": "MKT",
+    "intentCategory": "build",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Post-mortem framing after a launch, not a forward-looking plan request.",
+    "source": "constructed"
+  },
+  {
+    "text": "My last campaign got some clicks but no actual clients came from it.",
+    "expectedPrimary": "MKT",
+    "intentCategory": "build",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Results-gap framing (clicks vs. clients) rather than a bare planning ask.",
+    "source": "constructed"
+  },
+  {
+    "text": "I have a marketing plan sitting in a doc that I never actually followed.",
+    "expectedPrimary": "MKT",
+    "intentCategory": "organize",
+    "estateCategory": "business",
+    "classification": "clear",
+    "note": "Abandoned-plan framing, testing the intent classifier's 'organize' category rather than plan/build.",
+    "source": "constructed"
+  }
+]

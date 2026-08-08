@@ -107,6 +107,16 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
     createItemType: "SOP",
     detectPatterns: [
       /\b(?:an? )?sop\b|standard operating procedure\b/i,
+      // Founder phrasing that names the outcome ("a process") rather than
+      // the artifact type ("an SOP") — found via end-to-end journey
+      // validation (docs/estate/WORK_STATE_PRIORITY_MODEL.md): "develop a
+      // process for new clients" was reaching generic Document discovery
+      // instead of SOP's own, more specific questions. Deliberately
+      // requires a creation verb before "process" (not a bare "process"
+      // keyword) so unrelated mentions ("going through a process",
+      // "what's the process for signing up") are never misclassified.
+      /\b(?:develop|create|build|document|write(?: down)?|design)\s+(?:a |an |our |my |the |new )*process\b/i,
+      /\bprocess for (?:new |our )?clients\b/i,
     ],
     enhancements: [
       { id: "checklist", label: "Printable checklist", description: "Quick-reference checklist from the SOP" },

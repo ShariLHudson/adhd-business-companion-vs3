@@ -128,7 +128,7 @@ const CREATE: EstateCapability[] = [
     id: "create.sop",
     name: "SOP",
     category: "create",
-    triggers: ["sop", "standard operating", "procedure"],
+    triggers: ["sop", "standard operating", "procedure", "process", "develop a process"],
     experienceId: "create",
     spaceId: "creative-studio",
     toolId: "content-generator",

@@ -96,7 +96,7 @@ export function detectEmotionalState(
   const category = classifyUserMessage(text);
   if (category === "practical_task") {
     if (
-      /\b(write|draft|email|create|build|plan|playbook|proposal|newsletter|marketing|content|strategy|document|letter|blog|copy|structure|post|linkedin)\b/.test(
+      /\b(write|draft|email|create|build|plan|develop|design|playbook|proposal|newsletter|workshop|process|(?<!of )course|marketing|content|strategy|document|letter|blog|copy|structure|post|linkedin)\b/.test(
         source,
       )
     ) {
@@ -111,7 +111,7 @@ export function detectEmotionalState(
 
   if (shouldSuppressEmotionalTools(text)) {
     if (
-      /\b(write|draft|email|create|build|plan|content|post|linkedin|system|app|routing|code|debug)\b/.test(
+      /\b(write|draft|email|create|build|plan|develop|design|content|workshop|process|(?<!of )course|post|linkedin|system|app|routing|code|debug)\b/.test(
         source,
       )
     ) {
@@ -126,7 +126,7 @@ export function detectEmotionalState(
     (isContentBrainstorming(text) && !hasClearEmotionalSignal(text))
   ) {
     if (
-      /\b(write|draft|email|create|build|plan|content|post|linkedin)\b/.test(
+      /\b(write|draft|email|create|build|plan|develop|design|content|workshop|process|(?<!of )course|post|linkedin)\b/.test(
         source,
       )
     ) {
@@ -175,7 +175,7 @@ export function detectEmotionalState(
   }
 
   if (
-    /\b(write|draft|email|create|build|plan|playbook|proposal|newsletter|marketing|content|strategy|document|letter|blog|copy|structure)\b/.test(
+    /\b(write|draft|email|create|build|plan|develop|design|playbook|proposal|newsletter|workshop|process|(?<!of )course|marketing|content|strategy|document|letter|blog|copy|structure)\b/.test(
       source,
     )
   ) {
@@ -191,6 +191,33 @@ export function detectEmotionalState(
   }
 
   return "unclear";
+}
+
+/**
+ * Phase 1 of the Work State Priority Model
+ * (docs/estate/WORK_STATE_PRIORITY_MODEL.md §3.2): a narrow, explicit
+ * check for GENUINE confusion — deliberately separate from
+ * `detectEmotionalState()`'s `"unclear"` value, which is a catch-all that
+ * also fires for (a) short/greeting text with no real content, and
+ * (b) any text that simply didn't match a build-verb/artifact word yet —
+ * a vocabulary gap, not a human-state signal. Verified empirically before
+ * this fix: "I need help planning a workshop." and "I'm not sure what I
+ * need help with." both returned `"unclear"`, with no way to tell which
+ * was which from the enum value alone — exactly the conflation this
+ * function exists to resolve.
+ *
+ * Use this ALONGSIDE `detectEmotionalState()`, never as a replacement for
+ * it — it answers a narrower, different question ("is the founder
+ * actually confused, in their own words") than the full emotional
+ * classification does.
+ */
+const GENUINE_CONFUSION_RE =
+  /\b(?:confused|unsure|not (?:really |quite )?sure(?: what| how| where| if)?|no idea|no clue|not certain|uncertain|don'?t know where to start|don'?t know what (?:i need|to do|i'?m doing))\b/i;
+
+export function isGenuineConfusionSignal(text: string): boolean {
+  const t = text.trim();
+  if (!t) return false;
+  return GENUINE_CONFUSION_RE.test(t);
 }
 
 // Lightweight, rule-based secondary classifier. Sits ALONGSIDE intent/emotion

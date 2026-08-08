@@ -50,6 +50,7 @@ import {
   isConversationSessionSpineEnabled,
   syncUniversalCreationToSession,
 } from "@/lib/conversationSession";
+import { attachWorkIdentityAtCreation } from "@/lib/workIdentity/attachWorkIdentity";
 
 const STORAGE_KEY = "universal-creation-session-v1";
 
@@ -178,6 +179,17 @@ function buildInitialSession(
   ) {
     questionIndex += 1;
   }
+  // Work Identity, Slice 1B Remediation
+  // (docs/estate/WORK_IDENTITY_SLICE_1B_REMEDIATION.md): deliberately no
+  // WorkId logic here. `buildInitialSession` has two kinds of caller —
+  // the retained entry (`startUniversalCreationTurn`, the
+  // `resolveUniversalCreationTurn` recovery path) and a discarded
+  // feasibility probe (`shouldEnterUniversalCreation`, called from many
+  // other files just to check "would this be complete"). Attaching
+  // identity here would run — and, for commit-eligible text, mint a
+  // WorkId — every time any caller merely asks the question, never only
+  // when a session is genuinely kept. See `attachRetainedWorkIdentity`,
+  // called only from the retained callers.
   return {
     documentType,
     phase: "discovery",
@@ -189,6 +201,21 @@ function buildInitialSession(
     preparationReady: false,
     pendingEnhancements: [],
   };
+}
+
+/**
+ * The one and only place a WorkId is attached — called exclusively by
+ * the retained callers of `buildInitialSession` (never by
+ * `shouldEnterUniversalCreation`'s feasibility probe). Returns the
+ * session unchanged for exploration, a Support Gate pause, or when the
+ * flag is off — building an identical session either way.
+ */
+function attachRetainedWorkIdentity(
+  session: UniversalCreationSession,
+  userText: string,
+): UniversalCreationSession {
+  const workId = attachWorkIdentityAtCreation(userText);
+  return workId ? { ...session, workId } : session;
 }
 
 function nextQuestion(session: UniversalCreationSession) {
@@ -287,7 +314,10 @@ export function startUniversalCreationTurn(
   const docType = detectUniversalDocumentType(userText);
   if (!docType) return null;
 
-  const session = buildInitialSession(userText, docType, turn);
+  const session = attachRetainedWorkIdentity(
+    buildInitialSession(userText, docType, turn),
+    userText,
+  );
   if (isUniversalDiscoveryComplete(session.confidence)) {
     return finalizeDiscovery(session);
   }
@@ -443,10 +473,14 @@ export function resolveUniversalCreationTurn(
   try {
     return startUniversalCreationTurn(t, currentTurn);
   } catch {
+    // Recovery path — still a retained construction (its session is
+    // returned to the founder), so it attaches identity the same way
+    // startUniversalCreationTurn does, never via buildInitialSession
+    // directly.
     const docType = detectUniversalDocumentType(t);
     const plugin = docType ? pluginById(docType) : null;
     const session = docType
-      ? buildInitialSession(t, docType, currentTurn)
+      ? attachRetainedWorkIdentity(buildInitialSession(t, docType, currentTurn), t)
       : null;
     return {
       kind: "question",
@@ -454,7 +488,10 @@ export function resolveUniversalCreationTurn(
       question: plugin?.discoveryQuestions[0]?.prompt ?? "What should we build first?",
       session:
         session ??
-        buildInitialSession(t, docType ?? "document", currentTurn),
+        attachRetainedWorkIdentity(
+          buildInitialSession(t, docType ?? "document", currentTurn),
+          t,
+        ),
     };
   }
 }
