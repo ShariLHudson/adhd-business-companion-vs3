@@ -94,6 +94,16 @@ export type UniversalCreationSession = {
   pendingEnhancements: string[];
   /** Composed draft shown during review — persisted for revision turns. */
   draftContent?: string;
+  /**
+   * Work Identity, Slice 1B (docs/estate/WORK_IDENTITY_MODEL.md,
+   * docs/estate/COMMITMENT_RECOGNITION_DESIGN_REVIEW.md §7). Set once, at
+   * session creation, only when the founder's own language crossed the
+   * commitment boundary — never for exploratory or overwhelm-paused
+   * text (see `lib/workIdentity/attachWorkIdentity.ts`). Optional and
+   * unread by any existing code path outside `lib/workIdentity/` — a
+   * session without one is a normal, expected state, not an error.
+   */
+  workId?: string;
 };
 
 export const UNIVERSAL_DISCOVERY_THRESHOLD = 90;

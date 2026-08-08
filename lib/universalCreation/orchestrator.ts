@@ -50,6 +50,7 @@ import {
   isConversationSessionSpineEnabled,
   syncUniversalCreationToSession,
 } from "@/lib/conversationSession";
+import { attachWorkIdentityAtCreation } from "@/lib/workIdentity/attachWorkIdentity";
 
 const STORAGE_KEY = "universal-creation-session-v1";
 
@@ -188,6 +189,13 @@ function buildInitialSession(
     startedAtTurn: turn,
     preparationReady: false,
     pendingEnhancements: [],
+    // Work Identity, Slice 1B (docs/estate/WORK_IDENTITY_MODEL.md): the
+    // one and only place a WorkId is attached — buildInitialSession is
+    // the sole constructor of a new session, so this cannot run twice
+    // for the same piece of work. Returns undefined for exploration, a
+    // Support Gate pause, or when the flag is off — the session itself
+    // is built identically either way.
+    workId: attachWorkIdentityAtCreation(userText),
   };
 }
 
