@@ -1,57 +1,66 @@
 /**
- * Work Identity — Slice 1B: attaching a `WorkId` at the exact, single
- * moment a new Universal Creation session is built.
+ * Work Identity — attaching a `WorkId` at the exact, single moment a new
+ * Universal Creation session is genuinely kept.
  *
  * `buildInitialSession` (`lib/universalCreation/orchestrator.ts`) is the
- * sole constructor of a fresh `UniversalCreationSession` — confirmed
- * before writing this function: it is a private, non-exported function
- * with exactly one caller (`startUniversalCreationTurn`), and no other
- * function in `lib/universalCreation/` builds a session object from
- * scratch (every other reference spreads an existing session). This is
- * the "clear Work Recognition → Create path" the request scoped this
- * slice to — attaching identity here, and only here, is what makes "no
- * duplicate records" structural rather than a convention to remember.
+ * sole constructor of a fresh `UniversalCreationSession`, but it has two
+ * kinds of caller — the retained entry (`startUniversalCreationTurn` and
+ * `resolveUniversalCreationTurn`'s recovery path) and a discarded
+ * feasibility probe (`shouldEnterUniversalCreation`, called from many
+ * other files just to check "would this be complete"). This function is
+ * called only from the retained callers
+ * (`attachRetainedWorkIdentity` in `orchestrator.ts`) — never from
+ * inside `buildInitialSession` itself, and never for a probe whose
+ * result is thrown away (Slice 1B Remediation,
+ * docs/estate/WORK_IDENTITY_SLICE_1B_REMEDIATION.md §1–§2).
  *
- * Recomputes the Support Gate tier internally rather than requiring the
- * caller to thread it through `startUniversalCreationTurn`'s and
- * `buildInitialSession`'s signatures — a deliberate, smallest-safe-change
- * choice: `resolveSupportGate` is a cheap, pure, side-effect-free
- * function already computed once upstream in the live conversation turn
- * (Slice 1A's own call site), so recomputing it here costs nothing and
- * keeps this slice's change contained to a single call site rather than
- * threading a new parameter through every function between the live turn
- * and session construction. It also means this guarantee holds for any
- * caller path that reaches session creation, not only the one already
- * reviewed.
- *
- * Fully gated by `isWorkIdentityV1Enabled()` — with the flag off, this
- * always returns `undefined`, and `buildInitialSession`'s output is
- * byte-identical to before this slice (an explicit `workId: undefined`
- * key is dropped by `JSON.stringify`, so the persisted session shape is
- * unchanged either way).
+ * Takes the Support Gate tier as an explicit parameter rather than
+ * recomputing it — Slice 1B Remediation's other fix. Previously this
+ * module imported `detectEmotionalState` (`lib/companionEmotions.ts`)
+ * and `resolveSupportGate`
+ * (`lib/workStatePriority/resolveSupportGate.ts`) to recompute the tier
+ * internally; those are real, value-level imports, and — because this
+ * function is now called from `orchestrator.ts`, a module already
+ * transitively reachable *from* `companionEmotions.ts` via an unrelated,
+ * pre-existing chain — that recompute closed a genuine circular import
+ * (confirmed empirically in
+ * docs/estate/WORK_IDENTITY_SLICE_1B_REVIEW.md §5.1). The Work Identity
+ * layer must not import into the orchestration / emotion-detection
+ * layers at all; the caller already has (or can cheaply default) this
+ * value.
  */
 
-import { detectEmotionalState } from "../companionEmotions";
 import { isWorkIdentityV1Enabled } from "../intelligence-layer/featureFlags";
-import { resolveSupportGate } from "../workStatePriority/resolveSupportGate";
 import { mintWorkId } from "./mintWorkId";
 import { resolveCommitmentGate } from "./resolveCommitmentGate";
-import type { WorkId } from "./types";
+import type { CommitmentSupportGateTier, WorkId } from "./types";
 
 /**
- * Returns a freshly minted `WorkId` only when the founder's own language,
- * for this exact turn, crosses the commitment boundary
- * (COMMITMENT_RECOGNITION_DESIGN_REVIEW.md §7) — `undefined` for
- * exploration, for a Support Gate PAUSE, or when the flag is off. The
- * caller (session construction) is responsible for calling this exactly
- * once, at creation — never on every subsequent turn of an already-live
- * session, which would re-evaluate commitment for text that already has
- * an identity.
+ * Returns a freshly minted `WorkId` only when the founder's own language
+ * crosses the commitment boundary (COMMITMENT_RECOGNITION_DESIGN_REVIEW.md
+ * §7) — `undefined` for exploration, for a Support Gate pause, or when
+ * the flag is off.
+ *
+ * `supportGateTier` defaults to `"proceed"` when the caller does not
+ * supply one — `orchestrator.ts`'s retained call sites do not currently
+ * have the live turn's real, already-computed tier on hand without
+ * threading it through several public function signatures used by many
+ * other callers across the codebase (out of scope for this narrow
+ * remediation; see docs/estate/WORK_IDENTITY_SLICE_1B_REMEDIATION.md §5
+ * for the honest trade-off this default accepts). This is a literal
+ * default value, never a recompute — it introduces no import at all.
+ * The live conversation's own Support Gate check
+ * (`CompanionPageClient.tsx`) already blocks a genuinely overwhelmed
+ * turn from reaching Create Fast Path — and therefore this function —
+ * in the first place; this default only governs what happens for a
+ * caller that reaches this function directly, bypassing that check.
  */
-export function attachWorkIdentityAtCreation(userText: string): WorkId | undefined {
+export function attachWorkIdentityAtCreation(
+  userText: string,
+  supportGateTier: CommitmentSupportGateTier = "proceed",
+): WorkId | undefined {
   if (!isWorkIdentityV1Enabled()) return undefined;
 
-  const supportGateTier = resolveSupportGate(userText, detectEmotionalState(userText));
   const decision = resolveCommitmentGate({ userText, supportGateTier });
   if (decision.outcome !== "commit") return undefined;
 

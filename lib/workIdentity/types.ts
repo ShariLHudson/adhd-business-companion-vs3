@@ -18,8 +18,6 @@
  * WORK_IDENTITY_IMPLEMENTATION_PLAN.md §1's Slice 1).
  */
 
-import type { SupportGateTier } from "../workStatePriority/resolveSupportGate";
-
 /**
  * A reference to one piece of work's canonical identity
  * (WORK_IDENTITY_MODEL.md §1). A plain string alias, not branded — Slice 0
@@ -101,6 +99,19 @@ export type CommitmentGateReason =
   | "no_work_signal"
   | "no_signal";
 
+/**
+ * Structurally identical to `SupportGateTier`
+ * (lib/workStatePriority/resolveSupportGate.ts), declared locally rather
+ * than imported (Slice 1B Remediation,
+ * docs/estate/WORK_IDENTITY_SLICE_1B_REMEDIATION.md): the Work Identity
+ * layer must not import into the orchestration / emotion-detection
+ * layers, even for a type. Callers that already hold a real
+ * `SupportGateTier` value can pass it here directly — TypeScript's
+ * structural typing makes the two interchangeable without a shared
+ * import (both are exactly `"pause" | "soften" | "proceed"`).
+ */
+export type CommitmentSupportGateTier = "pause" | "soften" | "proceed";
+
 /** Input to `resolveCommitmentGate` — everything it is allowed to see. */
 export interface CommitmentRecognitionContext {
   readonly userText: string;
@@ -110,7 +121,7 @@ export interface CommitmentRecognitionContext {
    * (COMMITMENT_RECOGNITION_DESIGN_REVIEW.md §7, step 1): "pause" always
    * wins over anything the text alone would suggest.
    */
-  readonly supportGateTier: SupportGateTier;
+  readonly supportGateTier: CommitmentSupportGateTier;
   /**
    * Whatever possibilities are already named in this conversation, if
    * any — used only for referent resolution (§8), never mutated.
